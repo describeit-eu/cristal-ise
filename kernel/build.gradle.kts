@@ -3,7 +3,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 plugins {
     application
-    id("com.github.johnrengelman.shadow")
 }
 
 val mainVerticleName = "eu.describeit.cristalise.kernel.MainVerticle"
@@ -24,6 +23,7 @@ dependencies {
 
     testImplementation("io.vertx:vertx-junit5")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<ShadowJar> {
