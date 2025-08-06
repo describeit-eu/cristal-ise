@@ -1,3 +1,3 @@
-rootProject.name = "cristalise"
+rootProject.name = "cristal-ise"
 
 include("kernel")
