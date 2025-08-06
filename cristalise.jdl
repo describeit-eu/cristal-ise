@@ -1,0 +1,103 @@
+entity DomainPath {
+  path String
+}
+
+entity Item {
+  uuid UUID
+  name String
+  type String
+  version String
+}
+
+entity Collection {
+  name String
+  version String
+  properties TextBlob //json
+}
+
+entity CollectionMember {
+  childItem UUID
+  properties TextBlob //json
+}
+
+entity Action {
+  name String
+  path String
+  version String
+  properties TextBlob //json
+  // stateMachine TextBlob // json
+
+  isComposite Boolean
+  layout TextBlob //json
+}
+
+entity Job {
+  actionName String
+  actionName String
+  transition String
+}
+
+entity Event {
+  itemVersion String
+  actionDesc UUID
+  actionDescVersion String
+  script UUID
+  scriptVersion String
+  stateMachineDesc UUID
+  stateMachineVersion String
+
+  userLogin String
+  timestamp Instant
+}
+
+entity Outcome {
+  schema UUID
+  schemaVersion String
+
+  data TextBlob //json
+}
+
+entity Attachment {
+  name String
+  type String
+  fileName String
+
+  data Blob
+}
+
+entity ItemProperty {
+  name String
+  value String
+  isMutable Boolean
+}
+
+entity ViewPoint {
+  schema UUID
+  schemaVersion String
+  schemaName String
+  name String
+}
+
+relationship OneToMany {
+  Item{collections} to Collection
+  Item{properties} to ItemProperty
+  Item{jobs} to Job
+  Item{history} to Event
+  Item{viewPoints} to ViewPoint
+  Action{children} to Action{parent}
+  Collection{members} to CollectionMember
+  Event{outcomes} to Outcome
+  Outcome{attachments} to Attachment
+}
+
+relationship ManyToOne {
+  DomainPath{item} to Item{pathes}
+}
+
+relationship OneToOne {
+  Item{lifeCycle} to Action
+  ViewPoint{outcome} to Outcome
+}
+
+paginate Item with pagination
+paginate Event with pagination
