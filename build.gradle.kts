@@ -1,3 +1,5 @@
+import org.gradle.api.JavaVersion.VERSION_21
+
 // Root project build file
 plugins {
   id("com.github.johnrengelman.shadow") version "7.1.2" apply false
@@ -5,7 +7,6 @@ plugins {
 
 val vertxVersion  = "5.0.2"
 val junitVersion  = "5.13.4"
-val groovyVersion = "4.0.28"
 
 allprojects {
   group = "eu.describeit"
@@ -14,20 +15,20 @@ allprojects {
   repositories {
     mavenCentral()
   }
+
 }
 
 subprojects {
-  apply(plugin = "groovy")
+  apply(plugin = "java")
 
   dependencies {
     add("implementation", platform("io.vertx:vertx-stack-depchain:$vertxVersion"))
-    add("implementation", platform("org.apache.groovy:groovy-bom:$groovyVersion"))
 
     add("testImplementation", platform("org.junit:junit-bom:$junitVersion"))
   }
 
   tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_21.toString()
-    targetCompatibility = JavaVersion.VERSION_21.toString()
+    sourceCompatibility = VERSION_21.toString()
+    targetCompatibility = VERSION_21.toString()
   }
 }

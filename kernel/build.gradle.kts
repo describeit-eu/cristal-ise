@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
-import org.gradle.api.tasks.compile.GroovyCompile
 
 plugins {
     application
@@ -22,10 +21,8 @@ dependencies {
   implementation("io.vertx:vertx-pg-client")
   implementation("io.vertx:vertx-auth-properties")
   implementation("io.vertx:vertx-hazelcast")
-  annotationProcessor("io.vertx:vertx-codegen:processor")
+  annotationProcessor("io.vertx:vertx-codegen:5.0.2:processor")
 
-  // Groovy dependencies
-  implementation("org.apache.groovy:groovy")
 
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter")
@@ -49,11 +46,4 @@ tasks.withType<Test> {
 
 tasks.withType<JavaExec> {
     args = listOf(mainVerticleName)
-}
-
-// Configure Groovy compilation
-tasks.withType<GroovyCompile> {
-    sourceCompatibility = JavaVersion.VERSION_21.toString()
-    targetCompatibility = JavaVersion.VERSION_21.toString()
-    options.encoding = "UTF-8"
 }
