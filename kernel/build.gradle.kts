@@ -2,18 +2,21 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 plugins {
-    application
+  application
+  id("io.freefair.lombok")
 }
 
 val mainVerticleName = "eu.describeit.cristalise.kernel.MainVerticle"
 val launcherClassName = "io.vertx.launcher.application.VertxApplication"
 
 application {
-    mainClass.set(launcherClassName)
+  mainClass.set(launcherClassName)
 }
 
 dependencies {
   // Vert.x dependencies
+  annotationProcessor("io.vertx:vertx-codegen:5.0.2:processor")
+  implementation("io.vertx:vertx-core")
   implementation("io.vertx:vertx-launcher-application")
   implementation("io.vertx:vertx-jdbc-client")
   implementation("io.vertx:vertx-service-proxy")
@@ -21,8 +24,6 @@ dependencies {
   implementation("io.vertx:vertx-pg-client")
   implementation("io.vertx:vertx-auth-properties")
   implementation("io.vertx:vertx-hazelcast")
-  annotationProcessor("io.vertx:vertx-codegen:5.0.2:processor")
-
 
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter")

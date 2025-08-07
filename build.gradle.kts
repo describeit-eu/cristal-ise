@@ -3,6 +3,7 @@ import org.gradle.api.JavaVersion.VERSION_21
 // Root project build file
 plugins {
   id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+  id("io.freefair.lombok") version "8.14" apply false
 }
 
 val vertxVersion  = "5.0.2"
