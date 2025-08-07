@@ -1,0 +1,27 @@
+package eu.describeit.cristalise.kernel.persistency.domain;
+
+import io.vertx.codegen.format.SnakeCase;
+import io.vertx.codegen.json.annotations.JsonGen;
+import io.vertx.core.json.JsonObject;
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.sqlclient.templates.annotations.ParametersMapped;
+import io.vertx.sqlclient.templates.annotations.RowMapped;
+
+import java.util.UUID;
+
+/**
+ * Item data object representing the item table in the database.
+ */
+@DataObject
+@JsonGen
+@RowMapped(formatter = SnakeCase.class)
+@ParametersMapped(formatter = SnakeCase.class)
+public class ItemDO {
+  public ItemDO(JsonObject json) { ItemDOConverter.fromJson(json, this); }
+
+  private Long id;
+  private UUID uuid;
+  private String name;
+  private String type;
+  private String version;
+}

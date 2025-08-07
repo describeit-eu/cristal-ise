@@ -6,8 +6,9 @@ plugins {
   id("io.freefair.lombok") version "8.14" apply false
 }
 
-val vertxVersion  = "5.0.2"
-val junitVersion  = "5.13.4"
+val vertxVersion   = "5.0.2"
+val junitVersion   = "5.13.4"
+val jacksonVersion = "2.19.2"
 
 allprojects {
   group = "eu.describeit"
@@ -16,7 +17,6 @@ allprojects {
   repositories {
     mavenCentral()
   }
-
 }
 
 subprojects {
@@ -24,6 +24,7 @@ subprojects {
 
   dependencies {
     add("implementation", platform("io.vertx:vertx-stack-depchain:$vertxVersion"))
+    add("implementation", platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
 
     add("testImplementation", platform("org.junit:junit-bom:$junitVersion"))
   }
