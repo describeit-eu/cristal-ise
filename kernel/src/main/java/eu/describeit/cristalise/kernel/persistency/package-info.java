@@ -1,4 +1,4 @@
-@ModuleGen(name = "storage", groupPackage = "eu.describeit.cristalise.kernel.persistency")
+@ModuleGen(name = "cristalise-persistency", groupPackage = "eu.describeit.cristalise.kernel.persistency")
 
 package eu.describeit.cristalise.kernel.persistency;
 

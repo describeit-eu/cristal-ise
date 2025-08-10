@@ -6,6 +6,10 @@ import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,6 +17,9 @@ import java.util.UUID;
 @JsonGen
 @RowMapped(formatter = SnakeCase.class)
 @ParametersMapped(formatter = SnakeCase.class)
+@NoArgsConstructor
+@Data
+@Accessors(fluent = true)
 public class EventDO {
   public EventDO(JsonObject json) { EventDOConverter.fromJson(json, this); }
 

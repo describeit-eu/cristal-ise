@@ -6,6 +6,9 @@ import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
@@ -13,6 +16,9 @@ import java.util.UUID;
 @JsonGen
 @RowMapped(formatter = SnakeCase.class)
 @ParametersMapped(formatter = SnakeCase.class)
+@NoArgsConstructor
+@Data
+@Accessors(fluent = true)
 public class ViewPointDO {
   public ViewPointDO(JsonObject json) { ViewPointDOConverter.fromJson(json, this); }
 
