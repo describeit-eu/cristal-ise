@@ -3,7 +3,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 val vertxVersion   = "5.0.2"
 val junitVersion   = "5.13.4"
-val jacksonVersion = "2.19.2"
+val slf4jVersion   = "2.0.17"
+val logbackVersion = "1.5.18"
 
 plugins {
   application
@@ -33,14 +34,14 @@ dependencies {
 
   // Vert.x codegen dependencies
   compileOnly("io.vertx:vertx-codegen-json")
-  compileOnly("com.fasterxml.jackson.core:jackson-databind")
-  compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
   annotationProcessor("io.vertx:vertx-codegen:$vertxVersion:processor")
   annotationProcessor("io.vertx:vertx-sql-client-templates:$vertxVersion")
 
-//  implementation("org.slf4j:slf4j-api:2.0.12")
-//  implementation("qos.logback:logback-classic:1.5.3")
+  // Logging dependencies
+  implementation("org.slf4j:slf4j-api:$slf4jVersion")
+  implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
+  // Test dependencies
   platform("org.junit:junit-bom:$junitVersion")
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter")
