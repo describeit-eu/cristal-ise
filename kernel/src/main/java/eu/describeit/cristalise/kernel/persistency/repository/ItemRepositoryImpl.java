@@ -14,6 +14,16 @@ public class ItemRepositoryImpl implements ItemRepository {
 
   private final SqlClient client;
 
+  private static final String TABLE = "item";
+  private static final String COLUMNS = "id, uuid, name, type, version";
+  private static final String SQL_FIND_BY_ID     = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_FIND_BY_UUID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE uuid=#{uuid}";
+  private static final String SQL_FIND_ALL       = "SELECT " + COLUMNS + " FROM " + TABLE;
+  private static final String SQL_INSERT         = "INSERT INTO " + TABLE + " (uuid, name, type, version) VALUES (#{uuid}, #{name}, #{type}, #{version}) RETURNING " + COLUMNS;
+  private static final String SQL_UPDATE         = "UPDATE " + TABLE + " SET uuid=#{uuid}, name=#{name}, type=#{type}, version=#{version} WHERE id=#{id} RETURNING " + COLUMNS;
+  private static final String SQL_DELETE_BY_ID   = "DELETE FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_DELETE_BY_UUID = "DELETE FROM " + TABLE + " WHERE uuid=#{uuid}";
+
   public ItemRepositoryImpl(SqlClient client) {
     this.client = client;
   }
@@ -22,7 +32,7 @@ public class ItemRepositoryImpl implements ItemRepository {
   public Future<Optional<ItemDO>> findById(Long id) {
     Map<String, Object> params = Collections.singletonMap("id", id);
     return SqlTemplate
-      .forQuery(client, "SELECT id, uuid, name, type, version FROM item WHERE id=#{id}")
+      .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(params)
       .map(this::firstOptional);
@@ -32,7 +42,7 @@ public class ItemRepositoryImpl implements ItemRepository {
   public Future<Optional<ItemDO>> findByUuid(UUID uuid) {
     Map<String, Object> params = Collections.singletonMap("uuid", uuid);
     return SqlTemplate
-      .forQuery(client, "SELECT id, uuid, name, type, version FROM item WHERE uuid=#{uuid}")
+      .forQuery(client, SQL_FIND_BY_UUID)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(params)
       .map(this::firstOptional);
@@ -41,7 +51,7 @@ public class ItemRepositoryImpl implements ItemRepository {
   @Override
   public Future<List<ItemDO>> findAll() {
     return SqlTemplate
-      .forQuery(client, "SELECT id, uuid, name, type, version FROM item ORDER BY id")
+      .forQuery(client, SQL_FIND_ALL)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
       .map(rs -> {
@@ -55,11 +65,8 @@ public class ItemRepositoryImpl implements ItemRepository {
 
   @Override
   public Future<ItemDO> insert(ItemDO item) {
-    // Use forQuery with RETURNING to map back to ItemDO
-    String sql = "INSERT INTO item (uuid, name, type, version) VALUES (#{uuid}, #{name}, #{type}, #{version}) " +
-                 "RETURNING id, uuid, name, type, version";
     return SqlTemplate
-      .forQuery(client, sql)
+      .forQuery(client, SQL_INSERT)
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
@@ -72,10 +79,8 @@ public class ItemRepositoryImpl implements ItemRepository {
 
   @Override
   public Future<Optional<ItemDO>> update(ItemDO item) {
-    String sql = "UPDATE item SET uuid=#{uuid}, name=#{name}, type=#{type}, version=#{version} WHERE id=#{id} " +
-                 "RETURNING id, uuid, name, type, version";
     return SqlTemplate
-      .forQuery(client, sql)
+      .forQuery(client, SQL_UPDATE)
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
@@ -86,7 +91,7 @@ public class ItemRepositoryImpl implements ItemRepository {
   public Future<Integer> deleteById(Long id) {
     Map<String, Object> params = Collections.singletonMap("id", id);
     return SqlTemplate
-      .forUpdate(client, "DELETE FROM item WHERE id=#{id}")
+      .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(params)
       .map(rs -> rs.rowCount());
   }
@@ -95,7 +100,7 @@ public class ItemRepositoryImpl implements ItemRepository {
   public Future<Integer> deleteByUuid(UUID uuid) {
     Map<String, Object> params = Collections.singletonMap("uuid", uuid);
     return SqlTemplate
-      .forUpdate(client, "DELETE FROM item WHERE uuid=#{uuid}")
+      .forUpdate(client, SQL_DELETE_BY_UUID)
       .execute(params)
       .map(rs -> rs.rowCount());
   }
