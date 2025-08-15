@@ -5,6 +5,7 @@ import eu.describeit.cristalise.kernel.persistency.domain.ItemDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.ItemDORowMapper;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.RowSet;
+import io.vertx.sqlclient.SqlResult;
 import io.vertx.sqlclient.templates.SqlTemplate;
 import io.vertx.sqlclient.SqlClient;
 
@@ -93,7 +94,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(params)
-      .map(rs -> rs.rowCount());
+      .map(SqlResult::rowCount);
   }
 
   @Override
@@ -102,7 +103,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_UUID)
       .execute(params)
-      .map(rs -> rs.rowCount());
+      .map(SqlResult::rowCount);
   }
 
   private Optional<ItemDO> firstOptional(Iterable<ItemDO> rs) {

@@ -1,3 +1,5 @@
+kernel/src/test/docker/database/
+
 ### Vert.x ###
 .vertx/
 

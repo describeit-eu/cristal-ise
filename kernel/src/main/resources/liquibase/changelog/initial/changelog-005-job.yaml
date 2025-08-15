@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: "005-create-job"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: job
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: action_path
+                  type: varchar(1023)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transition
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: job
+            constraintName: fk_job_item
+            referencedColumnNames: id
+            referencedTableName: item

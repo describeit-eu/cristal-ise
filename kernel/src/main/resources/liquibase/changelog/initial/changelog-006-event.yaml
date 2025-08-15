@@ -1,0 +1,76 @@
+databaseChangeLog:
+  - changeSet:
+      id: "006-create-event"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: event
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: item_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_desc
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_desc_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: script
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: script_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state_machine_desc
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state_machine_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_login
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_properties
+                  type: jsonb
+                  constraints:
+                    nullable: true
+              - column:
+                  name: item_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: action
+            constraintName: fk_event_item
+            referencedColumnNames: id
+            referencedTableName: item

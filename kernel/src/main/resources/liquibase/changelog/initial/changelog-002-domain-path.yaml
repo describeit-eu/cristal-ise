@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: "002-create-domain-path"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: domain_path
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: path
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: domain_path
+            constraintName: fk_domain_path_item
+            referencedColumnNames: id
+            referencedTableName: item

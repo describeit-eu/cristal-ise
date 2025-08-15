@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: "010-create-viewpoint"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: view_point
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: schema
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: schema_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: schema_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: outcome_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: item_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: outcome_id
+            baseTableName: view_point
+            constraintName: fk_viewpoint_outcome
+            referencedColumnNames: id
+            referencedTableName: outcome
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: view_point
+            constraintName: fk_viewpoint_item
+            referencedColumnNames: id
+            referencedTableName: item

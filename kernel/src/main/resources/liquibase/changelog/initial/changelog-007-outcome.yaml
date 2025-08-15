@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: "007-create-outcome"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: outcome
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: schema
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: schema_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data
+                  type: jsonb
+                  constraints:
+                    nullable: true
+              - column:
+                  name: event_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: event_id
+            baseTableName: outcome
+            constraintName: fk_outcome_event
+            referencedColumnNames: id
+            referencedTableName: event

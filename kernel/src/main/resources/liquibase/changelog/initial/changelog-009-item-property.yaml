@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: "009-create-item-property"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: item_property
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_mutable
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: item_property
+            constraintName: fk_itemproperty_item
+            referencedColumnNames: id
+            referencedTableName: item

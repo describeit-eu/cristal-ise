@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: "008-create-attachment"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: attachment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data
+                  type: blob
+                  constraints:
+                    nullable: true
+              - column:
+                  name: outcome_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseColumnNames: outcome_id
+            baseTableName: attachment
+            constraintName: fk_attachment_outcome
+            referencedColumnNames: id
+            referencedTableName: outcome

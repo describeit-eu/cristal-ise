@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres-test
+    network_mode: host
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cristalise
+    volumes:
+      - ./database:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  liquibase:
+    image: liquibase/liquibase:4.33
+    container_name: liquibase-test
+    network_mode: host
+    command: update
+    environment:
+      - LIQUIBASE_COMMAND_DRIVER=org.postgresql.Driver
+      - LIQUIBASE_COMMAND_URL=jdbc:postgresql://localhost:5432/cristalise
+      - LIQUIBASE_COMMAND_USERNAME=postgres
+      - LIQUIBASE_COMMAND_PASSWORD=postgres
+      - LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME=public
+      - LIQUIBASE_COMMAND_CHANGELOG_FILE=changelog/changelog-master.yaml
+      - LIQUIBASE_LOG_LEVEL=INFO
+    volumes:
+      - ../../main/resources/liquibase/changelog:/liquibase/changelog
+    depends_on:
+      postgres:
+        condition: service_healthy

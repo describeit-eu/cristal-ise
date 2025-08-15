@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: "004-create-action"
+      author: "kovax"
+      changes:
+        - createTable:
+            tableName: action
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: path
+                  type: varchar(1023)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: properties
+                  type: jsonb
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_composite
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: layout
+                  type: jsonb
+                  constraints:
+                    nullable: true
+              - column:
+                  name: parent_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: item_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: parent_id
+            baseTableName: action
+            constraintName: fk_action_parent
+            referencedColumnNames: id
+            referencedTableName: action
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: action
+            constraintName: fk_action_item
+            referencedColumnNames: id
+            referencedTableName: item
