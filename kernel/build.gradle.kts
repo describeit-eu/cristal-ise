@@ -31,6 +31,7 @@ dependencies {
   implementation("io.vertx:vertx-pg-client")
 //  implementation("io.vertx:vertx-auth-properties")
 //  implementation("io.vertx:vertx-hazelcast")
+  implementation("org.postgresql:postgresql:42.7.4")
 
   // Vert.x codegen dependencies
   compileOnly("io.vertx:vertx-codegen-json")
@@ -46,6 +47,11 @@ dependencies {
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+  // Integration testing: Testcontainers + Liquibase + PostgreSQL JDBC
+  testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+  testImplementation("org.testcontainers:postgresql:1.21.3")
+  testImplementation("org.liquibase:liquibase-core:4.33.0")
 }
 
 //tasks.withType<ShadowJar> {

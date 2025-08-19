@@ -6,9 +6,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
@@ -20,8 +20,8 @@ import java.util.UUID;
 @RowMapped(formatter = SnakeCase.class)
 @ParametersMapped(formatter = SnakeCase.class)
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-@Accessors(fluent = true)
 public class ItemDO {
   public ItemDO(JsonObject json) { ItemDOConverter.fromJson(json, this); }
 

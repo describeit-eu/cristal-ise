@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: "001-item-test-data"
+      author: "kovax"
+      #context: "testData"
+      changes:
+        - loadData:
+            file: data/item.csv
+            separator: ";"
+            tableName: item
+            encoding: UTF-8
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+              - column:
+                  name: uuid
+                  type: uuid
+              - column:
+                  name: name
+                  type: string
+              - column:
+                  name: version
+                  type: string
