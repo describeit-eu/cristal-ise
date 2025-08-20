@@ -68,8 +68,9 @@ public class ItemRepositoryImpl implements ItemRepository {
       .execute(item)
       .compose(rowSet -> {
         Iterator<ItemDO> it = rowSet.iterator();
+
         if (it.hasNext()) return Future.succeededFuture(it.next());
-        return Future.failedFuture("Insert did not return a row");
+        else              return Future.failedFuture("Insert did not return a row uuid:"+item.getUuid());
       });
   }
 

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
@@ -20,22 +19,34 @@ import java.util.concurrent.CompletableFuture;
 import static eu.describeit.cristalise.kernel.persistency.utils.DatabaseTestUtils.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @Testcontainers(disabledWithoutDocker = true)
 @TestInstance(Lifecycle.PER_CLASS)
 class ItemRepositoryIT {
 
-  @Container
   private PostgreSQLContainer<?> pgContainer;
 
   private Vertx vertx;
   private Pool pool;
   private ItemRepository repository;
 
+  final UUID uuidZero = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+  // to be found
+  final long idBudapest = 1L;
+  final UUID uuidBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
+
+  // to be updated
+  final UUID uuidDelhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d");
+
+  // to be deleted
+  final UUID uuidLondon = UUID.fromString("04a71ecd-7cda-439f-bf6e-6517a824f753");
+  final long idParis = 2L;
+
   @BeforeAll
   void setUpAll() throws Exception {
-    // Init Vert.x and PgPool client
     vertx = Vertx.vertx();
     pgContainer = getPGContainer();
     pgContainer.start();
@@ -103,98 +114,83 @@ class ItemRepositoryIT {
   }
 
   @Test
-  void testFindByUuid() {
-    var uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    //var uuid = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
-    Optional<ItemDO> foundByUuid = await(repository.findByUuid(uuid));
+  void testFindBy() {
+    var nameBudapest = "Budapest";
+    var typeBudapest = "City";
+    var versionBudapest = "v1";
+
+    // use findByUuid
+    Optional<ItemDO> foundByUuid = await(repository.findByUuid(uuidBudapest));
 
     assertTrue(foundByUuid.isPresent());
-    var item = foundByUuid.get();
+    var itemByUuid = foundByUuid.get();
 
-    assertEquals(uuid, item.getUuid());
-    assertEquals(1, item.getId());
-    assertEquals("Budapest", item.getName());
-    assertEquals("Country", item.getType());
-    assertEquals("v1", item.getVersion());
+    assertEquals(uuidBudapest,    itemByUuid.getUuid());
+    assertEquals(idBudapest,      itemByUuid.getId());
+    assertEquals(nameBudapest,    itemByUuid.getName());
+    assertEquals(typeBudapest,    itemByUuid.getType());
+    assertEquals(versionBudapest, itemByUuid.getVersion());
+
+    // use findById and compare it with findByUuid
+    Optional<ItemDO> foundById = await(repository.findById(idBudapest));
+
+    assertTrue(foundById.isPresent());
+    var itemById = foundById.get();
+
+    assertEquals(itemByUuid, itemById);
+
+    // test non-existent item
+    Optional<ItemDO> noneExistent = await(repository.findByUuid(uuidZero));
+    assertTrue(noneExistent.isEmpty());
+  }
+
+  @Test
+  void testFindAll() {
+    List<ItemDO> foundItems = await(repository.findAll());
+    assertTrue(foundItems.size() >= 8, "There should be at least 8 cities in the database");
   }
 
   @Test
   void testInsert() {
-    ItemDO toInsert = new ItemDO(100L, UUID.randomUUID(), "name-1", "type-A", "v1");
+    ItemDO toInsert = new ItemDO(UUID.randomUUID(), "Tokyo", "megaCity", "v1.1");
 
-    ItemDO inserted = await(repository.insert(toInsert));
+    ItemDO cityTokyo = await(repository.insert(toInsert));
 
-    assertNotNull(inserted);
-    assertNotNull(inserted.getId(), "Inserted item should have generated id");
-    assertEquals(toInsert.getUuid(), inserted.getUuid());
-    assertEquals("name-1", inserted.getName());
+    assertNotNull(cityTokyo);
+    assertNotNull(cityTokyo.getId(), "Tokyo item should have generated id");
+
+    assertEquals(toInsert.getUuid(),    cityTokyo.getUuid());
+    assertEquals(toInsert.getName(),    cityTokyo.getName());
+    assertEquals(toInsert.getType(),    cityTokyo.getType());
+    assertEquals(toInsert.getVersion(), cityTokyo.getVersion());
   }
 
-  /*
   @Test
-  void testCrudOperations() {
-    // Initially empty
-    List<ItemDO> allBefore = await(repository.findAll());
-    assertNotNull(allBefore);
+  void testUpdate() {
+    ItemDO cityDelhi = await(repository.findByUuid(uuidDelhi)).get();
+    cityDelhi.setName("Mumbai");
 
-    // Insert
-    ItemDO toInsert = new ItemDO()
-      .uuid(UUID.randomUUID())
-      .name("name-1")
-      .type("type-A")
-      .version("v1");
+    ItemDO cityMumbai= await(repository.update(cityDelhi)).get();
 
-    ItemDO inserted = await(repository.insert(toInsert));
-    assertNotNull(inserted);
-    assertNotNull(inserted.id(), "Inserted item should have generated id");
-    assertEquals(toInsert.uuid(), inserted.uuid());
-    assertEquals("name-1", inserted.name());
-
-    // Find by id
-    Optional<ItemDO> foundById = await(repository.findById(inserted.id()));
-    assertTrue(foundById.isPresent());
-    assertEquals(inserted.uuid(), foundById.get().uuid());
-
-    // Find by uuid
-    Optional<ItemDO> foundByUuid = await(repository.findByUuid(inserted.uuid()));
-    assertTrue(foundByUuid.isPresent());
-    assertEquals(inserted.id(), item.id());
-
-    // Find all should contain at least one
-    List<ItemDO> all = await(repository.findAll());
-    assertTrue(all.size() >= 1);
-
-    // Update
-    ItemDO toUpdate = new ItemDO()
-      .id(inserted.id())
-      .uuid(inserted.uuid())
-      .name("name-2")
-      .type("type-A")
-      .version("v2");
-
-    Optional<ItemDO> updatedOpt = await(repository.update(toUpdate));
-    assertTrue(updatedOpt.isPresent());
-    ItemDO updated = updatedOpt.get();
-    assertEquals(inserted.id(), updated.id());
-    assertEquals("name-2", updated.name());
-    assertEquals("v2", updated.version());
-
-    // Delete by id
-    Integer rows = await(repository.deleteById(updated.id()));
-    assertEquals(1, rows);
-
-    Optional<ItemDO> afterDelete = await(repository.findById(updated.id()));
-    assertTrue(afterDelete.isEmpty());
-
-    // Insert again and delete by uuid
-    ItemDO again = await(repository.insert(new ItemDO()
-      .uuid(UUID.randomUUID()).name("again").type("type-B").version("v1")));
-
-    Integer rowsByUuid = await(repository.deleteByUuid(again.uuid()));
-    assertEquals(1, rowsByUuid);
-
-    Optional<ItemDO> afterDeleteUuid = await(repository.findByUuid(again.uuid()));
-    assertTrue(afterDeleteUuid.isEmpty());
+    assertEquals("Mumbai", cityMumbai.getName());
+    assertEquals(cityDelhi, cityMumbai  );
   }
-*/
+
+  @Test
+  void testDeleteById() {
+    var rowsById = await(repository.deleteById(idParis));
+    assertEquals(1, rowsById);
+
+    Optional<ItemDO> afterDelete = await(repository.findById(idParis));
+    assertTrue(afterDelete.isEmpty());
+  }
+
+  @Test
+  void testDeleteByUuid() {
+    var rowsById = await(repository.deleteByUuid(uuidLondon));
+    assertEquals(1, rowsById);
+
+    Optional<ItemDO> afterDelete = await(repository.findByUuid(uuidLondon));
+    assertTrue(afterDelete.isEmpty());
+  }
 }
