@@ -30,7 +30,7 @@ public class AttachmentRepositoryImpl implements AttachmentRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(AttachmentDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -39,11 +39,7 @@ public class AttachmentRepositoryImpl implements AttachmentRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(AttachmentDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<AttachmentDO> list = new ArrayList<>();
-        for (AttachmentDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -53,11 +49,7 @@ public class AttachmentRepositoryImpl implements AttachmentRepository {
       .mapFrom(AttachmentDOParametersMapper.INSTANCE)
       .mapTo(AttachmentDORowMapper.INSTANCE)
       .execute(attachment)
-      .compose(rowSet -> {
-        Iterator<AttachmentDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for attachment name:"+attachment.getName());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for attachment name:"+attachment.getName()));
   }
 
   @Override
@@ -67,7 +59,7 @@ public class AttachmentRepositoryImpl implements AttachmentRepository {
       .mapFrom(AttachmentDOParametersMapper.INSTANCE)
       .mapTo(AttachmentDORowMapper.INSTANCE)
       .execute(attachment)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -76,10 +68,5 @@ public class AttachmentRepositoryImpl implements AttachmentRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<AttachmentDO> firstOptional(Iterable<AttachmentDO> rs) {
-    Iterator<AttachmentDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

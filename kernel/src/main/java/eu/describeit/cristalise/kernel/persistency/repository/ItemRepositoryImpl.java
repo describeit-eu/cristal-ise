@@ -34,7 +34,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -43,7 +43,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .forQuery(client, SQL_FIND_BY_UUID)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("uuid", uuid))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -52,11 +52,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<ItemDO> list = new ArrayList<>();
-        for (ItemDO item : rowSet) list.add(item);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -66,12 +62,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
-      .compose(rowSet -> {
-        Iterator<ItemDO> it = rowSet.iterator();
-
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row uuid:"+item.getUuid());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row uuid:"+item.getUuid()));
   }
 
   @Override
@@ -81,7 +72,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -98,10 +89,5 @@ public class ItemRepositoryImpl implements ItemRepository {
       .forUpdate(client, SQL_DELETE_BY_UUID)
       .execute( Collections.singletonMap("uuid", uuid))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<ItemDO> firstOptional(Iterable<ItemDO> rs) {
-    Iterator<ItemDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

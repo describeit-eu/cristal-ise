@@ -30,7 +30,7 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -39,11 +39,7 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<OutcomeDO> list = new ArrayList<>();
-        for (OutcomeDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -53,11 +49,7 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .mapFrom(OutcomeDOParametersMapper.INSTANCE)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(outcome)
-      .compose(rowSet -> {
-        Iterator<OutcomeDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for outcome id:"+outcome.getId());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for outcome id:"+outcome.getId()));
   }
 
   @Override
@@ -67,7 +59,7 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .mapFrom(OutcomeDOParametersMapper.INSTANCE)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(outcome)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -76,10 +68,5 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<OutcomeDO> firstOptional(Iterable<OutcomeDO> rs) {
-    Iterator<OutcomeDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

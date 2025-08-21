@@ -30,7 +30,7 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -39,11 +39,7 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<ItemPropertyDO> list = new ArrayList<>();
-        for (ItemPropertyDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -53,11 +49,7 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .mapFrom(ItemPropertyDOParametersMapper.INSTANCE)
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(itemProperty)
-      .compose(rowSet -> {
-        Iterator<ItemPropertyDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for item_property name:"+itemProperty.getName());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for item_property name:"+itemProperty.getName()));
   }
 
   @Override
@@ -67,7 +59,7 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .mapFrom(ItemPropertyDOParametersMapper.INSTANCE)
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(itemProperty)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -76,10 +68,5 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<ItemPropertyDO> firstOptional(Iterable<ItemPropertyDO> rs) {
-    Iterator<ItemPropertyDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

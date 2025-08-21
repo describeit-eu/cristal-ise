@@ -30,7 +30,7 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override

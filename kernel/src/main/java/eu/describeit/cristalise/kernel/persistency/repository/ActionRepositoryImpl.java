@@ -31,7 +31,7 @@ public class ActionRepositoryImpl implements ActionRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ActionDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -40,11 +40,7 @@ public class ActionRepositoryImpl implements ActionRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(ActionDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<ActionDO> list = new ArrayList<>();
-        for (ActionDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -54,11 +50,7 @@ public class ActionRepositoryImpl implements ActionRepository {
       .mapFrom(ActionDOParametersMapper.INSTANCE)
       .mapTo(ActionDORowMapper.INSTANCE)
       .execute(action)
-      .compose(rowSet -> {
-        Iterator<ActionDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for action name:"+action.getName());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for action name:"+action.getName()));
   }
 
   @Override
@@ -68,7 +60,7 @@ public class ActionRepositoryImpl implements ActionRepository {
       .mapFrom(ActionDOParametersMapper.INSTANCE)
       .mapTo(ActionDORowMapper.INSTANCE)
       .execute(action)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -77,10 +69,5 @@ public class ActionRepositoryImpl implements ActionRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<ActionDO> firstOptional(Iterable<ActionDO> rs) {
-    Iterator<ActionDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

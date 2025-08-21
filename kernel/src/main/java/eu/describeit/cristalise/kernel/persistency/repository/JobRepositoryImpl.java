@@ -32,7 +32,7 @@ public class JobRepositoryImpl implements JobRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(JobDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -41,11 +41,7 @@ public class JobRepositoryImpl implements JobRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(JobDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<JobDO> list = new ArrayList<>();
-        for (JobDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -55,13 +51,7 @@ public class JobRepositoryImpl implements JobRepository {
       .mapFrom(JobDOParametersMapper.INSTANCE)
       .mapTo(JobDORowMapper.INSTANCE)
       .execute(job)
-      .compose(rowSet -> {
-        // Since RETURNING uses raw column names, we need to adapt: map result to JobDO using row mapper expects aliases, but we used RETURNING without alias.
-        // However, mapTo with RowMapper will map by position; for safety, we better change to query instead. So execute as query with RETURNING.
-        Iterator<JobDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for job item:"+job.getItemId());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for job item:"+job.getItemId()));
   }
 
   @Override
@@ -71,7 +61,7 @@ public class JobRepositoryImpl implements JobRepository {
       .mapFrom(JobDOParametersMapper.INSTANCE)
       .mapTo(JobDORowMapper.INSTANCE)
       .execute(job)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -80,10 +70,5 @@ public class JobRepositoryImpl implements JobRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<JobDO> firstOptional(Iterable<JobDO> rs) {
-    Iterator<JobDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

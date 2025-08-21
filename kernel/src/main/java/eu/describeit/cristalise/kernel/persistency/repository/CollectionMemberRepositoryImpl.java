@@ -30,7 +30,7 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -39,11 +39,7 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<CollectionMemberDO> list = new ArrayList<>();
-        for (CollectionMemberDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -53,11 +49,7 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .mapFrom(CollectionMemberDOParametersMapper.INSTANCE)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(member)
-      .compose(rowSet -> {
-        Iterator<CollectionMemberDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for collection_member id:"+member.getCollectionId());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for collection_member id:"+member.getCollectionId()));
   }
 
   @Override
@@ -67,7 +59,7 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .mapFrom(CollectionMemberDOParametersMapper.INSTANCE)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(member)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -76,10 +68,5 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<CollectionMemberDO> firstOptional(Iterable<CollectionMemberDO> rs) {
-    Iterator<CollectionMemberDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

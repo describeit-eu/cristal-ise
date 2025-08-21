@@ -30,7 +30,7 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -39,11 +39,7 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<CollectionDO> list = new ArrayList<>();
-        for (CollectionDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -53,11 +49,7 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .mapFrom(CollectionDOParametersMapper.INSTANCE)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(collection)
-      .compose(rowSet -> {
-        Iterator<CollectionDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for collection name:"+collection.getName());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for collection name:"+collection.getName()));
   }
 
   @Override
@@ -67,7 +59,7 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .mapFrom(CollectionDOParametersMapper.INSTANCE)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(collection)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -76,10 +68,5 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<CollectionDO> firstOptional(Iterable<CollectionDO> rs) {
-    Iterator<CollectionDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }

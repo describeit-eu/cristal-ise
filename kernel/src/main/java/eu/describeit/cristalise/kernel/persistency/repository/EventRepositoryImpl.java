@@ -30,7 +30,7 @@ public class EventRepositoryImpl implements EventRepository {
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -39,11 +39,7 @@ public class EventRepositoryImpl implements EventRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<EventDO> list = new ArrayList<>();
-        for (EventDO row : rowSet) list.add(row);
-        return list;
-      });
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -53,11 +49,7 @@ public class EventRepositoryImpl implements EventRepository {
       .mapFrom(EventDOParametersMapper.INSTANCE)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(event)
-      .compose(rowSet -> {
-        Iterator<EventDO> it = rowSet.iterator();
-        if (it.hasNext()) return Future.succeededFuture(it.next());
-        else              return Future.failedFuture("Insert did not return a row for event id:"+event.getId());
-      });
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for event id:"+event.getId()));
   }
 
   @Override
@@ -67,7 +59,7 @@ public class EventRepositoryImpl implements EventRepository {
       .mapFrom(EventDOParametersMapper.INSTANCE)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(event)
-      .map(this::firstOptional);
+      .map(RepositoryUtils::firstOptional);
   }
 
   @Override
@@ -76,10 +68,5 @@ public class EventRepositoryImpl implements EventRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
-  }
-
-  private Optional<EventDO> firstOptional(Iterable<EventDO> rs) {
-    Iterator<EventDO> it = rs.iterator();
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty();
   }
 }
