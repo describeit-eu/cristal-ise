@@ -37,6 +37,7 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             baseColumnNames: item_id
             baseTableName: item_property
-            constraintName: fk_itemproperty_item
+            constraintName: fk_itemProperty_item
             referencedColumnNames: id
             referencedTableName: item
+            onDelete: CASCADE

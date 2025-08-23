@@ -26,6 +26,6 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             baseColumnNames: item_id
             baseTableName: domain_path
-            constraintName: fk_domain_path_item
+            constraintName: fk_domainPath_item
             referencedColumnNames: id
             referencedTableName: item
