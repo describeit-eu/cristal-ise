@@ -21,18 +21,16 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   private ItemRepository repository;
 
-  final UUID uuidZero = UUID.fromString("00000000-0000-0000-0000-000000000000");
+  final UUID idZero = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
   // to be found
-  final long idBudapest = 1L;
-  final UUID uuidBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
+  final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
 
   // to be updated
-  final UUID uuidDelhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d");
+  final UUID idDelhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d");
 
   // to be deleted
-  final UUID uuidLondon = UUID.fromString("04a71ecd-7cda-439f-bf6e-6517a824f753");
-  final long idParis = 2L;
+  final UUID idParis = UUID.fromString("b42800c5-463f-4a9a-be7d-11c792856ced");
 
   @BeforeAll
   @Override
@@ -42,40 +40,33 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
-  void testFindBy() {
+  void testFindById() {
     var nameBudapest = "Budapest";
     var typeBudapest = "City";
     var versionBudapest = "v1";
 
     // use findByUuid
-    Optional<ItemDO> foundByUuid = await(repository.findByUuid(uuidBudapest));
+    Optional<ItemDO> foundByUuid = await(repository.findById(idBudapest));
 
     assertTrue(foundByUuid.isPresent());
     var itemByUuid = foundByUuid.get();
 
-    assertEquals(uuidBudapest,    itemByUuid.getUuid());
     assertEquals(idBudapest,      itemByUuid.getId());
     assertEquals(nameBudapest,    itemByUuid.getName());
     assertEquals(typeBudapest,    itemByUuid.getType());
     assertEquals(versionBudapest, itemByUuid.getVersion());
+  }
 
-    // use findById and compare it with findByUuid
-    Optional<ItemDO> foundById = await(repository.findById(idBudapest));
-
-    assertTrue(foundById.isPresent());
-    var itemById = foundById.get();
-
-    assertEquals(itemByUuid, itemById);
-
-    // test non-existent item
-    Optional<ItemDO> noneExistent = await(repository.findByUuid(uuidZero));
+  @Test
+  void testFindNoneExistent() {
+    Optional<ItemDO> noneExistent = await(repository.findById(idZero));
     assertTrue(noneExistent.isEmpty());
   }
 
   @Test
   void testFindAll() {
     List<ItemDO> foundItems = await(repository.findAll());
-    assertTrue(foundItems.size() >= 8, "There should be at least 8 cities in the database");
+    assertTrue(foundItems.size() >= 9, "There should be at least 8 cities in the database");
   }
 
   @Test
@@ -85,17 +76,12 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
     ItemDO cityTokyo = await(repository.insert(toInsert));
 
     assertNotNull(cityTokyo);
-    assertNotNull(cityTokyo.getId(), "Tokyo item should have generated id");
-
-    assertEquals(toInsert.getUuid(),    cityTokyo.getUuid());
-    assertEquals(toInsert.getName(),    cityTokyo.getName());
-    assertEquals(toInsert.getType(),    cityTokyo.getType());
-    assertEquals(toInsert.getVersion(), cityTokyo.getVersion());
+    assertEquals(toInsert, cityTokyo);
   }
 
   @Test
   void testUpdate() {
-    ItemDO cityDelhi = await(repository.findByUuid(uuidDelhi)).get();
+    ItemDO cityDelhi = await(repository.findById(idDelhi)).get();
     cityDelhi.setName("Mumbai");
 
     ItemDO cityMumbai= await(repository.update(cityDelhi)).get();
@@ -114,11 +100,8 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
-  void testDeleteByUuid() {
-    var rowsById = await(repository.deleteByUuid(uuidLondon));
-    assertEquals(1, rowsById);
-
-    Optional<ItemDO> afterDelete = await(repository.findByUuid(uuidLondon));
-    assertTrue(afterDelete.isEmpty());
+  void testDeleteNoneExistent() {
+    var rowsById = await(repository.deleteById(idZero));
+    assertEquals(0, rowsById);
   }
 }

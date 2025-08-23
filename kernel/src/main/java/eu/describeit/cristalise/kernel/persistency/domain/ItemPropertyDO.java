@@ -8,6 +8,7 @@ import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @DataObject
 @JsonGen
@@ -19,7 +20,7 @@ public final class ItemPropertyDO {
   public ItemPropertyDO() {}
 
   @java.beans.ConstructorProperties({"id", "name", "value", "isMutable", "itemId"})
-  public ItemPropertyDO(Long id, String name, String value, Boolean isMutable, Long itemId) {
+  public ItemPropertyDO(Long id, String name, String value, Boolean isMutable, UUID itemId) {
     this.id = id;
     this.name = name;
     this.value = value;
@@ -28,7 +29,7 @@ public final class ItemPropertyDO {
   }
 
   @java.beans.ConstructorProperties({"name", "value", "isMutable", "itemId"})
-  public ItemPropertyDO(String name, String value, Boolean isMutable, Long itemId) {
+  public ItemPropertyDO(String name, String value, Boolean isMutable, UUID itemId) {
     this(null, name, value, isMutable, itemId);
   }
 
@@ -61,17 +62,17 @@ public final class ItemPropertyDO {
   public ItemPropertyDO setName(String name) { this.name = name; return this; }
   public ItemPropertyDO setValue(String value) { this.value = value; return this; }
   public ItemPropertyDO setIsMutable(Boolean isMutable) { this.isMutable = isMutable; return this; }
-  public ItemPropertyDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public ItemPropertyDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getName() { return name; }
   public String getValue() { return value; }
   public Boolean getIsMutable() { return isMutable; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String name;
   private String value;
   private Boolean isMutable;
-  private Long itemId;
+  private UUID itemId;
 }

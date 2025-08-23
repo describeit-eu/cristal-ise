@@ -8,6 +8,7 @@ import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @DataObject
 @JsonGen
@@ -19,14 +20,14 @@ public final class DomainPathDO {
   public DomainPathDO() {}
 
   @java.beans.ConstructorProperties({"id", "path", "itemId"})
-  public DomainPathDO(Long id, String path, Long itemId) {
+  public DomainPathDO(Long id, String path, UUID itemId) {
     this.id = id;
     this.path = path;
     this.itemId = itemId;
   }
 
   @java.beans.ConstructorProperties({"path", "itemId"})
-  public DomainPathDO(String path, Long itemId) {
+  public DomainPathDO(String path, UUID itemId) {
     this(null, path, itemId);
   }
 
@@ -54,13 +55,13 @@ public final class DomainPathDO {
 
   public DomainPathDO setId(Long id) { this.id = id; return this; }
   public DomainPathDO setPath(String path) { this.path = path; return this; }
-  public DomainPathDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public DomainPathDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getPath() { return path; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String path;
-  private Long itemId;
+  private UUID itemId;
 }

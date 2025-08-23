@@ -21,7 +21,7 @@ public final class EventDO {
   public EventDO() {}
 
   @java.beans.ConstructorProperties({"id", "itemVersion", "actionDesc", "actionDescVersion", "script", "scriptVersion", "stateMachineDesc", "stateMachineVersion", "userLogin", "timestamp", "actionProperties", "itemId"})
-  public EventDO(Long id, String itemVersion, UUID actionDesc, String actionDescVersion, UUID script, String scriptVersion, UUID stateMachineDesc, String stateMachineVersion, String userLogin, LocalDateTime timestamp, String actionProperties, Long itemId) {
+  public EventDO(Long id, String itemVersion, UUID actionDesc, String actionDescVersion, UUID script, String scriptVersion, UUID stateMachineDesc, String stateMachineVersion, String userLogin, LocalDateTime timestamp, String actionProperties, UUID itemId) {
     this.id = id;
     this.itemVersion = itemVersion;
     this.actionDesc = actionDesc;
@@ -37,7 +37,7 @@ public final class EventDO {
   }
 
   @java.beans.ConstructorProperties({"itemVersion", "actionDesc", "actionDescVersion", "script", "scriptVersion", "stateMachineDesc", "stateMachineVersion", "userLogin", "timestamp", "actionProperties", "itemId"})
-  public EventDO(String itemVersion, UUID actionDesc, String actionDescVersion, UUID script, String scriptVersion, UUID stateMachineDesc, String stateMachineVersion, String userLogin, LocalDateTime timestamp, String actionProperties, Long itemId) {
+  public EventDO(String itemVersion, UUID actionDesc, String actionDescVersion, UUID script, String scriptVersion, UUID stateMachineDesc, String stateMachineVersion, String userLogin, LocalDateTime timestamp, String actionProperties, UUID itemId) {
     this(null, itemVersion, actionDesc, actionDescVersion, script, scriptVersion, stateMachineDesc, stateMachineVersion, userLogin, timestamp, actionProperties, itemId);
   }
 
@@ -84,7 +84,7 @@ public final class EventDO {
   public EventDO setUserLogin(String userLogin) { this.userLogin = userLogin; return this; }
   public EventDO setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; return this; }
   public EventDO setActionProperties(String actionProperties) { this.actionProperties = actionProperties; return this; }
-  public EventDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public EventDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getItemVersion() { return itemVersion; }
@@ -97,7 +97,7 @@ public final class EventDO {
   public String getUserLogin() { return userLogin; }
   public LocalDateTime getTimestamp() { return timestamp; }
   public String getActionProperties() { return actionProperties; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String itemVersion;
@@ -110,5 +110,5 @@ public final class EventDO {
   private String userLogin;
   private LocalDateTime timestamp;
   private String actionProperties;
-  private Long itemId;
+  private UUID itemId;
 }

@@ -9,9 +9,7 @@ import java.util.UUID;
 
 public interface ItemRepository {
 
-  Future<Optional<ItemDO>> findById(Long id);
-
-  Future<Optional<ItemDO>> findByUuid(UUID uuid);
+  Future<Optional<ItemDO>> findById(UUID id);
 
   Future<List<ItemDO>> findAll();
 
@@ -28,10 +26,5 @@ public interface ItemRepository {
   /**
    * Delete by id. Returns the number of affected rows (0 or 1).
    */
-  Future<Integer> deleteById(Long id);
-
-  /**
-   * Delete by id. Returns the number of affected rows (0 or 1).
-   */
-  Future<Integer> deleteByUuid(UUID uuid);
+  Future<Integer> deleteById(UUID id);
 }

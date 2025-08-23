@@ -20,7 +20,7 @@ public final class ViewPointDO {
   public ViewPointDO() {}
 
   @java.beans.ConstructorProperties({"id", "name", "schema", "schemaVersion", "schemaName", "outcomeId", "itemId"})
-  public ViewPointDO(Long id, String name, UUID schema, String schemaVersion, String schemaName, Long outcomeId, Long itemId) {
+  public ViewPointDO(Long id, String name, UUID schema, String schemaVersion, String schemaName, Long outcomeId, UUID itemId) {
     this.id = id;
     this.name = name;
     this.schema = schema;
@@ -31,7 +31,7 @@ public final class ViewPointDO {
   }
 
   @java.beans.ConstructorProperties({"name", "schema", "schemaVersion", "schemaName", "outcomeId", "itemId"})
-  public ViewPointDO(String name, UUID schema, String schemaVersion, String schemaName, Long outcomeId, Long itemId) {
+  public ViewPointDO(String name, UUID schema, String schemaVersion, String schemaName, Long outcomeId, UUID itemId) {
     this(null, name, schema, schemaVersion, schemaName, outcomeId, itemId);
   }
 
@@ -68,7 +68,7 @@ public final class ViewPointDO {
   public ViewPointDO setSchemaVersion(String schemaVersion) { this.schemaVersion = schemaVersion; return this; }
   public ViewPointDO setSchemaName(String schemaName) { this.schemaName = schemaName; return this; }
   public ViewPointDO setOutcomeId(Long outcomeId) { this.outcomeId = outcomeId; return this; }
-  public ViewPointDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public ViewPointDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getName() { return name; }
@@ -76,7 +76,7 @@ public final class ViewPointDO {
   public String getSchemaVersion() { return schemaVersion; }
   public String getSchemaName() { return schemaName; }
   public Long getOutcomeId() { return outcomeId; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String name;
@@ -84,5 +84,5 @@ public final class ViewPointDO {
   private String schemaVersion;
   private String schemaName;
   private Long outcomeId;
-  private Long itemId;
+  private UUID itemId;
 }

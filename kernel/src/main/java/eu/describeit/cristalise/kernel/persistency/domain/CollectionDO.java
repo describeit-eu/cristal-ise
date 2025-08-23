@@ -8,6 +8,7 @@ import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @DataObject
 @JsonGen
@@ -19,7 +20,7 @@ public final class CollectionDO {
   public CollectionDO() {}
 
   @java.beans.ConstructorProperties({"id", "name", "version", "properties", "itemId"})
-  public CollectionDO(Long id, String name, String version, String properties, Long itemId) {
+  public CollectionDO(Long id, String name, String version, String properties, UUID itemId) {
     this.id = id;
     this.name = name;
     this.version = version;
@@ -28,7 +29,7 @@ public final class CollectionDO {
   }
 
   @java.beans.ConstructorProperties({"name", "version", "properties", "itemId"})
-  public CollectionDO(String name, String version, String properties, Long itemId) {
+  public CollectionDO(String name, String version, String properties, UUID itemId) {
     this(null, name, version, properties, itemId);
   }
 
@@ -61,17 +62,17 @@ public final class CollectionDO {
   public CollectionDO setName(String name) { this.name = name; return this; }
   public CollectionDO setVersion(String version) { this.version = version; return this; }
   public CollectionDO setProperties(String properties) { this.properties = properties; return this; }
-  public CollectionDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public CollectionDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getName() { return name; }
   public String getVersion() { return version; }
   public String getProperties() { return properties; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String name;
   private String version;
   private String properties;
-  private Long itemId;
+  private UUID itemId;
 }

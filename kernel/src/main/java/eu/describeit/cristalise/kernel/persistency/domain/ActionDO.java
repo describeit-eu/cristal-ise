@@ -8,6 +8,7 @@ import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @DataObject
 @JsonGen
@@ -19,7 +20,7 @@ public final class ActionDO {
   public ActionDO() {}
 
   @java.beans.ConstructorProperties({"id", "name", "path", "version", "properties", "isComposite", "layout", "parentId", "itemId"})
-  public ActionDO(Long id, String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId, Long itemId) {
+  public ActionDO(Long id, String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId, UUID itemId) {
     this.id = id;
     this.name = name;
     this.path = path;
@@ -32,7 +33,7 @@ public final class ActionDO {
   }
 
   @java.beans.ConstructorProperties({"name", "path", "version", "properties", "isComposite", "layout", "parentId", "itemId"})
-  public ActionDO(String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId, Long itemId) {
+  public ActionDO(String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId, UUID itemId) {
     this(null, name, path, version, properties, isComposite, layout, parentId, itemId);
   }
 
@@ -73,7 +74,7 @@ public final class ActionDO {
   public ActionDO setIsComposite(Boolean isComposite) { this.isComposite = isComposite; return this; }
   public ActionDO setLayout(String layout) { this.layout = layout; return this; }
   public ActionDO setParentId(Long parentId) { this.parentId = parentId; return this; }
-  public ActionDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public ActionDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getName() { return name; }
@@ -83,7 +84,7 @@ public final class ActionDO {
   public Boolean getIsComposite() { return isComposite; }
   public String getLayout() { return layout; }
   public Long getParentId() { return parentId; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String name;
@@ -93,5 +94,5 @@ public final class ActionDO {
   private Boolean isComposite;
   private String layout;
   private Long parentId;
-  private Long itemId;
+  private UUID itemId;
 }

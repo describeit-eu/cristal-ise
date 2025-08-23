@@ -8,6 +8,7 @@ import io.vertx.sqlclient.templates.annotations.ParametersMapped;
 import io.vertx.sqlclient.templates.annotations.RowMapped;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @DataObject
 @JsonGen
@@ -19,7 +20,7 @@ public final class JobDO {
   public JobDO() {}
 
   @java.beans.ConstructorProperties({"id", "actionName", "transition", "itemId"})
-  public JobDO(Long id, String actionName, String transition, Long itemId) {
+  public JobDO(Long id, String actionName, String transition, UUID itemId) {
     this.id = id;
     this.actionName = actionName;
     this.transition = transition;
@@ -27,7 +28,7 @@ public final class JobDO {
   }
 
   @java.beans.ConstructorProperties({"actionName", "transition", "itemId"})
-  public JobDO(String actionName, String transition, Long itemId) {
+  public JobDO(String actionName, String transition, UUID itemId) {
     this(null, actionName, transition, itemId);
   }
 
@@ -58,15 +59,15 @@ public final class JobDO {
   public JobDO setId(Long id) { this.id = id; return this; }
   public JobDO setActionName(String actionName) { this.actionName = actionName; return this; }
   public JobDO setTransition(String transition) { this.transition = transition; return this; }
-  public JobDO setItemId(Long itemId) { this.itemId = itemId; return this; }
+  public JobDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getActionName() { return actionName; }
   public String getTransition() { return transition; }
-  public Long getItemId() { return itemId; }
+  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String actionName;
   private String transition;
-  private Long itemId;
+  private UUID itemId;
 }

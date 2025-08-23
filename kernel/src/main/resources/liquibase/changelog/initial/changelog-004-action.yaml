@@ -51,7 +51,7 @@ databaseChangeLog:
                     nullable: true
               - column:
                   name: item_id
-                  type: bigint
+                  type: uuid
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:

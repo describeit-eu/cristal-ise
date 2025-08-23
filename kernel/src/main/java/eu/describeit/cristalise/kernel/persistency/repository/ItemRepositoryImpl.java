@@ -15,34 +15,23 @@ public class ItemRepositoryImpl implements ItemRepository {
   private final SqlClient client;
 
   private static final String TABLE = "item";
-  private static final String COLUMNS = "id,uuid,name,type,version";
+  private static final String COLUMNS = "id,name,type,version";
   private static final String SQL_FIND_BY_ID     = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
-  private static final String SQL_FIND_BY_UUID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE uuid=#{uuid}";
   private static final String SQL_FIND_ALL       = "SELECT " + COLUMNS + " FROM " + TABLE;
-  private static final String SQL_INSERT         = "INSERT INTO " + TABLE + " (uuid, name, type, version) VALUES (#{uuid}, #{name}, #{type}, #{version}) RETURNING " + COLUMNS;
-  private static final String SQL_UPDATE         = "UPDATE "      + TABLE + " SET uuid=#{uuid}, name=#{name}, type=#{type}, version=#{version} WHERE id=#{id} RETURNING " + COLUMNS;
+  private static final String SQL_INSERT         = "INSERT INTO " + TABLE + " (id, name, type, version) VALUES (#{id}, #{name}, #{type}, #{version}) RETURNING " + COLUMNS;
+  private static final String SQL_UPDATE         = "UPDATE "      + TABLE + " SET id=#{id}, name=#{name}, type=#{type}, version=#{version} WHERE id=#{id} RETURNING " + COLUMNS;
   private static final String SQL_DELETE_BY_ID   = "DELETE FROM " + TABLE + " WHERE id=#{id}";
-  private static final String SQL_DELETE_BY_UUID = "DELETE FROM " + TABLE + " WHERE uuid=#{uuid}";
 
   public ItemRepositoryImpl(SqlClient client) {
     this.client = client;
   }
 
   @Override
-  public Future<Optional<ItemDO>> findById(Long id) {
+  public Future<Optional<ItemDO>> findById(UUID id) {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional);
-  }
-
-  @Override
-  public Future<Optional<ItemDO>> findByUuid(UUID uuid) {
-    return SqlTemplate
-      .forQuery(client, SQL_FIND_BY_UUID)
-      .mapTo(ItemDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("uuid", uuid))
       .map(RepositoryUtils::firstOptional);
   }
 
@@ -62,7 +51,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row uuid:"+item.getUuid()));
+      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row id:"+item.getId()));
   }
 
   @Override
@@ -76,18 +65,10 @@ public class ItemRepositoryImpl implements ItemRepository {
   }
 
   @Override
-  public Future<Integer> deleteById(Long id) {
+  public Future<Integer> deleteById(UUID id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount);
-  }
-
-  @Override
-  public Future<Integer> deleteByUuid(UUID uuid) {
-    return SqlTemplate
-      .forUpdate(client, SQL_DELETE_BY_UUID)
-      .execute( Collections.singletonMap("uuid", uuid))
       .map(SqlResult::rowCount);
   }
 }

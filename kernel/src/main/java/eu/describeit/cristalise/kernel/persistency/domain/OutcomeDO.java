@@ -20,7 +20,7 @@ public final class OutcomeDO {
   public OutcomeDO() {}
 
   @java.beans.ConstructorProperties({"id", "schema", "schemaVersion", "data", "eventId"})
-  public OutcomeDO(Long id, UUID schema, String schemaVersion, String data, Long eventId) {
+  public OutcomeDO(Long id, UUID schema, String schemaVersion, String data, UUID eventId) {
     this.id = id;
     this.schema = schema;
     this.schemaVersion = schemaVersion;
@@ -29,7 +29,7 @@ public final class OutcomeDO {
   }
 
   @java.beans.ConstructorProperties({"schema", "schemaVersion", "data", "eventId"})
-  public OutcomeDO(UUID schema, String schemaVersion, String data, Long eventId) {
+  public OutcomeDO(UUID schema, String schemaVersion, String data, UUID eventId) {
     this(null, schema, schemaVersion, data, eventId);
   }
 
@@ -62,17 +62,17 @@ public final class OutcomeDO {
   public OutcomeDO setSchema(UUID schema) { this.schema = schema; return this; }
   public OutcomeDO setSchemaVersion(String schemaVersion) { this.schemaVersion = schemaVersion; return this; }
   public OutcomeDO setData(String data) { this.data = data; return this; }
-  public OutcomeDO setEventId(Long eventId) { this.eventId = eventId; return this; }
+  public OutcomeDO setEventId(UUID eventId) { this.eventId = eventId; return this; }
 
   public Long getId() { return id; }
   public UUID getSchema() { return schema; }
   public String getSchemaVersion() { return schemaVersion; }
   public String getData() { return data; }
-  public Long getEventId() { return eventId; }
+  public UUID getEventId() { return eventId; }
 
   private Long id;
   private UUID schema;
   private String schemaVersion;
   private String data;
-  private Long eventId;
+  private UUID eventId;
 }

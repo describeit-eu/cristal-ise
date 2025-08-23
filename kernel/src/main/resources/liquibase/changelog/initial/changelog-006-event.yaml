@@ -65,12 +65,12 @@ databaseChangeLog:
                     nullable: true
               - column:
                   name: item_id
-                  type: bigint
+                  type: uuid
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
             baseColumnNames: item_id
-            baseTableName: action
+            baseTableName: event
             constraintName: fk_event_item
             referencedColumnNames: id
             referencedTableName: item
