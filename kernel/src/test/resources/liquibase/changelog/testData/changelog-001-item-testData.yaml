@@ -1,8 +1,8 @@
 databaseChangeLog:
   - changeSet:
-      id: "001-item-test-data"
+      id: "001-item-testData"
       author: "kovax"
-      #context: "testData"
+      context: "item"
       changes:
         - loadData:
             file: data/item.csv

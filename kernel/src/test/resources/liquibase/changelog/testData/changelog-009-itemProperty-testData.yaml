@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: "009-itemProperty-testData"
+      author: "kovax"
+      context: "itemProperty"
+      changes:
+        - loadData:
+            file: data/itemProperty.csv
+            separator: ";"
+            tableName: item_property
+            encoding: UTF-8
+            columns:
+              - column:
+                  name: name
+                  type: string
+              - column:
+                  name: value
+                  type: string
+              - column:
+                  name: is_mutable
+                  type: boolean
+              - column:
+                  name: item_id
+                  type: uuid

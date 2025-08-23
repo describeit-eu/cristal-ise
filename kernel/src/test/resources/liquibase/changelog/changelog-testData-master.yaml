@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: testData/changelog-001-item-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-009-itemProperty-testData.yaml

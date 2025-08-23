@@ -21,10 +21,12 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class DatabaseTestUtils {
+  public static final String DB_IMAGE = "postgres:17";
+  public static final String DB_NAME = "cristalise-test";
 
   public static PostgreSQLContainer<?> getPGContainer() {
-    var container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
-    container.withDatabaseName("cristalise-test");
+    var container = new PostgreSQLContainer<>(DB_IMAGE);
+    container.withDatabaseName(DB_NAME);
 
     log.info("getPGContainer() - {}", container);
 
@@ -32,11 +34,17 @@ public class DatabaseTestUtils {
   }
 
   public static void liquibaseLoadTestData(PostgreSQLContainer<?> pgContainer) throws Exception {
-    liquibaseCreateTables(pgContainer, "/liquibase/changelog/changelog-testData-master.yaml");
+    liquibaseLoadTestData(pgContainer, null);
+  }
+
+  public static void liquibaseLoadTestData(PostgreSQLContainer<?> pgContainer, String context) throws Exception {
+    var logFile = "/liquibase/changelog/changelog-testData-master.yaml";
+    liquibaseUpdate(pgContainer, logFile, context);
   }
 
   public static void liquibaseCreateTables(PostgreSQLContainer<?> pgContainer) throws Exception {
-    liquibaseCreateTables(pgContainer, "/liquibase/changelog/changelog-master.yaml");
+    var logFile = "/liquibase/changelog/changelog-master.yaml";
+    liquibaseUpdate(pgContainer, logFile, null);
   }
 
   public static Pool getPool(Vertx vertx, PostgreSQLContainer<?> pgContainer) {
@@ -59,7 +67,7 @@ public class DatabaseTestUtils {
       .build();
   }
 
-  private static void liquibaseCreateTables(PostgreSQLContainer<?> pgContainer, String logFile) throws Exception {
+  private static void liquibaseUpdate(PostgreSQLContainer<?> pgContainer, String logFile, String context) throws Exception {
     Scope.child(Scope.Attr.resourceAccessor, new ClassLoaderResourceAccessor(), () -> {
       CommandScope update = new CommandScope("update");
 
@@ -67,6 +75,7 @@ public class DatabaseTestUtils {
       update.addArgumentValue("url", pgContainer.getJdbcUrl());
       update.addArgumentValue("username", pgContainer.getUsername());
       update.addArgumentValue("password", pgContainer.getPassword());
+      if (context != null) update.addArgumentValue("contextFilter", context);
 
       update.execute();
 
@@ -101,10 +110,10 @@ public class DatabaseTestUtils {
 
       future.onComplete(ar -> {
         if (ar.succeeded()) {
-          log.info("await(onComplete) - SUCCEEDED result:{}", ar.result());
+          log.debug("await(onComplete) - SUCCEEDED result:{}", ar.result());
           futureResult.complete(ar.result());
         } else if (ar.failed()) {
-          log.info("await(onComplete) - FAILED", ar.cause());
+          log.debug("await(onComplete) - FAILED", ar.cause());
           futureResult.completeExceptionally(ar.cause());
         } else {
           log.warn("await(onComplete) - ??????? result:{}", ar);
