@@ -22,6 +22,9 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
   private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET name=#{name}, value=#{value}, is_mutable=#{is_mutable}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS;
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}";
 
+  private static final String SQL_FIND_BY_ITEM_ID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{item_id}";
+  private static final String SQL_DELETE_BY_ITEM_ID = "DELETE FROM " + TABLE + " WHERE item_id=#{item_id}";
+
   public ItemPropertyRepositoryImpl(SqlClient client) { this.client = client; }
 
   @Override
@@ -31,6 +34,15 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("id", id))
       .map(RepositoryUtils::firstOptional);
+  }
+
+  @Override
+  public Future<List<ItemPropertyDO>> findByItemId(UUID item_id) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_BY_ITEM_ID)
+      .mapTo(ItemPropertyDORowMapper.INSTANCE)
+      .execute(Collections.singletonMap("item_id", item_id))
+      .map(RepositoryUtils::toList);
   }
 
   @Override
@@ -67,6 +79,14 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
+      .map(SqlResult::rowCount);
+  }
+
+  @Override
+  public Future<Integer> deleteByItemId(UUID item_id) {
+    return SqlTemplate
+      .forUpdate(client, SQL_DELETE_BY_ITEM_ID)
+      .execute(Collections.singletonMap("item_id", item_id))
       .map(SqlResult::rowCount);
   }
 }
