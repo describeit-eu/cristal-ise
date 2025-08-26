@@ -14,40 +14,35 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: item_version
-                  type: varchar(255)
-                  constraints:
-                    nullable: false
-              - column:
                   name: action_desc
                   type: uuid
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: action_desc_version
                   type: varchar(255)
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: script
                   type: uuid
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: script_version
                   type: varchar(255)
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: state_machine_desc
                   type: uuid
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: state_machine_version
                   type: varchar(255)
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: user_login
                   type: varchar(255)
@@ -66,6 +61,11 @@ databaseChangeLog:
               - column:
                   name: item_id
                   type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_version
+                  type: varchar(255)
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
