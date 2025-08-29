@@ -1,26 +1,30 @@
 entity DomainPath {
+  id Long
   path String
 }
 
 entity Item {
-  uuid UUID
+  id UUID
   name String
   type String
   version String
 }
 
 entity Collection {
+  id Long
   name String
   version String
   properties TextBlob //json
 }
 
 entity CollectionMember {
+  id Long
   childItem UUID
   properties TextBlob //json
 }
 
 entity Action {
+  id Long
   name String
   path String
   version String
@@ -32,12 +36,14 @@ entity Action {
 }
 
 entity Job {
+  id Long
   actionName String
   actionName String
   transition String
 }
 
 entity Event {
+  id Long
   itemVersion String
   actionDesc UUID
   actionDescVersion String
@@ -51,6 +57,7 @@ entity Event {
 }
 
 entity Outcome {
+  id Long
   schema UUID
   schemaVersion String
 
@@ -58,6 +65,7 @@ entity Outcome {
 }
 
 entity Attachment {
+  id Long
   name String
   type String
   fileName String
@@ -66,12 +74,14 @@ entity Attachment {
 }
 
 entity ItemProperty {
+  id Long
   name String
   value String
   isMutable Boolean
 }
 
 entity ViewPoint {
+  id Long
   schema UUID
   schemaVersion String
   schemaName String
@@ -91,11 +101,11 @@ relationship OneToMany {
 }
 
 relationship ManyToOne {
+  Item{lifeCycle} to Action
   DomainPath{item} to Item{pathes}
 }
 
 relationship OneToOne {
-  Item{lifeCycle} to Action
   ViewPoint{outcome} to Outcome
 }
 

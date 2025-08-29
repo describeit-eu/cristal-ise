@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: "002-domainPath-testData"
+      author: "kovax"
+      context: "domainPath"
+      changes:
+        - loadData:
+            file: data/02-domainPath.csv
+            separator: ";"
+            tableName: domain_path
+            encoding: UTF-8
+            nullValue: NULL
+            columns:
+              - column:
+                  name: item_id
+                  type: uuid
+              - column:
+                  name: path
+                  type: string

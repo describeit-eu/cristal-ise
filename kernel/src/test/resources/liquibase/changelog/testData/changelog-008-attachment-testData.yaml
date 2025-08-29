@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: "008-attachment-testData"
+      author: "kovax"
+      context: "attachment"
+      changes:
+        - loadData:
+            file: data/08-attachment.csv
+            separator: ";"
+            tableName: attachment
+            encoding: UTF-8
+            nullValue: NULL
+            columns:
+              - column:
+                  name: name
+                  type: string
+              - column:
+                  name: type
+                  type: string
+              - column:
+                  name: file_name
+                  type: string
+              - column:
+                  name: data
+                  type: string
+              - column:
+                  name: outcome_id
+                  type: numeric
+

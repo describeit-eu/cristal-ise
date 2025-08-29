@@ -20,7 +20,7 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
 
   private ItemPropertyRepository repository;
 
-  // Known item UUIDs from test data (item.csv)
+  // Known item UUIDs from test data (01-item.csv)
   final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
   final UUID idParis = UUID.fromString("b42800c5-463f-4a9a-be7d-11c792856ced");
 

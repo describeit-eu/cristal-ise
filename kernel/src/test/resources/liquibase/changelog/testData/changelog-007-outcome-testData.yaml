@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: "007-outcome-testData"
+      author: "kovax"
+      context: "outcome"
+      changes:
+        - loadData:
+            file: data/07-outcome.csv
+            separator: ";"
+            tableName: outcome
+            encoding: UTF-8
+            nullValue: NULL
+            columns:
+              - column:
+                  name: schema
+                  header: schema_id
+                  type: uuid
+              - column:
+                  name: schema_version
+                  type: string
+              - column:
+                  name: data
+                  type: string
+              - column:
+                  name: event_id
+                  type: numeric

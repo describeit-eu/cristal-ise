@@ -1,24 +1,22 @@
 databaseChangeLog:
   - changeSet:
-      id: "001-item-testData"
+      id: "005-job-testData"
       author: "kovax"
-      context: "item"
+      context: "job"
       changes:
         - loadData:
-            file: data/01-item.csv
+            file: data/05-job.csv
             separator: ";"
-            tableName: item
+            tableName: job
             encoding: UTF-8
+            nullValue: NULL
             columns:
               - column:
-                  name: id
-                  type: bigint
-              - column:
-                  name: uuid
+                  name: item_id
                   type: uuid
               - column:
-                  name: name
+                  name: action_path
                   type: string
               - column:
-                  name: version
+                  name: transition
                   type: string

@@ -4,4 +4,31 @@ databaseChangeLog:
       file: testData/changelog-001-item-testData.yaml
   - include:
       relativeToChangelogFile: true
+      file: testData/changelog-002-domainPath-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-003-collection-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-003-collection-member-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-004-action-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-005-job-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-006-event-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-007-outcome-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-008-attachment-testData.yaml
+  - include:
+      relativeToChangelogFile: true
       file: testData/changelog-009-itemProperty-testData.yaml
+  - include:
+      relativeToChangelogFile: true
+      file: testData/changelog-010-viewPoint-testData.yaml

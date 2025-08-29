@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: "004-action-testData"
+      author: "kovax"
+      context: "action"
+      changes:
+        - loadData:
+            file: data/04-action.csv
+            separator: ";"
+            tableName: action
+            encoding: UTF-8
+            nullValue: NULL
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+              - column:
+                  name: name
+                  type: string
+              - column:
+                  name: path
+                  type: string
+              - column:
+                  name: version
+                  type: string
+              - column:
+                  name: properties
+                  type: string
+              - column:
+                  name: is_composite
+                  type: boolean
+              - column:
+                  name: layout
+                  type: string
+              - column:
+                  name: parent_id
+                  type: numeric
+              - column:
+                  name: item_id
+                  type: uuid

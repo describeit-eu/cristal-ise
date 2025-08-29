@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: "003-collection-member-testData"
+      author: "kovax"
+      context: "collectionMember"
+      changes:
+        - loadData:
+            file: data/03-collection-member.csv
+            separator: ";"
+            tableName: collection_member
+            encoding: UTF-8
+            nullValue: NULL
+            columns:
+              - column:
+                  name: child_item
+                  type: uuid
+              - column:
+                  name: properties
+                  type: string
+              - column:
+                  name: collection_id
+                  type: numeric
