@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: "003-create-collection"
+      id: "003-create-collection-member"
       author: "kovax"
       changes:
         - createTable:
-            tableName: collection
+            tableName: collection_member
             columns:
               - column:
                   name: id
@@ -14,13 +14,8 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: name
-                  type: varchar(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: version
-                  type: varchar(255)
+                  name: child_item
+                  type: uuid
                   constraints:
                     nullable: false
               - column:
@@ -29,13 +24,13 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: item_id
-                  type: uuid
+                  name: collection_id
+                  type: bigint
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
-            baseColumnNames: item_id
-            baseTableName: collection
-            constraintName: fk_collection_item
+            baseColumnNames: collection_id
+            baseTableName: collection_member
+            constraintName: fk_collection_member_collection
             referencedColumnNames: id
-            referencedTableName: item
+            referencedTableName: collection

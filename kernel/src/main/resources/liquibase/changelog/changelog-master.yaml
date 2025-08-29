@@ -10,6 +10,9 @@ databaseChangeLog:
       file: initial/changelog-003-collection.yaml
   - include:
       relativeToChangelogFile: true
+      file: initial/changelog-003-collection-member.yaml
+  - include:
+      relativeToChangelogFile: true
       file: initial/changelog-004-action.yaml
   - include:
       relativeToChangelogFile: true
