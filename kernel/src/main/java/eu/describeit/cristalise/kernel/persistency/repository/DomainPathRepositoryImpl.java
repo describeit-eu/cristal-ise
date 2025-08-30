@@ -21,6 +21,9 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
   private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (path, item_id) VALUES (#{path}, #{item_id}) RETURNING " + COLUMNS;
   private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET path=#{path}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS;
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_FIND_BY_ITEM_ID = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{item_id}";
+  private static final String SQL_GET_CHILDREN = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE path <@ text2ltree(#{path}) AND nlevel(path) = nlevel(text2ltree(#{path})) + 1";
+  private static final String SQL_GET_TREE     = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE path <@ text2ltree(#{path})";
 
   public DomainPathRepositoryImpl(SqlClient client) { this.client = client; }
 
@@ -76,6 +79,47 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
       .map(SqlResult::rowCount);
+  }
+
+  @Override
+  public Future<List<DomainPathDO>> findByItemId(UUID itemId) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_BY_ITEM_ID)
+      .mapTo(DomainPathDORowMapper.INSTANCE)
+      .execute(Collections.singletonMap("item_id", itemId))
+      .map(rowSet -> {
+        List<DomainPathDO> list = new ArrayList<>();
+        for (DomainPathDO row : rowSet) list.add(row);
+        return list;
+      });
+  }
+
+  @Override
+  public Future<List<DomainPathDO>> getChildren(String path) {
+    Map<String, Object> params = Map.of("path", path);
+    return SqlTemplate
+      .forQuery(client, SQL_GET_CHILDREN)
+      .mapTo(DomainPathDORowMapper.INSTANCE)
+      .execute(params)
+      .map(rowSet -> {
+        List<DomainPathDO> list = new ArrayList<>();
+        for (DomainPathDO row : rowSet) list.add(row);
+        return list;
+      });
+  }
+
+  @Override
+  public Future<List<DomainPathDO>> getTree(String path) {
+    Map<String, Object> params = Map.of("path", path);
+    return SqlTemplate
+      .forQuery(client, SQL_GET_TREE)
+      .mapTo(DomainPathDORowMapper.INSTANCE)
+      .execute(params)
+      .map(rowSet -> {
+        List<DomainPathDO> list = new ArrayList<>();
+        for (DomainPathDO row : rowSet) list.add(row);
+        return list;
+      });
   }
 
   private Optional<DomainPathDO> firstOptional(Iterable<DomainPathDO> rs) {

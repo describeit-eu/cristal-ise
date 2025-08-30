@@ -29,3 +29,10 @@ databaseChangeLog:
             constraintName: fk_domainPath_item
             referencedColumnNames: id
             referencedTableName: item
+            onDelete: CASCADE
+        - sql:
+            sql: "CREATE INDEX path_gist_idx ON domain_path USING GIST (path);"
+        - sql:
+            sql: "CREATE INDEX path_idx ON domain_path USING BTREE (path);"
+        - sql:
+            sql: "CREATE INDEX path_hash_idx ON domain_path USING HASH (path);"
