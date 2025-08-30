@@ -1,0 +1,9 @@
+# Build a Postgres image with ltree extension initialized
+# Note: Official postgres images already include the ltree extension binary.
+# We just add an init script so that a fresh database enables it on first run.
+
+FROM postgres:17
+
+# Copy initialization scripts. Any .sql in this directory will be executed on first container start
+# when the database cluster is created.
+COPY initdb/ /docker-entrypoint-initdb.d/
