@@ -5,7 +5,7 @@ databaseChangeLog:
       context: "collectionMember"
       changes:
         - loadData:
-            file: data/03-collection-member.csv
+            file: data/05-collection-member.csv
             separator: ";"
             tableName: collection_member
             encoding: UTF-8

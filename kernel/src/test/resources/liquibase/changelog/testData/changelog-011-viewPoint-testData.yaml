@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: "010-viewPoint-testData"
+      author: "kovax"
+      context: "viewPoint"
+      changes:
+        - loadData:
+            file: data/11-viewPoint.csv
+            separator: ";"
+            tableName: view_point
+            encoding: UTF-8
+            nullValue: NULL
+            columns:
+              - column:
+                  name: item_id
+                  type: uuid
+              - column:
+                  name: name
+                  type: string
+              - column:
+                  name: schema
+                  type: uuid
+              - column:
+                  name: schema_version
+                  type: string
+              - column:
+                  name: schema_name
+                  type: string
+              - column:
+                  name: outcome_id
+                  type: numeric
+

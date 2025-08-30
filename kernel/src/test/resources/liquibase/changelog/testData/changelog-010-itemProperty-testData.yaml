@@ -5,7 +5,7 @@ databaseChangeLog:
       context: "itemProperty"
       changes:
         - loadData:
-            file: data/09-itemProperty.csv
+            file: data/10-itemProperty.csv
             separator: ";"
             tableName: item_property
             encoding: UTF-8

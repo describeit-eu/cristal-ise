@@ -1,19 +1,19 @@
 databaseChangeLog:
   - include:
       relativeToChangelogFile: true
-      file: initial/changelog-001-item.yaml
+      file: initial/changelog-001-action.yaml
   - include:
       relativeToChangelogFile: true
-      file: initial/changelog-002-domain-path.yaml
+      file: initial/changelog-002-item.yaml
   - include:
       relativeToChangelogFile: true
-      file: initial/changelog-003-collection.yaml
+      file: initial/changelog-003-domain-path.yaml
   - include:
       relativeToChangelogFile: true
-      file: initial/changelog-003-collection-member.yaml
+      file: initial/changelog-004-collection.yaml
   - include:
       relativeToChangelogFile: true
-      file: initial/changelog-004-action.yaml
+      file: initial/changelog-004-collection-member.yaml
   - include:
       relativeToChangelogFile: true
       file: initial/changelog-005-job.yaml

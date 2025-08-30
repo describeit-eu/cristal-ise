@@ -1,0 +1,7 @@
+name;path;version;properties;is_composite;layout;parent_id
+CityWf;/wf;v1;null;true;null;null
+BudapestWf;/wf;v2;null;false;null;
+ParisWf;/wf;v2;null;false;null;
+LondonWf;/wf;v2;null;false;null;
+BernWf;/wf;v2;null;false;null;
+WashingtonWf;/wf;v2;null;false;null;

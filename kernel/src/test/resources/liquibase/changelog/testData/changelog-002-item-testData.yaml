@@ -5,7 +5,7 @@ databaseChangeLog:
       context: "item"
       changes:
         - loadData:
-            file: data/01-item.csv
+            file: data/02-item.csv
             separator: ";"
             tableName: item
             encoding: UTF-8
@@ -22,3 +22,6 @@ databaseChangeLog:
               - column:
                   name: version
                   type: string
+              - column:
+                  name: action_id
+                  type: bigint

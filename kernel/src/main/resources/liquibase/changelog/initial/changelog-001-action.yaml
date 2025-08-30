@@ -49,20 +49,9 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: true
-              - column:
-                  name: item_id
-                  type: uuid
-                  constraints:
-                    nullable: false
         - addForeignKeyConstraint:
             baseColumnNames: parent_id
             baseTableName: action
             constraintName: fk_action_parent
             referencedColumnNames: id
             referencedTableName: action
-        - addForeignKeyConstraint:
-            baseColumnNames: item_id
-            baseTableName: action
-            constraintName: fk_action_item
-            referencedColumnNames: id
-            referencedTableName: item

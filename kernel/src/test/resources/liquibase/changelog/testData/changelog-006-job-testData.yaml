@@ -1,26 +1,22 @@
 databaseChangeLog:
   - changeSet:
-      id: "007-outcome-testData"
+      id: "005-job-testData"
       author: "kovax"
-      context: "outcome"
+      context: "job"
       changes:
         - loadData:
-            file: data/07-outcome.csv
+            file: data/06-job.csv
             separator: ";"
-            tableName: outcome
+            tableName: job
             encoding: UTF-8
             nullValue: NULL
             columns:
               - column:
-                  name: schema
-                  header: schema_id
+                  name: item_id
                   type: uuid
               - column:
-                  name: schema_version
+                  name: action_path
                   type: string
               - column:
-                  name: data
+                  name: transition
                   type: string
-              - column:
-                  name: event_id
-                  type: numeric

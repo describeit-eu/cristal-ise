@@ -22,16 +22,17 @@ final public class ItemDO {
 
   public ItemDO() {}
 
-  @java.beans.ConstructorProperties({"id", "name", "type", "version"})
-  public ItemDO(UUID id, String name, String type, String version) {
+  @java.beans.ConstructorProperties({"id", "name", "type", "version", "actionId"})
+  public ItemDO(UUID id, String name, String type, String version, Long actionId) {
     this.id = id;
     this.name = name;
     this.type = type;
     this.version = version;
+    this.actionId = actionId;
   }
 
   public ItemDO(ItemDO other) {
-    this(other.id, other.name, other.type, other.version);
+    this(other.id, other.name, other.type, other.version, other.actionId);
   }
 
   @Override
@@ -39,10 +40,11 @@ final public class ItemDO {
     if (!(o instanceof ItemDO other)) return false;
 
     return
-      Objects.equals(this.getId(),      other.getId()) &&
-      Objects.equals(this.getName(),    other.getName()) &&
-      Objects.equals(this.getType(),    other.getType()) &&
-      Objects.equals(this.getVersion(), other.getVersion());
+      Objects.equals(this.getId(),       other.getId()) &&
+      Objects.equals(this.getName(),     other.getName()) &&
+      Objects.equals(this.getType(),     other.getType()) &&
+      Objects.equals(this.getVersion(),  other.getVersion()) &&
+      Objects.equals(this.getActionId(), other.getActionId());
   }
 
   @Override
@@ -60,14 +62,17 @@ final public class ItemDO {
   public ItemDO setName(String name) { this.name = name; return this; }
   public ItemDO setType(String type) { this.type = type; return this; }
   public ItemDO setVersion(String version) { this.version = version; return this; }
+  public ItemDO setActionId(Long actionId) { this.actionId = actionId; return this; }
 
   public UUID getId() { return id; }
   public String getName() { return name; }
   public String getType() { return type; }
   public String getVersion() { return version; }
+  public Long getActionId() { return actionId; }
 
   private UUID id;
   private String name;
   private String type;
   private String version;
+  private Long actionId;
 }

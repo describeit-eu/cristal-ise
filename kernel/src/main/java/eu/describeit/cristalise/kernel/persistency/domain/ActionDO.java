@@ -19,8 +19,8 @@ public final class ActionDO {
 
   public ActionDO() {}
 
-  @java.beans.ConstructorProperties({"id", "name", "path", "version", "properties", "isComposite", "layout", "parentId", "itemId"})
-  public ActionDO(Long id, String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId, UUID itemId) {
+  @java.beans.ConstructorProperties({"id", "name", "path", "version", "properties", "isComposite", "layout", "parentId"})
+  public ActionDO(Long id, String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId) {
     this.id = id;
     this.name = name;
     this.path = path;
@@ -29,16 +29,15 @@ public final class ActionDO {
     this.isComposite = isComposite;
     this.layout = layout;
     this.parentId = parentId;
-    this.itemId = itemId;
   }
 
-  @java.beans.ConstructorProperties({"name", "path", "version", "properties", "isComposite", "layout", "parentId", "itemId"})
-  public ActionDO(String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId, UUID itemId) {
-    this(null, name, path, version, properties, isComposite, layout, parentId, itemId);
+  @java.beans.ConstructorProperties({"name", "path", "version", "properties", "isComposite", "layout", "parentId"})
+  public ActionDO(String name, String path, String version, String properties, Boolean isComposite, String layout, Long parentId) {
+    this(null, name, path, version, properties, isComposite, layout, parentId);
   }
 
   public ActionDO(ActionDO other) {
-    this(null, other.name, other.path, other.version, other.properties, other.isComposite, other.layout, other.parentId, other.itemId);
+    this(null, other.name, other.path, other.version, other.properties, other.isComposite, other.layout, other.parentId);
   }
 
   @Override
@@ -51,19 +50,18 @@ public final class ActionDO {
            Objects.equals(this.getProperties(), other.getProperties()) &&
            Objects.equals(this.getIsComposite(), other.getIsComposite()) &&
            Objects.equals(this.getLayout(), other.getLayout()) &&
-           Objects.equals(this.getParentId(), other.getParentId()) &&
-           Objects.equals(this.getItemId(), other.getItemId());
+           Objects.equals(this.getParentId(), other.getParentId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getName(), getPath(), getVersion(), getProperties(), getIsComposite(), getLayout(), getParentId(), getItemId());
+    return Objects.hash(getId(), getName(), getPath(), getVersion(), getProperties(), getIsComposite(), getLayout(), getParentId());
   }
 
   @Override
   public String toString() {
-    return "ActionDO[id=%s, name='%s', path='%s', version='%s', properties='%s', isComposite=%s, layout='%s', parentId=%s, itemId=%s]"
-      .formatted(this.id, this.name, this.path, this.version, this.properties, this.isComposite, this.layout, this.parentId, this.itemId);
+    return "ActionDO[id=%s, name='%s', path='%s', version='%s', properties='%s', isComposite=%s, layout='%s', parentId=%s]"
+      .formatted(this.id, this.name, this.path, this.version, this.properties, this.isComposite, this.layout, this.parentId);
   }
 
   public ActionDO setId(Long id) { this.id = id; return this; }
@@ -74,7 +72,6 @@ public final class ActionDO {
   public ActionDO setIsComposite(Boolean isComposite) { this.isComposite = isComposite; return this; }
   public ActionDO setLayout(String layout) { this.layout = layout; return this; }
   public ActionDO setParentId(Long parentId) { this.parentId = parentId; return this; }
-  public ActionDO setItemId(UUID itemId) { this.itemId = itemId; return this; }
 
   public Long getId() { return id; }
   public String getName() { return name; }
@@ -84,7 +81,6 @@ public final class ActionDO {
   public Boolean getIsComposite() { return isComposite; }
   public String getLayout() { return layout; }
   public Long getParentId() { return parentId; }
-  public UUID getItemId() { return itemId; }
 
   private Long id;
   private String name;
@@ -94,5 +90,4 @@ public final class ActionDO {
   private Boolean isComposite;
   private String layout;
   private Long parentId;
-  private UUID itemId;
 }

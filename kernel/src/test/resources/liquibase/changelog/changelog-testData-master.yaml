@@ -1,34 +1,34 @@
 databaseChangeLog:
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-001-item-testData.yaml
+      file: testData/changelog-001-action-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-002-domainPath-testData.yaml
+      file: testData/changelog-002-item-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-003-collection-testData.yaml
+      file: testData/changelog-003-domainPath-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-003-collection-member-testData.yaml
+      file: testData/changelog-004-collection-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-004-action-testData.yaml
+      file: testData/changelog-005-collection-member-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-005-job-testData.yaml
+      file: testData/changelog-006-job-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-006-event-testData.yaml
+      file: testData/changelog-007-event-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-007-outcome-testData.yaml
+      file: testData/changelog-008-outcome-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-008-attachment-testData.yaml
+      file: testData/changelog-009-attachment-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-009-itemProperty-testData.yaml
+      file: testData/changelog-010-itemProperty-testData.yaml
   - include:
       relativeToChangelogFile: true
-      file: testData/changelog-010-viewPoint-testData.yaml
+      file: testData/changelog-011-viewPoint-testData.yaml

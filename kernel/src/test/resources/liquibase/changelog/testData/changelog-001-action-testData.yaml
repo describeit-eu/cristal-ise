@@ -5,7 +5,7 @@ databaseChangeLog:
       context: "action"
       changes:
         - loadData:
-            file: data/04-action.csv
+            file: data/01-action.csv
             separator: ";"
             tableName: action
             encoding: UTF-8
@@ -35,6 +35,3 @@ databaseChangeLog:
               - column:
                   name: parent_id
                   type: numeric
-              - column:
-                  name: item_id
-                  type: uuid

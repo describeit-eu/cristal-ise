@@ -5,7 +5,7 @@ databaseChangeLog:
       context: "event"
       changes:
         - loadData:
-            file: data/06-event.csv
+            file: data/07-event.csv
             separator: ";"
             tableName: event
             encoding: UTF-8

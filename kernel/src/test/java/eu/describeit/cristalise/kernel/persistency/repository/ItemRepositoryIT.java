@@ -71,7 +71,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testInsert() {
-    ItemDO toInsert = new ItemDO(UUID.randomUUID(), "Tokyo", "megaCity", "v1.1");
+    ItemDO toInsert = new ItemDO(UUID.randomUUID(), "Tokyo", "megaCity", "v1.1", null);
 
     ItemDO cityTokyo = await(repository.insert(toInsert));
 

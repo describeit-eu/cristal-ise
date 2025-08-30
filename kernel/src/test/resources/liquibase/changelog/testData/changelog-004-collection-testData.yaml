@@ -1,13 +1,13 @@
 databaseChangeLog:
   - changeSet:
-      id: "010-viewPoint-testData"
+      id: "003-collection-testData"
       author: "kovax"
-      context: "viewPoint"
+      context: "collection"
       changes:
         - loadData:
-            file: data/10-viewPoint.csv
+            file: data/04-collections.csv
             separator: ";"
-            tableName: view_point
+            tableName: collection
             encoding: UTF-8
             nullValue: NULL
             columns:
@@ -18,15 +18,8 @@ databaseChangeLog:
                   name: name
                   type: string
               - column:
-                  name: schema
-                  type: uuid
-              - column:
-                  name: schema_version
+                  name: version
                   type: string
               - column:
-                  name: schema_name
+                  name: properties
                   type: string
-              - column:
-                  name: outcome_id
-                  type: numeric
-

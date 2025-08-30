@@ -1,13 +1,13 @@
 databaseChangeLog:
   - changeSet:
-      id: "005-job-testData"
+      id: "002-domainPath-testData"
       author: "kovax"
-      context: "job"
+      context: "domainPath"
       changes:
         - loadData:
-            file: data/05-job.csv
+            file: data/03-domainPath.csv
             separator: ";"
-            tableName: job
+            tableName: domain_path
             encoding: UTF-8
             nullValue: NULL
             columns:
@@ -15,8 +15,5 @@ databaseChangeLog:
                   name: item_id
                   type: uuid
               - column:
-                  name: action_path
-                  type: string
-              - column:
-                  name: transition
+                  name: path
                   type: string

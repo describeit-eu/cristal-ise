@@ -27,3 +27,14 @@ databaseChangeLog:
                   type: varchar(255)
                   constraints:
                     nullable: false
+              - column:
+                  name: action_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseColumnNames: action_id
+            baseTableName: item
+            constraintName: fk_action_item
+            referencedColumnNames: id
+            referencedTableName: action
