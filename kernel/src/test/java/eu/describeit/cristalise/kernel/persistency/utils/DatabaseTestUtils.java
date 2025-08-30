@@ -21,7 +21,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class DatabaseTestUtils {
-  public static final String DB_IMAGE = "postgres:17";
+  public static final String DB_IMAGE = "postgres:17-ltree";
   public static final String DB_NAME = "cristalise-test";
 
   public static PostgreSQLContainer<?> getPGContainer() {
