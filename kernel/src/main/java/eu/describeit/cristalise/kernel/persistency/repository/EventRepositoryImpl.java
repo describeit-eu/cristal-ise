@@ -9,6 +9,7 @@ import io.vertx.sqlclient.SqlResult;
 import io.vertx.sqlclient.templates.SqlTemplate;
 
 import java.util.*;
+import java.util.UUID;
 
 public class EventRepositoryImpl implements EventRepository {
 
@@ -18,9 +19,11 @@ public class EventRepositoryImpl implements EventRepository {
   private static final String COLUMNS = "id,item_version,action_desc,action_version,script,script_version,state_machine_desc,state_machine_version,user_login,timestamp,action_properties,item_id,action_path,transition_name";
   private static final String SQL_FIND_BY_ID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
   private static final String SQL_FIND_ALL     = "SELECT " + COLUMNS + " FROM " + TABLE;
+  private static final String SQL_FIND_BY_ITEM_ID = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{item_id}";
   private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (item_version, action_desc, action_version, script, script_version, state_machine_desc, state_machine_version, user_login, timestamp, action_properties, item_id, action_path, transition_name) VALUES (#{item_version}, #{action_desc}, #{action_version}, #{script}, #{script_version}, #{state_machine_desc}, #{state_machine_version}, #{user_login}, #{timestamp}, #{action_properties}, #{item_id}, #{action_path}, #{transition_name}) RETURNING " + COLUMNS;
   private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET item_version=#{item_version}, action_desc=#{action_desc}, action_version=#{action_version}, script=#{script}, script_version=#{script_version}, state_machine_desc=#{state_machine_desc}, state_machine_version=#{state_machine_version}, user_login=#{user_login}, timestamp=#{timestamp}, action_properties=#{action_properties}, item_id=#{item_id}, action_path=#{action_path}, transition_name=#{transition_name} WHERE id=#{id} RETURNING " + COLUMNS;
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_DELETE_BY_ITEM_ID = "DELETE FROM " + TABLE + " WHERE item_id=#{item_id}";
 
   public EventRepositoryImpl(SqlClient client) { this.client = client; }
 
@@ -39,6 +42,15 @@ public class EventRepositoryImpl implements EventRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
+      .map(RepositoryUtils::toList);
+  }
+
+  @Override
+  public Future<List<EventDO>> findByItemId(UUID item_id) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_BY_ITEM_ID)
+      .mapTo(EventDORowMapper.INSTANCE)
+      .execute(Collections.singletonMap("item_id", item_id))
       .map(RepositoryUtils::toList);
   }
 
@@ -67,6 +79,14 @@ public class EventRepositoryImpl implements EventRepository {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
+      .map(SqlResult::rowCount);
+  }
+
+  @Override
+  public Future<Integer> deleteByItemId(UUID item_id) {
+    return SqlTemplate
+      .forUpdate(client, SQL_DELETE_BY_ITEM_ID)
+      .execute(Collections.singletonMap("item_id", item_id))
       .map(SqlResult::rowCount);
   }
 }

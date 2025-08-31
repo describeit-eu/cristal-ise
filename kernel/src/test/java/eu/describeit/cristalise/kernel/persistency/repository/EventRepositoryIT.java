@@ -32,7 +32,7 @@ class EventRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindAll() {
     List<EventDO> events = await(repository.findAll());
-    // From 07-event.csv we inserted 10 rows
+    // From 07-event.csv we inserted at least 10 rows
     assertTrue(events.size() >= 10, "There should be at least 10 events loaded from CSV");
 
     // spot check a known field mapping for first event
@@ -90,5 +90,35 @@ class EventRepositoryIT extends AbstractRepositoryIT {
     assertEquals(1, rows);
     Optional<EventDO> afterDelete = await(repository.findById(updated.getId()));
     assertTrue(afterDelete.isEmpty());
+  }
+
+  @Test
+  void testFindByItemId() {
+    UUID budapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
+    List<EventDO> events = await(repository.findByItemId(budapest));
+    assertTrue(events.size() >= 1, "Expected at least one event for Budapest item");
+    assertTrue(events.stream().allMatch(e -> budapest.equals(e.getItemId())));
+  }
+
+  @Test
+  void testDeleteByItemId() {
+    // Use an item that initially has no events in CSV (Delhi)
+    UUID delhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d");
+
+    LocalDateTime base = LocalDateTime.now().withNano(0);
+    EventDO ev1 = new EventDO(null, null, null, null, null, null, "u1", base, null, delhi, "v1", "/CityWf", "Start");
+    EventDO ev2 = new EventDO(null, null, null, null, null, null, "u2", base.plusMinutes(1), null, delhi, "v1", "/CityWf/UpdateCity", "Done");
+
+    await(repository.insert(ev1));
+    await(repository.insert(ev2));
+
+    List<EventDO> before = await(repository.findByItemId(delhi));
+    assertEquals(2, before.size());
+
+    int deleted = await(repository.deleteByItemId(delhi));
+    assertEquals(2, deleted);
+
+    List<EventDO> after = await(repository.findByItemId(delhi));
+    assertTrue(after.isEmpty());
   }
 }
