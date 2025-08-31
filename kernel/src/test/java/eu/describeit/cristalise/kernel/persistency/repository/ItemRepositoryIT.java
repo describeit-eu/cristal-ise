@@ -42,7 +42,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindById() {
     var nameBudapest = "Budapest";
-    var typeBudapest = "City";
+    var typeBudapest = "Capital";
     var versionBudapest = "v1";
 
     // use findByUuid
