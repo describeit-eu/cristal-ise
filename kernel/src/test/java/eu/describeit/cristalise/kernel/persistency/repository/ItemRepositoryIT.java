@@ -29,8 +29,8 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
   // to be updated
   final UUID idDelhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d");
 
-  // to be deleted
-  final UUID idParis = UUID.fromString("b42800c5-463f-4a9a-be7d-11c792856ced");
+  // to be deleted (choose an item without events to avoid FK violations)
+  final UUID idLondon = UUID.fromString("04a71ecd-7cda-439f-bf6e-6517a824f753");
 
   @BeforeAll
   @Override
@@ -92,10 +92,10 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testDeleteById() {
-    var rowsById = await(repository.deleteById(idParis));
+    var rowsById = await(repository.deleteById(idLondon));
     assertEquals(1, rowsById);
 
-    Optional<ItemDO> afterDelete = await(repository.findById(idParis));
+    Optional<ItemDO> afterDelete = await(repository.findById(idLondon));
     assertTrue(afterDelete.isEmpty());
   }
 

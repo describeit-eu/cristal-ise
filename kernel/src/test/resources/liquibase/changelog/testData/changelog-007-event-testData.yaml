@@ -24,6 +24,12 @@ databaseChangeLog:
                   name: action_version
                   type: string
               - column:
+                  name: action_path
+                  type: string
+              - column:
+                  name: transition_name
+                  type: string
+              - column:
                   name: script
                   type: uuid
               - column:
@@ -43,10 +49,4 @@ databaseChangeLog:
                   type: timestamp
               - column:
                   name: action_properties
-                  type: string
-              - column:
-                  name: action_path
-                  type: string
-              - column:
-                  name: transition_name
                   type: string

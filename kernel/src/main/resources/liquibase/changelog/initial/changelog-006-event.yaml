@@ -84,3 +84,4 @@ databaseChangeLog:
             constraintName: fk_event_item
             referencedColumnNames: id
             referencedTableName: item
+            onDelete: CASCADE
