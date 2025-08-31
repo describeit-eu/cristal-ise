@@ -39,3 +39,4 @@ databaseChangeLog:
             constraintName: fk_outcome_event
             referencedColumnNames: id
             referencedTableName: event
+            onDelete: CASCADE
