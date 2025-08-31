@@ -19,7 +19,7 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: action_desc_version
+                  name: action_version
                   type: varchar(255)
                   constraints:
                     nullable: true
@@ -68,6 +68,16 @@ databaseChangeLog:
                   type: varchar(255)
                   constraints:
                     nullable: false
+              - column:
+                  name: action_path
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: transition_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
         - addForeignKeyConstraint:
             baseColumnNames: item_id
             baseTableName: event

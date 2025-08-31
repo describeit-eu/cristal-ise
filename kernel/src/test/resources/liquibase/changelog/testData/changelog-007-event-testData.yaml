@@ -21,7 +21,7 @@ databaseChangeLog:
                   name: action_desc
                   type: uuid
               - column:
-                  name: action_desc_version
+                  name: action_version
                   type: string
               - column:
                   name: script
@@ -43,4 +43,10 @@ databaseChangeLog:
                   type: timestamp
               - column:
                   name: action_properties
+                  type: string
+              - column:
+                  name: action_path
+                  type: string
+              - column:
+                  name: transition_name
                   type: string

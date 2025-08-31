@@ -1,1 +1,1 @@
-item_id;item_version;action_desc;action_desc_version;script;script_version;state_machine_desc;state_machine_version;user_login;timestamp;action_properties
+item_id;item_version;action_properties;action_path;transition_name;action_desc;action_version;script;script_version;state_machine_desc;state_machine_version;user_login;timestamp

@@ -15,11 +15,11 @@ public class EventRepositoryImpl implements EventRepository {
   private final SqlClient client;
 
   private static final String TABLE = "event";
-  private static final String COLUMNS = "id,item_version,action_desc,action_desc_version,script,script_version,state_machine_desc,state_machine_version,user_login,timestamp,action_properties,item_id";
+  private static final String COLUMNS = "id,item_version,action_desc,action_version,script,script_version,state_machine_desc,state_machine_version,user_login,timestamp,action_properties,item_id,action_path,transition_name";
   private static final String SQL_FIND_BY_ID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
   private static final String SQL_FIND_ALL     = "SELECT " + COLUMNS + " FROM " + TABLE;
-  private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (item_version, action_desc, action_desc_version, script, script_version, state_machine_desc, state_machine_version, user_login, timestamp, action_properties, item_id) VALUES (#{item_version}, #{action_desc}, #{action_desc_version}, #{script}, #{script_version}, #{state_machine_desc}, #{state_machine_version}, #{user_login}, #{timestamp}, #{action_properties}, #{item_id}) RETURNING " + COLUMNS;
-  private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET item_version=#{item_version}, action_desc=#{action_desc}, action_desc_version=#{action_desc_version}, script=#{script}, script_version=#{script_version}, state_machine_desc=#{state_machine_desc}, state_machine_version=#{state_machine_version}, user_login=#{user_login}, timestamp=#{timestamp}, action_properties=#{action_properties}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS;
+  private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (item_version, action_desc, action_version, script, script_version, state_machine_desc, state_machine_version, user_login, timestamp, action_properties, item_id, action_path, transition_name) VALUES (#{item_version}, #{action_desc}, #{action_version}, #{script}, #{script_version}, #{state_machine_desc}, #{state_machine_version}, #{user_login}, #{timestamp}, #{action_properties}, #{item_id}, #{action_path}, #{transition_name}) RETURNING " + COLUMNS;
+  private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET item_version=#{item_version}, action_desc=#{action_desc}, action_version=#{action_version}, script=#{script}, script_version=#{script_version}, state_machine_desc=#{state_machine_desc}, state_machine_version=#{state_machine_version}, user_login=#{user_login}, timestamp=#{timestamp}, action_properties=#{action_properties}, item_id=#{item_id}, action_path=#{action_path}, transition_name=#{transition_name} WHERE id=#{id} RETURNING " + COLUMNS;
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}";
 
   public EventRepositoryImpl(SqlClient client) { this.client = client; }
