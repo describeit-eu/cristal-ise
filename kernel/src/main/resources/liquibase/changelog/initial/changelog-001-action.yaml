@@ -34,9 +34,8 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: is_composite
-                  type: boolean
-                  defaultValueBoolean: false
+                  name: type
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:

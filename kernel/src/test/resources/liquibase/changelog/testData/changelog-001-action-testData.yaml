@@ -27,8 +27,8 @@ databaseChangeLog:
                   name: properties
                   type: string
               - column:
-                  name: is_composite
-                  type: boolean
+                  name: type
+                  type: string
               - column:
                   name: layout
                   type: string

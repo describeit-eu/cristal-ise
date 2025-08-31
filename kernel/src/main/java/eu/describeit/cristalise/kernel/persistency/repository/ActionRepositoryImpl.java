@@ -15,12 +15,12 @@ public class ActionRepositoryImpl implements ActionRepository {
   private final SqlClient client;
 
   private static final String TABLE = "action";
-  private static final String COLUMNS = "id,name,path,version,properties,is_composite,layout,parent_id,item_id";
-  private static final String SELECT_COLUMNS = "id,name,path,version,properties,is_composite,layout,parent_id,item_id";
+  private static final String COLUMNS = "id,name,path,version,properties,type,layout,parent_id";
+  private static final String SELECT_COLUMNS = "id,name,path,version,properties,type,layout,parent_id";
   private static final String SQL_FIND_BY_ID   = "SELECT " + SELECT_COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
   private static final String SQL_FIND_ALL     = "SELECT " + SELECT_COLUMNS + " FROM " + TABLE;
-  private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (name, path, version, properties, is_composite, layout, parent_id, item_id) VALUES (#{name}, #{path}, #{version}, #{properties}, #{is_composite}, #{layout}, #{parent_id}, #{item_id}) RETURNING " + COLUMNS;
-  private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET name=#{name}, path=#{path}, version=#{version}, properties=#{properties}, is_composite=#{is_composite}, layout=#{layout}, parent_id=#{parent_id}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS;
+  private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (name, path, version, properties, type, layout, parent_id) VALUES (#{name}, #{path}, #{version}, #{properties}, #{type}, #{layout}, #{parent_id}) RETURNING " + COLUMNS;
+  private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET name=#{name}, path=#{path}, version=#{version}, properties=#{properties}, type=#{type}, layout=#{layout}, parent_id=#{parent_id} WHERE id=#{id} RETURNING " + COLUMNS;
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}";
 
   public ActionRepositoryImpl(SqlClient client) { this.client = client; }
