@@ -5,6 +5,7 @@ import io.vertx.core.Future;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface OutcomeRepository {
 
@@ -17,4 +18,8 @@ public interface OutcomeRepository {
   Future<Optional<OutcomeDO>> update(OutcomeDO outcome);
 
   Future<Integer> deleteById(Long id);
+
+  Future<List<OutcomeDO>> findByItemId(UUID itemId);
+
+  Future<Integer> deleteByItemId(UUID itemId);
 }

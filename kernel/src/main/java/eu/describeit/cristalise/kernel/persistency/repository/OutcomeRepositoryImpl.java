@@ -16,11 +16,13 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
 
   private static final String TABLE = "outcome";
   private static final String COLUMNS = "id,schema,schema_version,data,event_id,item_id";
-  private static final String SQL_FIND_BY_ID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
-  private static final String SQL_FIND_ALL     = "SELECT " + COLUMNS + " FROM " + TABLE;
-  private static final String SQL_INSERT       = "INSERT INTO " + TABLE + " (schema, schema_version, data, event_id, item_id) VALUES (#{schema}, #{schema_version}, #{data}, #{event_id}, #{item_id}) RETURNING " + COLUMNS;
-  private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET schema=#{schema}, schema_version=#{schema_version}, data=#{data}, event_id=#{event_id}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS;
-  private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_FIND_BY_ID      = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_FIND_BY_ITEM_ID = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{itemId}";
+  private static final String SQL_FIND_ALL        = "SELECT " + COLUMNS + " FROM " + TABLE;
+  private static final String SQL_INSERT          = "INSERT INTO " + TABLE + " (schema, schema_version, data, event_id, item_id) VALUES (#{schema}, #{schema_version}, #{data}, #{event_id}, #{item_id}) RETURNING " + COLUMNS;
+  private static final String SQL_UPDATE          = "UPDATE "      + TABLE + " SET schema=#{schema}, schema_version=#{schema_version}, data=#{data}, event_id=#{event_id}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS;
+  private static final String SQL_DELETE_BY_ID      = "DELETE FROM " + TABLE + " WHERE id=#{id}";
+  private static final String SQL_DELETE_BY_ITEM_ID = "DELETE FROM " + TABLE + " WHERE item_id=#{itemId}";
 
   public OutcomeRepositoryImpl(SqlClient client) { this.client = client; }
 
@@ -67,6 +69,23 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
       .execute(Collections.singletonMap("id", id))
+      .map(SqlResult::rowCount);
+  }
+
+  @Override
+  public Future<List<OutcomeDO>> findByItemId(UUID itemId) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_BY_ITEM_ID)
+      .mapTo(OutcomeDORowMapper.INSTANCE)
+      .execute(Collections.singletonMap("itemId", itemId))
+      .map(RepositoryUtils::toList);
+  }
+
+  @Override
+  public Future<Integer> deleteByItemId(UUID itemId) {
+    return SqlTemplate
+      .forUpdate(client, SQL_DELETE_BY_ITEM_ID)
+      .execute(Collections.singletonMap("itemId", itemId))
       .map(SqlResult::rowCount);
   }
 }
