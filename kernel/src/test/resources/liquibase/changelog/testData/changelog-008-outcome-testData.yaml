@@ -10,17 +10,3 @@ databaseChangeLog:
             tableName: outcome
             encoding: UTF-8
             nullValue: NULL
-            columns:
-              - column:
-                  name: schema
-                  header: schema_id
-                  type: uuid
-              - column:
-                  name: schema_version
-                  type: string
-              - column:
-                  name: data
-                  type: string
-              - column:
-                  name: event_id
-                  type: numeric

@@ -10,28 +10,3 @@ databaseChangeLog:
             tableName: action
             encoding: UTF-8
             nullValue: NULL
-            columns:
-              - column:
-                  name: id
-                  type: numeric
-              - column:
-                  name: name
-                  type: string
-              - column:
-                  name: path
-                  type: string
-              - column:
-                  name: version
-                  type: string
-              - column:
-                  name: properties
-                  type: string
-              - column:
-                  name: type
-                  type: string
-              - column:
-                  name: layout
-                  type: string
-              - column:
-                  name: parent_id
-                  type: numeric

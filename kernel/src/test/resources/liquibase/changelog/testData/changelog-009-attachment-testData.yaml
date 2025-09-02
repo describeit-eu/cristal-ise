@@ -10,20 +10,3 @@ databaseChangeLog:
             tableName: attachment
             encoding: UTF-8
             nullValue: NULL
-            columns:
-              - column:
-                  name: name
-                  type: string
-              - column:
-                  name: type
-                  type: string
-              - column:
-                  name: file_name
-                  type: string
-              - column:
-                  name: data
-                  type: string
-              - column:
-                  name: outcome_id
-                  type: numeric
-

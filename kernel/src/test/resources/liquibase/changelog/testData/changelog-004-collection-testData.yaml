@@ -10,16 +10,3 @@ databaseChangeLog:
             tableName: collection
             encoding: UTF-8
             nullValue: NULL
-            columns:
-              - column:
-                  name: item_id
-                  type: uuid
-              - column:
-                  name: name
-                  type: string
-              - column:
-                  name: version
-                  type: string
-              - column:
-                  name: properties
-                  type: string

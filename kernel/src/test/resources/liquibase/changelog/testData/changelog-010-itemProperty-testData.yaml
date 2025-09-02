@@ -9,16 +9,3 @@ databaseChangeLog:
             separator: ";"
             tableName: item_property
             encoding: UTF-8
-            columns:
-              - column:
-                  name: name
-                  type: string
-              - column:
-                  name: value
-                  type: string
-              - column:
-                  name: is_mutable
-                  type: boolean
-              - column:
-                  name: item_id
-                  type: uuid

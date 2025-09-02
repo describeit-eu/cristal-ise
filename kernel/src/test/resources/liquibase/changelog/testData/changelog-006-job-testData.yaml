@@ -10,13 +10,3 @@ databaseChangeLog:
             tableName: job
             encoding: UTF-8
             nullValue: NULL
-            columns:
-              - column:
-                  name: item_id
-                  type: uuid
-              - column:
-                  name: action_path
-                  type: string
-              - column:
-                  name: transition
-                  type: string
