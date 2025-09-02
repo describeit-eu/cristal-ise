@@ -54,3 +54,4 @@ databaseChangeLog:
             constraintName: fk_action_parent
             referencedColumnNames: id
             referencedTableName: action
+            onDelete: CASCADE

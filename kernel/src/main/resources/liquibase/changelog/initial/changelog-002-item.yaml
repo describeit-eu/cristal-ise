@@ -38,3 +38,4 @@ databaseChangeLog:
             constraintName: fk_action_item
             referencedColumnNames: id
             referencedTableName: action
+            onDelete: NO ACTION

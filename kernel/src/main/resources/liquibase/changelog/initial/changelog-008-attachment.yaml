@@ -44,3 +44,4 @@ databaseChangeLog:
             constraintName: fk_attachment_outcome
             referencedColumnNames: id
             referencedTableName: outcome
+            onDelete: CASCADE

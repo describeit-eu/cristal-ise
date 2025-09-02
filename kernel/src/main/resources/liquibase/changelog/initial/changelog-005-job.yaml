@@ -34,3 +34,4 @@ databaseChangeLog:
             constraintName: fk_job_item
             referencedColumnNames: id
             referencedTableName: item
+            onDelete: CASCADE

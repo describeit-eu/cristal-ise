@@ -34,3 +34,4 @@ databaseChangeLog:
             constraintName: fk_collection_member_collection
             referencedColumnNames: id
             referencedTableName: collection
+            onDelete: CASCADE

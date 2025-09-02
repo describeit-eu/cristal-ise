@@ -49,9 +49,11 @@ databaseChangeLog:
             constraintName: fk_viewpoint_outcome
             referencedColumnNames: id
             referencedTableName: outcome
+            onDelete: NO ACTION
         - addForeignKeyConstraint:
             baseColumnNames: item_id
             baseTableName: view_point
             constraintName: fk_viewpoint_item
             referencedColumnNames: id
             referencedTableName: item
+            onDelete: CASCADE

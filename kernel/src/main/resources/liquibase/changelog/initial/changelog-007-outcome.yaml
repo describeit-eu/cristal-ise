@@ -33,10 +33,22 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
+              - column:
+                  name: item_id
+                  type: uuid
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseColumnNames: event_id
             baseTableName: outcome
             constraintName: fk_outcome_event
             referencedColumnNames: id
             referencedTableName: event
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id
+            baseTableName: outcome
+            constraintName: fk_outcome_item
+            referencedColumnNames: id
+            referencedTableName: item
             onDelete: CASCADE
