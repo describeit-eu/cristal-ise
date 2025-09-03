@@ -10,3 +10,7 @@ databaseChangeLog:
             tableName: event
             encoding: UTF-8
             nullValue: NULL
+            columns:
+              - column:
+                  name: timestamp
+                  type: timestamp
