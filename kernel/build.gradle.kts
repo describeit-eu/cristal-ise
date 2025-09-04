@@ -5,10 +5,12 @@ val vertxVersion   = "5.0.4"
 val junitVersion   = "5.13.4"
 val slf4jVersion   = "2.0.17"
 val logbackVersion = "1.5.18"
+val groovyVersion  = "5.0.0"
 
 plugins {
   application
   java
+  groovy
   id("io.freefair.lombok") version "8.14"
 //  id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -22,6 +24,9 @@ application {
 
 dependencies {
   implementation(platform("io.vertx:vertx-stack-depchain:$vertxVersion"))
+
+  // Groovy support
+  implementation("org.apache.groovy:groovy:$groovyVersion")
 
   // Vert.x dependencies
 //  implementation("io.vertx:vertx-launcher-application")
