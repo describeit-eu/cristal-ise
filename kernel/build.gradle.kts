@@ -1,11 +1,14 @@
 //import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
-val vertxVersion   = "5.0.4"
-val junitVersion   = "5.13.4"
-val slf4jVersion   = "2.0.17"
-val logbackVersion = "1.5.18"
-val groovyVersion  = "5.0.0"
+val vertxVersion     = "5.0.4"
+val slf4jVersion     = "2.0.17"
+val logbackVersion   = "1.5.18"
+val liquibaseVersion = "4.33.0"
+val groovyVersion    = "5.0.0"
+
+val junitVersion          = "5.13.4"
+val testcontainersVersion = "1.21.3"
 
 plugins {
   application
@@ -30,18 +33,19 @@ dependencies {
 
   // Vert.x dependencies
 //  implementation("io.vertx:vertx-launcher-application")
-//  implementation("io.vertx:vertx-jdbc-client")
-//  implementation("io.vertx:vertx-service-proxy")
+  implementation("io.vertx:vertx-lang-groovy:$vertxVersion")
+  implementation("io.vertx:vertx-service-proxy")
   implementation("io.vertx:vertx-sql-client-templates")
   implementation("io.vertx:vertx-pg-client")
 //  implementation("io.vertx:vertx-auth-properties")
-//  implementation("io.vertx:vertx-hazelcast")
+  implementation("io.vertx:vertx-hazelcast")
   implementation("org.postgresql:postgresql:42.7.4")
 
   // Vert.x codegen dependencies
   compileOnly("io.vertx:vertx-codegen-json")
   annotationProcessor("io.vertx:vertx-codegen:$vertxVersion:processor")
   annotationProcessor("io.vertx:vertx-sql-client-templates:$vertxVersion")
+  annotationProcessor("io.vertx:vertx-service-proxy:$vertxVersion")
 
   // Logging dependencies
   implementation("org.slf4j:slf4j-api:$slf4jVersion")
@@ -54,9 +58,9 @@ dependencies {
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   // Integration testing: Testcontainers + Liquibase + PostgreSQL JDBC
-  testImplementation("org.testcontainers:junit-jupiter:1.21.3")
-  testImplementation("org.testcontainers:postgresql:1.21.3")
-  testImplementation("org.liquibase:liquibase-core:4.33.0")
+  testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
+  testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+  testImplementation("org.liquibase:liquibase-core:$liquibaseVersion")
 }
 
 //tasks.withType<ShadowJar> {
