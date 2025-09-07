@@ -32,8 +32,8 @@ dependencies {
   implementation("org.apache.groovy:groovy:$groovyVersion")
 
   // Vert.x dependencies
-//  implementation("io.vertx:vertx-launcher-application")
-  implementation("io.vertx:vertx-lang-groovy:$vertxVersion")
+  implementation("io.vertx:vertx-launcher-application")
+  implementation("io.vertx:vertx-lang-groovy")
   implementation("io.vertx:vertx-service-proxy")
   implementation("io.vertx:vertx-sql-client-templates")
   implementation("io.vertx:vertx-pg-client")
@@ -46,6 +46,8 @@ dependencies {
   annotationProcessor("io.vertx:vertx-codegen:$vertxVersion:processor")
   annotationProcessor("io.vertx:vertx-sql-client-templates:$vertxVersion")
   annotationProcessor("io.vertx:vertx-service-proxy:$vertxVersion")
+
+  implementation("org.liquibase:liquibase-core:${liquibaseVersion}")
 
   // Logging dependencies
   implementation("org.slf4j:slf4j-api:$slf4jVersion")
@@ -60,7 +62,6 @@ dependencies {
   // Integration testing: Testcontainers + Liquibase + PostgreSQL JDBC
   testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
   testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-  testImplementation("org.liquibase:liquibase-core:$liquibaseVersion")
 }
 
 //tasks.withType<ShadowJar> {
