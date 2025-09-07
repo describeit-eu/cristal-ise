@@ -1,4 +1,4 @@
-package eu.describeit.cristalise.kernel.entity;
+package eu.describeit.cristalise.kernel.item;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;

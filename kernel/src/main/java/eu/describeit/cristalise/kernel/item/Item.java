@@ -1,4 +1,4 @@
-package eu.describeit.cristalise.kernel.entity;
+package eu.describeit.cristalise.kernel.item;
 
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;

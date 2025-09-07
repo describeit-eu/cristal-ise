@@ -1,6 +1,6 @@
 package eu.describeit.cristalise.kernel.service;
 
-import eu.describeit.cristalise.kernel.entity.Item;
+import eu.describeit.cristalise.kernel.item.Item;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import lombok.extern.slf4j.Slf4j;
