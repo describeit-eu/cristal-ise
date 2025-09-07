@@ -1,10 +1,12 @@
 package eu.describeit.cristalise.kernel
 
 import eu.describeit.cristalise.kernel.item.ItemVerticle
+import groovy.transform.CompileStatic
 import io.vertx.core.*
 import groovy.util.logging.Slf4j
 
 @Slf4j
+//@CompileStatic
 class MainVerticle extends VerticleBase {
 
   @Override

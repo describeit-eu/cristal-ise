@@ -1,6 +1,7 @@
 package eu.describeit.cristalise.kernel.service
 
 import eu.describeit.cristalise.kernel.item.Item
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import groovy.util.logging.Slf4j
@@ -8,6 +9,7 @@ import groovy.util.logging.Slf4j
 import java.util.List
 
 @Slf4j
+@CompileStatic
 class ItemService implements Item {
 
     @Override
