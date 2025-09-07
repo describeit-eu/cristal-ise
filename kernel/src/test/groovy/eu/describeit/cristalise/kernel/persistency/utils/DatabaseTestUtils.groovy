@@ -2,6 +2,7 @@ package eu.describeit.cristalise.kernel.persistency.utils
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import io.vertx.core.Completable
 import io.vertx.core.Context
 import io.vertx.core.Future
 import io.vertx.core.Vertx
@@ -14,8 +15,6 @@ import liquibase.Scope
 import liquibase.command.CommandScope
 import liquibase.resource.ClassLoaderResourceAccessor
 import org.testcontainers.containers.PostgreSQLContainer
-
-import java.util.concurrent.CompletableFuture
 
 import static java.util.concurrent.TimeUnit.SECONDS
 
@@ -93,7 +92,7 @@ class DatabaseTestUtils {
       .setPassword(pgContainer.getPassword())
   }
 
-  static <T> T awaitSimple(Future<T> future) {
+  static <T> T await(Future<T> future) {
     try {
       return future.toCompletionStage().toCompletableFuture().get(5, SECONDS)
     } catch (Exception e) {
@@ -101,7 +100,8 @@ class DatabaseTestUtils {
     }
   }
 
-  static <T> T await(Future<T> future) {
+/*
+  static <T> T awaitDebug(Future<T> future) {
     if (Context.isOnVertxThread()) {
       log.info("await() - Vert.x event loop thread")
       return Future.await(future)
@@ -132,4 +132,5 @@ class DatabaseTestUtils {
       }
     }
   }
+*/
 }

@@ -1,5 +1,6 @@
 package eu.describeit.cristalise.kernel;
 
+import groovy.transform.CompileStatic;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(VertxExtension.class)
+@CompileStatic
 public class TestMainVerticle {
   @BeforeEach
   public void deploy_verticle(Vertx vertx, VertxTestContext testContext) {

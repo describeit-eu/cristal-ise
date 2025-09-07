@@ -1,5 +1,6 @@
 package eu.describeit.cristalise.kernel.item;
 
+import groovy.transform.CompileStatic;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.ThreadingModel;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Slf4j
 @ExtendWith(VertxExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@CompileStatic
 class ItemVerticleTest {
 
     private Item itemService;

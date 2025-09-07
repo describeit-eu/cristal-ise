@@ -5,7 +5,7 @@ val vertxVersion     = "5.0.4"
 val slf4jVersion     = "2.0.17"
 val logbackVersion   = "1.5.18"
 val liquibaseVersion = "4.33.0"
-val groovyVersion    = "5.0.0"
+val groovyVersion    = "4.0.28"
 
 val junitVersion          = "5.13.4"
 val testcontainersVersion = "1.21.3"
