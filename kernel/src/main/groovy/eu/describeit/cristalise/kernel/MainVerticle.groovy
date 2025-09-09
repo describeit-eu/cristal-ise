@@ -6,7 +6,7 @@ import io.vertx.core.*
 import groovy.util.logging.Slf4j
 
 @Slf4j
-//@CompileStatic
+@CompileStatic
 class MainVerticle extends VerticleBase {
 
   @Override
@@ -17,15 +17,15 @@ class MainVerticle extends VerticleBase {
 
     Promise<?> promise = Promise.promise()
 
-    vertx.deployVerticle(ItemVerticle.class, options).onComplete { ar ->
-      if (ar.succeeded()) {
-        log.info("ItemVerticle deployed successfully")
-        promise.succeed()
-      } else {
-        log.error("Error deploying ItemVerticle", ar.cause())
-        promise.fail(ar.cause())
-      }
-    }
+    vertx.deployVerticle(ItemVerticle.class, options)
+      .onSuccess((String result) -> {
+        log.info("ItemVerticle deployed successfully");
+        promise.complete(result);
+      })
+      .onFailure((Throwable failure) -> {
+        log.error("Error deploying ItemVerticle", failure);
+        promise.fail(failure);
+      });
 
     return promise.future()
   }
