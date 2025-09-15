@@ -59,7 +59,7 @@ class StateMachineDelegate {
   }
 
   public void state(String stateName, Closure cl = null) {
-    log.debug "state() - stateName: $stateName"
+    log.debug "state() - stateName:{}", stateName
     assert stateName
     def state = stateCache[stateName]
     if (!state) {
@@ -71,7 +71,7 @@ class StateMachineDelegate {
   }
 
   public void transition(String transName, Map<String, String> states = null, Closure cl = null) {
-    log.debug "transition() - transName: $transName, states: $states"
+    log.debug "transition() - transName:{}, states:{}", transName, states
     assert transName
 
     def trans = transCache[transName]
@@ -103,14 +103,14 @@ class StateMachineDelegate {
   }
 
   public void initialState(String stateName) {
-    log.debug "initialState() - stateName: $stateName"
+    log.debug "initialState() - stateName:{}", stateName
     assert stateCache && stateCache[stateName]
 
     sm.initialState = stateCache[stateName]
   }
 
   public void finishingState(String... stateNames) {
-    log.debug "finishingState() - states: $stateNames"
+    log.debug "finishingState() - states:{}", stateNames
     List<Integer> ids = []
 
     for (s in stateNames) {
