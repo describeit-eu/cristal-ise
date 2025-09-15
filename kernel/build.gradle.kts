@@ -9,6 +9,7 @@ val groovyVersion    = "4.0.28"
 
 val junitVersion          = "5.13.4"
 val testcontainersVersion = "1.21.3"
+val spockVersion          = "2.3-groovy-4.0"
 
 plugins {
   application
@@ -40,6 +41,7 @@ dependencies {
 //  implementation("io.vertx:vertx-auth-properties")
   implementation("io.vertx:vertx-hazelcast")
   implementation("org.postgresql:postgresql:42.7.4")
+  implementation("com.fasterxml.jackson.core:jackson-databind")
 
   // Vert.x codegen dependencies
   compileOnly("io.vertx:vertx-codegen-json")
@@ -57,6 +59,7 @@ dependencies {
   platform("org.junit:junit-bom:$junitVersion")
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter")
+  testImplementation("org.spockframework:spock-core:$spockVersion")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   // Integration testing: Testcontainers + Liquibase + PostgreSQL JDBC
