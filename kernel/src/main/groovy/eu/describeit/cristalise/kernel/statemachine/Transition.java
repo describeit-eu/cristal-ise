@@ -1,6 +1,5 @@
 package eu.describeit.cristalise.kernel.statemachine;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

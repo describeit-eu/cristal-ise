@@ -1,23 +1,3 @@
-/**
- * This file is part of the CRISTAL-iSE kernel.
- * Copyright (c) 2001-2015 The CRISTAL Consortium. All rights reserved.
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 3 of the License, or (at
- * your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; with out even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
- *
- * http://www.fsf.org/licensing/licenses/lgpl.html
- */
 package eu.describeit.cristalise.dsl.statemachine
 
 import eu.describeit.cristalise.kernel.statemachine.State
@@ -50,7 +30,7 @@ class StateMachineDelegate {
     sm.namespace = ns
   }
 
-  public void processClosure(Closure cl) {
+  public void processClosure(@DelegatesTo(StateMachineDelegate) Closure cl) {
     assert cl, "StateMachineDelegate only works with a valid Closure"
 
     cl.delegate = this
@@ -58,7 +38,7 @@ class StateMachineDelegate {
     cl()
   }
 
-  public void state(String stateName, Closure cl = null) {
+  public void state(String stateName) {
     log.debug "state() - stateName:{}", stateName
     assert stateName
     def state = stateCache[stateName]
@@ -66,11 +46,9 @@ class StateMachineDelegate {
       state = sm.createState(stateName)
       stateCache[stateName] = state
     }
-
-//        if(cl) new StateDelegate(state).processClosure(cl)
   }
 
-  public void transition(String transName, Map<String, String> states = null, Closure cl = null) {
+  public void transition(String transName, Map<String, String> states = null, @DelegatesTo(TransitionDelegate) Closure cl = null) {
     log.debug "transition() - transName:{}, states:{}", transName, states
     assert transName
 

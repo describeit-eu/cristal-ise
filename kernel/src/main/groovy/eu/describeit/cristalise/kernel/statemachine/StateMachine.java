@@ -1,18 +1,25 @@
 package eu.describeit.cristalise.kernel.statemachine;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import eu.describeit.cristalise.kernel.BuiltInResources;
+import eu.describeit.cristalise.kernel.DescriptionObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+
+import static eu.describeit.cristalise.kernel.BuiltInResources.STATE_MACHINE_RESOURCE;
 
 @Slf4j @Data
-public class StateMachine {
-  public String namespace;
-  public String name;
-  public Integer version;
+public class StateMachine implements DescriptionObject {
+  private String namespace;
+  private String name;
+  private Integer version;
+
+  private UUID itemID;
 
   private List<State> states;
   private List<Transition> transitions;
@@ -151,8 +158,9 @@ public class StateMachine {
     return states.stream().filter(s -> s.getName().equals(name)).findFirst().orElse(null);
   }
 
-  public int getErrorTransitionIdForState(int id) {
-//    return getState(id).getErrorTransitionId();
-    return -1;
+  @JsonIgnore
+  @Override
+  public BuiltInResources getResourceType() {
+    return STATE_MACHINE_RESOURCE;
   }
 }
