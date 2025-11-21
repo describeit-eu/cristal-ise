@@ -63,7 +63,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindAll() {
     List<ItemDO> foundItems = await(repository.findAll())
-    assertTrue(foundItems.size() >= 9, "There should be at least 8 cities in the database")
+    assertTrue(foundItems.size() >= 9, "There should be at least 9 cities in the database")
   }
 
   @Test

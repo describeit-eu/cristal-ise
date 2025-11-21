@@ -1,11 +1,10 @@
 package eu.describeit.cristalise.kernel.persistency.repository
 
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionDO
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 
-import java.util.List
-import java.util.Optional
-
+@CompileStatic
 public interface CollectionRepository {
 
   Future<Optional<CollectionDO>> findById(Long id)

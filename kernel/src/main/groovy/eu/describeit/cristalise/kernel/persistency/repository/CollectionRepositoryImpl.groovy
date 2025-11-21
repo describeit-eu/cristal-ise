@@ -3,13 +3,16 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionDO
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.*
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
+@CompileStatic
 public class CollectionRepositoryImpl implements CollectionRepository {
 
   private final SqlClient client
@@ -29,8 +32,8 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(CollectionDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -39,7 +42,7 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(RepositoryUtils::toList)
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -49,7 +52,7 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .mapFrom(CollectionDOParametersMapper.INSTANCE)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(collection)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for collection name:"+collection.getName()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for collection name:"+collection.getName()))
   }
 
   @Override
@@ -59,14 +62,14 @@ public class CollectionRepositoryImpl implements CollectionRepository {
       .mapFrom(CollectionDOParametersMapper.INSTANCE)
       .mapTo(CollectionDORowMapper.INSTANCE)
       .execute(collection)
-      .map(RepositoryUtils::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(Long id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 }

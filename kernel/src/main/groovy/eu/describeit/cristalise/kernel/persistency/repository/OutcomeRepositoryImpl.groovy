@@ -3,13 +3,16 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.OutcomeDO
 import eu.describeit.cristalise.kernel.persistency.domain.OutcomeDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.OutcomeDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.*
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
+@CompileStatic
 public class OutcomeRepositoryImpl implements OutcomeRepository {
 
   private final SqlClient client
@@ -31,8 +34,8 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(OutcomeDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -41,7 +44,7 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(RepositoryUtils::toList)
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -51,7 +54,7 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .mapFrom(OutcomeDOParametersMapper.INSTANCE)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(outcome)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for outcome id:"+outcome.getId()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for outcome id:"+outcome.getId()))
   }
 
   @Override
@@ -61,15 +64,15 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
       .mapFrom(OutcomeDOParametersMapper.INSTANCE)
       .mapTo(OutcomeDORowMapper.INSTANCE)
       .execute(outcome)
-      .map(RepositoryUtils::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(Long id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 
   @Override
@@ -77,15 +80,15 @@ public class OutcomeRepositoryImpl implements OutcomeRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ITEM_ID)
       .mapTo(OutcomeDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("itemId", itemId))
-      .map(RepositoryUtils::toList)
+      .execute(Collections.singletonMap("itemId", (Object)itemId))
+      .map(rs -> toList(rs))
   }
 
   @Override
   public Future<Integer> deleteByItemId(UUID itemId) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ITEM_ID)
-      .execute(Collections.singletonMap("itemId", itemId))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("itemId", (Object)itemId))
+      .map(rs -> rs.rowCount())
   }
 }

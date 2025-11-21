@@ -3,13 +3,16 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionMemberDO
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionMemberDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.CollectionMemberDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.*
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
+@CompileStatic
 public class CollectionMemberRepositoryImpl implements CollectionMemberRepository {
 
   private final SqlClient client
@@ -29,8 +32,8 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -39,7 +42,7 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(RepositoryUtils::toList)
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -49,7 +52,7 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .mapFrom(CollectionMemberDOParametersMapper.INSTANCE)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(member)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for collection_member id:"+member.getCollectionId()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for collection_member id:"+member.getCollectionId()))
   }
 
   @Override
@@ -59,14 +62,14 @@ public class CollectionMemberRepositoryImpl implements CollectionMemberRepositor
       .mapFrom(CollectionMemberDOParametersMapper.INSTANCE)
       .mapTo(CollectionMemberDORowMapper.INSTANCE)
       .execute(member)
-      .map(RepositoryUtils::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(Long id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 }

@@ -1,11 +1,11 @@
 package eu.describeit.cristalise.kernel.persistency.repository
 
 import eu.describeit.cristalise.kernel.persistency.domain.AttachmentDO
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 
-import java.util.List
-import java.util.Optional
 
+@CompileStatic
 interface AttachmentRepository {
 
   Future<Optional<AttachmentDO>> findById(Long id)

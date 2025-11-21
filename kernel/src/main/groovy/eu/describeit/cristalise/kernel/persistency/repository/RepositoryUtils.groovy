@@ -1,5 +1,6 @@
 package eu.describeit.cristalise.kernel.persistency.repository
 
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 
 import java.util.ArrayList
@@ -10,6 +11,7 @@ import java.util.Optional
 /**
  * Small helper utilities to reduce duplicated code across repository implementations.
  */
+@CompileStatic
 final class RepositoryUtils {
 
   private RepositoryUtils() {}
@@ -19,7 +21,7 @@ final class RepositoryUtils {
    */
   static <T> Optional<T> firstOptional(Iterable<T> rs) {
     Iterator<T> it = rs.iterator()
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty()
+    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty() as Optional<T>
   }
 
   /**

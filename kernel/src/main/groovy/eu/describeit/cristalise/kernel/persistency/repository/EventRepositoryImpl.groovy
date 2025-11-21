@@ -3,14 +3,16 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.EventDO
 import eu.describeit.cristalise.kernel.persistency.domain.EventDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.EventDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.*
-import java.util.UUID
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
+@CompileStatic
 public class EventRepositoryImpl implements EventRepository {
 
   private final SqlClient client
@@ -32,8 +34,8 @@ public class EventRepositoryImpl implements EventRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(EventDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -42,7 +44,7 @@ public class EventRepositoryImpl implements EventRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(RepositoryUtils::toList)
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -50,8 +52,8 @@ public class EventRepositoryImpl implements EventRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ITEM_ID)
       .mapTo(EventDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("item_id", item_id))
-      .map(RepositoryUtils::toList)
+      .execute(Collections.singletonMap("item_id", (Object)item_id))
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -61,7 +63,7 @@ public class EventRepositoryImpl implements EventRepository {
       .mapFrom(EventDOParametersMapper.INSTANCE)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(event)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for event id:"+event.getId()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for event id:"+event.getId()))
   }
 
   @Override
@@ -71,22 +73,22 @@ public class EventRepositoryImpl implements EventRepository {
       .mapFrom(EventDOParametersMapper.INSTANCE)
       .mapTo(EventDORowMapper.INSTANCE)
       .execute(event)
-      .map(RepositoryUtils::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(Long id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 
   @Override
   public Future<Integer> deleteByItemId(UUID item_id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ITEM_ID)
-      .execute(Collections.singletonMap("item_id", item_id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("item_id", (Object)item_id))
+      .map(rs -> rs.rowCount())
   }
 }

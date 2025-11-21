@@ -3,14 +3,17 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.ViewPointDO
 import eu.describeit.cristalise.kernel.persistency.domain.ViewPointDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.ViewPointDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.*
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
-public class ViewPointRepositoryImpl implements ViewPointRepository {
+@CompileStatic
+ public class ViewPointRepositoryImpl implements ViewPointRepository {
 
   private final SqlClient client
 
@@ -31,8 +34,8 @@ public class ViewPointRepositoryImpl implements ViewPointRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ViewPointDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -41,7 +44,7 @@ public class ViewPointRepositoryImpl implements ViewPointRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(ViewPointDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(RepositoryUtils::toList)
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -51,7 +54,7 @@ public class ViewPointRepositoryImpl implements ViewPointRepository {
       .mapFrom(ViewPointDOParametersMapper.INSTANCE)
       .mapTo(ViewPointDORowMapper.INSTANCE)
       .execute(viewPoint)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row for viewPoint id:"+viewPoint.getId()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for viewPoint id:"+viewPoint.getId()))
   }
 
   @Override
@@ -61,15 +64,15 @@ public class ViewPointRepositoryImpl implements ViewPointRepository {
       .mapFrom(ViewPointDOParametersMapper.INSTANCE)
       .mapTo(ViewPointDORowMapper.INSTANCE)
       .execute(viewPoint)
-      .map(RepositoryUtils::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(Long id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 
   @Override
@@ -77,15 +80,15 @@ public class ViewPointRepositoryImpl implements ViewPointRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ITEM_ID)
       .mapTo(ViewPointDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("itemId", itemId))
-      .map(RepositoryUtils::toList)
+      .execute(Collections.singletonMap("itemId", (Object)itemId))
+      .map(rs -> toList(rs))
   }
 
   @Override
   public Future<Integer> deleteByItemId(UUID itemId) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ITEM_ID)
-      .execute(Collections.singletonMap("itemId", itemId))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("itemId", (Object)itemId))
+      .map(rs -> rs.rowCount())
   }
 }

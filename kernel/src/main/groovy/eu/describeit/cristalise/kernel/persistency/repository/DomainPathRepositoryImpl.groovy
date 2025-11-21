@@ -3,13 +3,16 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.DomainPathDO
 import eu.describeit.cristalise.kernel.persistency.domain.DomainPathDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.DomainPathDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.*
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
+@CompileStatic
 public class DomainPathRepositoryImpl implements DomainPathRepository {
 
   private final SqlClient client
@@ -32,8 +35,8 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(DomainPathDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -42,11 +45,7 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(rowSet -> {
-        List<DomainPathDO> list = new ArrayList<>()
-        for (DomainPathDO row : rowSet) list.add(row)
-        return list
-      })
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -56,11 +55,7 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
       .mapFrom(DomainPathDOParametersMapper.INSTANCE)
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(domainPath)
-      .compose(rowSet -> {
-        Iterator<DomainPathDO> it = rowSet.iterator()
-        if (it.hasNext()) return Future.succeededFuture(it.next())
-        else              return Future.failedFuture("Insert did not return a row for domain path:"+domainPath.getPath())
-      })
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for domain path:"+domainPath.getPath()))
   }
 
   @Override
@@ -70,15 +65,15 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
       .mapFrom(DomainPathDOParametersMapper.INSTANCE)
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(domainPath)
-      .map(this::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(Long id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 
   @Override
@@ -86,44 +81,27 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ITEM_ID)
       .mapTo(DomainPathDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("item_id", itemId))
-      .map(rowSet -> {
-        List<DomainPathDO> list = new ArrayList<>()
-        for (DomainPathDO row : rowSet) list.add(row)
-        return list
-      })
+      .execute(Collections.singletonMap("item_id", (Object)itemId))
+      .map(rs -> toList(rs))
   }
 
   @Override
   public Future<List<DomainPathDO>> getChildren(String path) {
-    Map<String, Object> params = Map.of("path", path)
+    Map<String, Object> params = Map.of("path", (Object)path)
     return SqlTemplate
       .forQuery(client, SQL_GET_CHILDREN)
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(params)
-      .map(rowSet -> {
-        List<DomainPathDO> list = new ArrayList<>()
-        for (DomainPathDO row : rowSet) list.add(row)
-        return list
-      })
+      .map(rs -> toList(rs))
   }
 
   @Override
   public Future<List<DomainPathDO>> getTree(String path) {
-    Map<String, Object> params = Map.of("path", path)
+    Map<String, Object> params = Map.of("path", (Object)path)
     return SqlTemplate
       .forQuery(client, SQL_GET_TREE)
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(params)
-      .map(rowSet -> {
-        List<DomainPathDO> list = new ArrayList<>()
-        for (DomainPathDO row : rowSet) list.add(row)
-        return list
-      })
-  }
-
-  private Optional<DomainPathDO> firstOptional(Iterable<DomainPathDO> rs) {
-    Iterator<DomainPathDO> it = rs.iterator()
-    return it.hasNext() ? Optional.ofNullable(it.next()) : Optional.empty()
+      .map(rs -> toList(rs))
   }
 }

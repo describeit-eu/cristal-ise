@@ -8,7 +8,7 @@ val liquibaseVersion = "4.33.0"
 val groovyVersion    = "4.0.28"
 
 val junitVersion          = "5.13.4"
-val testcontainersVersion = "1.21.3"
+val testcontainersVersion = "2.0.2"
 val spockVersion          = "2.3-groovy-4.0"
 
 plugins {
@@ -63,8 +63,9 @@ dependencies {
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   // Integration testing: Testcontainers + Liquibase + PostgreSQL JDBC
-  testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
-  testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+  testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainersVersion"))
+  testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+  testImplementation("org.testcontainers:testcontainers-postgresql")
 }
 
 //tasks.withType<ShadowJar> {

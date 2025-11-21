@@ -3,13 +3,16 @@ package eu.describeit.cristalise.kernel.persistency.repository
 import eu.describeit.cristalise.kernel.persistency.domain.ItemDO
 import eu.describeit.cristalise.kernel.persistency.domain.ItemDOParametersMapper
 import eu.describeit.cristalise.kernel.persistency.domain.ItemDORowMapper
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
-import io.vertx.sqlclient.SqlResult
 import io.vertx.sqlclient.templates.SqlTemplate
 import io.vertx.sqlclient.SqlClient
 
-import java.util.*
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
 
+@CompileStatic
 public class ItemRepositoryImpl implements ItemRepository {
 
   private final SqlClient client
@@ -31,8 +34,8 @@ public class ItemRepositoryImpl implements ItemRepository {
     return SqlTemplate
       .forQuery(client, SQL_FIND_BY_ID)
       .mapTo(ItemDORowMapper.INSTANCE)
-      .execute(Collections.singletonMap("id", id))
-      .map(RepositoryUtils::firstOptional)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
@@ -41,7 +44,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .forQuery(client, SQL_FIND_ALL)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(Collections.emptyMap())
-      .map(RepositoryUtils::toList)
+      .map(rs -> toList(rs))
   }
 
   @Override
@@ -51,7 +54,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
-      .compose(rowSet -> RepositoryUtils.firstOrFail(rowSet, "Insert did not return a row id:"+item.getId()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row id:"+item.getId()))
   }
 
   @Override
@@ -61,14 +64,14 @@ public class ItemRepositoryImpl implements ItemRepository {
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
-      .map(RepositoryUtils::firstOptional)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
   public Future<Integer> deleteById(UUID id) {
     return SqlTemplate
       .forUpdate(client, SQL_DELETE_BY_ID)
-      .execute(Collections.singletonMap("id", id))
-      .map(SqlResult::rowCount)
+      .execute(Collections.singletonMap("id", (Object)id))
+      .map(rs -> rs.rowCount())
   }
 }
