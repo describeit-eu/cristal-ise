@@ -2,8 +2,6 @@ package eu.describeit.cristalise.kernel.persistency.utils
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import io.vertx.core.Completable
-import io.vertx.core.Context
 import io.vertx.core.Future
 import io.vertx.core.Vertx
 import io.vertx.pgclient.PgBuilder
@@ -14,7 +12,7 @@ import io.vertx.sqlclient.SqlClient
 import liquibase.Scope
 import liquibase.command.CommandScope
 import liquibase.resource.ClassLoaderResourceAccessor
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 
 import static java.util.concurrent.TimeUnit.SECONDS
 
@@ -24,8 +22,8 @@ class DatabaseTestUtils {
   static final String DB_IMAGE = "postgres:17-ltree"
   static final String DB_NAME = "cristalise-test"
 
-  static PostgreSQLContainer<?> getPGContainer() {
-    def container = new PostgreSQLContainer<>(DB_IMAGE)
+  static PostgreSQLContainer getPGContainer() {
+    def container = new PostgreSQLContainer(DB_IMAGE)
     container.withDatabaseName(DB_NAME)
 
     log.info("getPGContainer() - {}", container)
@@ -33,21 +31,21 @@ class DatabaseTestUtils {
     return container
   }
 
-  static void liquibaseLoadTestData(PostgreSQLContainer<?> pgContainer) throws Exception {
+  static void liquibaseLoadTestData(PostgreSQLContainer pgContainer) throws Exception {
     liquibaseLoadTestData(pgContainer, null)
   }
 
-  static void liquibaseLoadTestData(PostgreSQLContainer<?> pgContainer, String context) throws Exception {
+  static void liquibaseLoadTestData(PostgreSQLContainer pgContainer, String context) throws Exception {
     def logFile = "/liquibase/changelog/changelog-testData-master.yaml"
     liquibaseUpdate(pgContainer, logFile, context)
   }
 
-  static void liquibaseCreateTables(PostgreSQLContainer<?> pgContainer) throws Exception {
+  static void liquibaseCreateTables(PostgreSQLContainer pgContainer) throws Exception {
     def logFile = "/liquibase/changelog/changelog-master.yaml"
     liquibaseUpdate(pgContainer, logFile, null)
   }
 
-  static Pool getPool(Vertx vertx, PostgreSQLContainer<?> pgContainer) {
+  static Pool getPool(Vertx vertx, PostgreSQLContainer pgContainer) {
     def connectOptions = getPgConnectOptions(pgContainer)
 
     return PgBuilder.pool()
@@ -57,7 +55,7 @@ class DatabaseTestUtils {
       .build()
   }
 
-  static SqlClient getSqlClient(Vertx vertx, PostgreSQLContainer<?> pgContainer) {
+  static SqlClient getSqlClient(Vertx vertx, PostgreSQLContainer pgContainer) {
     def connectOptions = getPgConnectOptions(pgContainer)
 
     return PgBuilder.client()
@@ -67,7 +65,7 @@ class DatabaseTestUtils {
       .build()
   }
 
-  private static void liquibaseUpdate(PostgreSQLContainer<?> pgContainer, String logFile, String context) throws Exception {
+  private static void liquibaseUpdate(PostgreSQLContainer pgContainer, String logFile, String context) throws Exception {
     Scope.child(Scope.Attr.resourceAccessor, new ClassLoaderResourceAccessor(), () -> {
       def update = new CommandScope("update")
 
@@ -83,7 +81,7 @@ class DatabaseTestUtils {
     })
   }
 
-  private static PgConnectOptions getPgConnectOptions(PostgreSQLContainer<?> pgContainer) {
+  private static PgConnectOptions getPgConnectOptions(PostgreSQLContainer pgContainer) {
     return new PgConnectOptions()
       .setPort(pgContainer.getMappedPort(5432))
       .setHost(pgContainer.getHost())

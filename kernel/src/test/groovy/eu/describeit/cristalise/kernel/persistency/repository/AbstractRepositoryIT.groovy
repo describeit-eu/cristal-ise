@@ -7,7 +7,7 @@ import io.vertx.sqlclient.Pool
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 
 import static eu.describeit.cristalise.kernel.persistency.utils.DatabaseTestUtils.*
 import static java.util.concurrent.TimeUnit.SECONDS
@@ -22,7 +22,7 @@ import static java.util.concurrent.TimeUnit.SECONDS
 @CompileStatic
 abstract class AbstractRepositoryIT {
 
-  protected PostgreSQLContainer<?> pgContainer
+  protected PostgreSQLContainer pgContainer
   protected Vertx vertx
   protected Pool pool
 
@@ -39,14 +39,15 @@ abstract class AbstractRepositoryIT {
 
   @AfterAll
   void tearDownAll() {
-    if (pool != null) {
-      pool.close()
-    }
-    if (vertx != null) {
-      vertx.close().toCompletionStage().toCompletableFuture().orTimeout(5, SECONDS).exceptionally(ex -> null)
-    }
-    if (pgContainer != null) {
-      pgContainer.stop()
-    }
+    pool?.close()
+
+    vertx
+      ?.close()
+      ?.toCompletionStage()
+      ?.toCompletableFuture()
+      ?.orTimeout(5, SECONDS)
+      ?.exceptionally(ex -> null)
+
+    pgContainer?.stop()
   }
 }
