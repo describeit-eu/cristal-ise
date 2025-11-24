@@ -3,9 +3,10 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 val vertxVersion     = "5.0.4"
 val slf4jVersion     = "2.0.17"
-val logbackVersion   = "1.5.18"
-val liquibaseVersion = "4.33.0"
+val logbackVersion   = "1.5.21"
+val liquibaseVersion = "5.0.1"
 val groovyVersion    = "4.0.28"
+val daggerVersion    = "2.57.2"
 
 val junitVersion          = "5.13.4"
 val testcontainersVersion = "2.0.2"
@@ -27,12 +28,11 @@ application {
 }
 
 dependencies {
-  implementation(platform("io.vertx:vertx-stack-depchain:$vertxVersion"))
-
   // Groovy support
   implementation("org.apache.groovy:groovy:$groovyVersion")
 
   // Vert.x dependencies
+  implementation(platform("io.vertx:vertx-stack-depchain:$vertxVersion"))
   implementation("io.vertx:vertx-launcher-application")
   implementation("io.vertx:vertx-lang-groovy")
   implementation("io.vertx:vertx-service-proxy")
@@ -40,6 +40,7 @@ dependencies {
   implementation("io.vertx:vertx-pg-client")
 //  implementation("io.vertx:vertx-auth-properties")
   implementation("io.vertx:vertx-hazelcast")
+  implementation("io.vertx:vertx-config")
   implementation("org.postgresql:postgresql:42.7.4")
   implementation("com.fasterxml.jackson.core:jackson-databind")
 
@@ -49,6 +50,8 @@ dependencies {
   annotationProcessor("io.vertx:vertx-sql-client-templates:$vertxVersion")
   annotationProcessor("io.vertx:vertx-service-proxy:$vertxVersion")
 
+  implementation("com.google.dagger:dagger:${daggerVersion}")
+  annotationProcessor ("com.google.dagger:dagger-compiler:${daggerVersion}")
   implementation("org.liquibase:liquibase-core:${liquibaseVersion}")
 
   // Logging dependencies
@@ -56,7 +59,7 @@ dependencies {
   implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
   // Test dependencies
-  platform("org.junit:junit-bom:$junitVersion")
+  testImplementation(platform("org.junit:junit-bom:$junitVersion"))
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.spockframework:spock-core:$spockVersion")
@@ -76,13 +79,20 @@ dependencies {
 //    mergeServiceFiles()
 //}
 
-tasks.withType<Test> {
+tasks {
+  compileGroovy {
+    groovyOptions.isJavaAnnotationProcessing = true
+  }
+
+  withType<Test> {
     useJUnitPlatform()
     testLogging {
-        events = setOf(PASSED, SKIPPED, FAILED)
+      events = setOf(PASSED, SKIPPED, FAILED)
     }
+  }
+
+  withType<JavaExec> {
+    args = listOf(mainVerticleName)
+  }
 }
 
-tasks.withType<JavaExec> {
-    args = listOf(mainVerticleName)
-}

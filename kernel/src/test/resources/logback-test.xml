@@ -9,8 +9,7 @@
   </appender>
 
   <!-- Slf4j log levels are ERROR, WARN, INFO, DEBUG, TRACE-->
-
-  <logger name="io.vertx" level="TRACE"/>
+<!--  <logger name="io.vertx" level="TRACE"/>-->
 
   <root level="DEBUG">
     <appender-ref ref="STDOUT"/>
