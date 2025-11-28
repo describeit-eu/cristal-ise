@@ -10,9 +10,9 @@ import java.util.List;
 @ProxyGen // Generate the proxy and handler
 @VertxGen // Generate clients in non-java languages
 public interface Item {
-    public static final String ADDRESS = "cristalise-items";
+    String ADDRESS = "cristalise-items";
 
-    public Future<String> requestAction(
+    Future<String> requestAction(
             String     itemUuid,
             String     actorUuid,
             String     actionPath,
