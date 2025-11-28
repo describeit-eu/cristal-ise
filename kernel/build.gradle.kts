@@ -89,6 +89,9 @@ tasks {
     testLogging {
       events = setOf(PASSED, SKIPPED, FAILED)
     }
+    configureEach {
+      maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    }
   }
 
   withType<JavaExec> {
