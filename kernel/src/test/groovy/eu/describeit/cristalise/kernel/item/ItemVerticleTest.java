@@ -1,5 +1,7 @@
 package eu.describeit.cristalise.kernel.item;
 
+import eu.describeit.cristalise.kernel.dagger.DaggerKernelModule_ItemFactory;
+import eu.describeit.cristalise.kernel.dagger.KernelModule;
 import groovy.transform.CompileStatic;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -21,47 +23,51 @@ import java.util.UUID;
 @CompileStatic
 class ItemVerticleTest {
 
-    private Item itemService;
+  private Item itemService;
 
-    @BeforeAll
-    @DisplayName("Deploy ItemVerticle and create service proxy")
-    public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
-        DeploymentOptions options = new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER);
-        vertx.deployVerticle(new ItemVerticle(new ItemService()), options).onComplete(testContext.succeeding(id -> {
-            log.info("ItemVerticle deployed with id:{}", id);
-            itemService = Item.createProxy(vertx);
-            testContext.completeNow();
-        }));
-    }
+  @BeforeAll
+  @DisplayName("Deploy ItemVerticle and create service proxy")
+  public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
+    DeploymentOptions options = new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER);
 
-    @Test
-    @DisplayName("Test requestAction method successfully")
-    public void testRequestActionSuccess(Vertx vertx, VertxTestContext testContext) {
-        String itemUuid = UUID.randomUUID().toString();
-        String actorUuid = UUID.randomUUID().toString();
-        String actionPath = "/some/action";
-        String transitionID = "Start";
-        String outcome = "{}";
-        String fileName = null;
-        List<Byte> attachment = Collections.emptyList(); // Using empty list for simplicity
+    KernelModule.ItemFactory component = DaggerKernelModule_ItemFactory.create();
 
-        Future<String> future = itemService.requestAction(
-                itemUuid,
-                actorUuid,
-                actionPath,
-                transitionID,
-                outcome,
-                fileName,
-                attachment
-        );
+    vertx.deployVerticle(component.itemVerticle(), options)
+      .onComplete(testContext.succeeding(id -> {
+        log.info("ItemVerticle deployed with id:{}", id);
+        itemService = Item.createProxy(vertx);
+        testContext.completeNow();
+      }));
+  }
 
-        future.onComplete(testContext.succeeding(result -> testContext.verify(() -> {
-            String expectedResult = String.format("Action '%s' requested for Item %s by Actor %s", actionPath, itemUuid, actorUuid);
-            Assertions.assertEquals(expectedResult, result, "The result string should match the expected format.");
-            testContext.completeNow();
-        })));
-    }
+  @Test
+  @DisplayName("Test requestAction method successfully")
+  public void testRequestActionSuccess(Vertx vertx, VertxTestContext testContext) {
+    String itemUuid = UUID.randomUUID().toString();
+    String actorUuid = UUID.randomUUID().toString();
+    String actionPath = "/some/action";
+    String transitionID = "Start";
+    String outcome = "{}";
+    String fileName = null;
+    List<Byte> attachment = Collections.emptyList(); // Using empty list for simplicity
 
-    // Optional: Add a test case for failure scenarios if needed
-    // For example, if you modify requestAction to potentially fail under certain conditions.
+    Future<String> future = itemService.requestAction(
+      itemUuid,
+      actorUuid,
+      actionPath,
+      transitionID,
+      outcome,
+      fileName,
+      attachment
+    );
+
+    future.onComplete(testContext.succeeding(result -> testContext.verify(() -> {
+      String expectedResult = String.format("Action '%s' requested for Item %s by Actor %s", actionPath, itemUuid, actorUuid);
+      Assertions.assertEquals(expectedResult, result, "The result string should match the expected format.");
+      testContext.completeNow();
+    })));
+  }
+
+  // Optional: Add a test case for failure scenarios if needed
+  // For example, if you modify requestAction to potentially fail under certain conditions.
 }
