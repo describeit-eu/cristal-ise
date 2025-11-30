@@ -1,6 +1,6 @@
 package eu.describeit.cristalise.kernel.item
 
-import eu.describeit.cristalise.kernel.service.ItemService
+
 import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.core.VerticleBase
@@ -12,34 +12,26 @@ import javax.inject.Inject
 @CompileStatic
 class ItemVerticle extends VerticleBase {
 
-    /**
-     * Item service to be registered. If not injected (e.g., in tests),
-     * a default ItemService instance will be used as a fallback.
-     */
-    @Inject
-    Item itemService
+  Item itemService
 
-    ItemVerticle() {}
+  @Inject
+  ItemVerticle(Item service) {
+    itemService = service
+  }
 
-    ItemVerticle(Item itemService) {
-        this.itemService = itemService
-    }
+  @Override
+  public Future<?> start() throws Exception {
+    new ServiceBinder(vertx)
+      .setAddress(Item.ADDRESS)
+      .register(Item.class, itemService)
 
-    @Override
-    public Future<?> start() throws Exception {
-        Item service = (itemService != null) ? itemService : new ItemService()
+    log.info("ItemVerticle started")
+    return super.start()
+  }
 
-        new ServiceBinder(vertx)
-            .setAddress(Item.ADDRESS)
-            .register(Item.class, service)
-
-        log.info("ItemVerticle started")
-        return super.start()
-    }
-
-    @Override
-    public Future<?> stop() throws Exception {
-        log.info("ItemVerticle stopped")
-        return super.stop()
-    }
+  @Override
+  public Future<?> stop() throws Exception {
+    log.info("ItemVerticle stopped")
+    return super.stop()
+  }
 }

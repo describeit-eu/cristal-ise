@@ -27,7 +27,7 @@ class ItemVerticleTest {
     @DisplayName("Deploy ItemVerticle and create service proxy")
     public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
         DeploymentOptions options = new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER);
-        vertx.deployVerticle(new ItemVerticle(), options).onComplete(testContext.succeeding(id -> {
+        vertx.deployVerticle(new ItemVerticle(new ItemService()), options).onComplete(testContext.succeeding(id -> {
             log.info("ItemVerticle deployed with id:{}", id);
             itemService = Item.createProxy(vertx);
             testContext.completeNow();

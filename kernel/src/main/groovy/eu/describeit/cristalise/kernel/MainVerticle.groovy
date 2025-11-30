@@ -1,8 +1,8 @@
 package eu.describeit.cristalise.kernel
 
-import eu.describeit.cristalise.kernel.item.ItemVerticle
+import eu.describeit.cristalise.kernel.dagger.KernelModule
 import eu.describeit.cristalise.kernel.item.DaggerItemComponent
-import eu.describeit.cristalise.kernel.item.ItemComponent
+
 import groovy.transform.CompileStatic
 import io.vertx.core.*
 import groovy.util.logging.Slf4j
@@ -20,12 +20,9 @@ class MainVerticle extends VerticleBase {
     Promise<?> promise = Promise.promise()
 
     // Build DI component and inject dependencies into verticles
-    ItemComponent component = DaggerItemComponent.create()
+    KernelModule.ItemFactory component = DaggerItemComponent.create()
 
-    ItemVerticle v = new ItemVerticle()
-    component.inject(v)
-
-    vertx.deployVerticle(v, options)
+    vertx.deployVerticle(component.itemVerticle(), options)
       .onSuccess((String result) -> {
         log.info("ItemVerticle deployed successfully");
         promise.complete(result);
