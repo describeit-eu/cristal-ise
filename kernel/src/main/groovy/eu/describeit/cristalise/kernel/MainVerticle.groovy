@@ -13,16 +13,12 @@ class MainVerticle extends VerticleBase {
 
   @Override
   public Future<?> start() {
-    DeploymentOptions options = new DeploymentOptions()
-      .setThreadingModel(ThreadingModel.VIRTUAL_THREAD)
-      .setInstances(1)
-
     Promise<?> promise = Promise.promise()
 
     // Build DI component and inject dependencies into verticles
     KernelModule.ItemFactory component = DaggerKernelModule_ItemFactory.create()
 
-    vertx.deployVerticle(component.itemVerticle(), options)
+    vertx.deployVerticle(component.itemVerticle(), component.deploymentOptions())
       .onSuccess((String result) -> {
         log.info("ItemVerticle deployed successfully");
         promise.complete(result);
