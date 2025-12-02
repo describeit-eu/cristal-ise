@@ -10,7 +10,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 import java.time.LocalDateTime
 
-import static eu.describeit.cristalise.kernel.persistency.utils.DatabaseTestUtils.await
+import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.await
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.postgresql.PostgreSQLContainer
 
-import static eu.describeit.cristalise.kernel.persistency.utils.DatabaseTestUtils.*
+import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.*
 import static java.util.concurrent.TimeUnit.SECONDS
 
 /**

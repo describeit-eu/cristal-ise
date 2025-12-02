@@ -1,7 +1,7 @@
 package eu.describeit.cristalise.kernel.item;
 
-import eu.describeit.cristalise.kernel.dagger.DaggerKernelModule_ItemFactory;
-import eu.describeit.cristalise.kernel.dagger.KernelModule;
+import eu.describeit.cristalise.kernel.dagger.DaggerKernelComponent;
+import eu.describeit.cristalise.kernel.dagger.KernelComponent;
 import groovy.transform.CompileStatic;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -30,7 +30,7 @@ class ItemVerticleTest {
   public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
     DeploymentOptions options = new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER);
 
-    KernelModule.ItemFactory component = DaggerKernelModule_ItemFactory.create();
+    KernelComponent component = DaggerKernelComponent.create();
 
     vertx.deployVerticle(component.itemVerticle(), options)
       .onComplete(testContext.succeeding(id -> {

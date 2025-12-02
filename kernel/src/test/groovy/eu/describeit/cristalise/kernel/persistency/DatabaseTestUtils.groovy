@@ -1,4 +1,4 @@
-package eu.describeit.cristalise.kernel.persistency.utils
+package eu.describeit.cristalise.kernel.persistency
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j

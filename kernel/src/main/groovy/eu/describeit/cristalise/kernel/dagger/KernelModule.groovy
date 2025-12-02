@@ -6,6 +6,7 @@ import dagger.Provides
 import eu.describeit.cristalise.kernel.item.Item
 import eu.describeit.cristalise.kernel.item.ItemService
 import eu.describeit.cristalise.kernel.item.ItemVerticle
+import groovy.transform.CompileStatic
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
@@ -19,6 +20,7 @@ import javax.inject.Singleton
 /**
  * Dagger module that provides bindings for Item-related services.
  */
+@CompileStatic
 @Module
 class KernelModule {
 
@@ -78,11 +80,4 @@ class KernelModule {
       .setInstances(deploymentConfig.getInteger("instances", 1))
   }
 
-  @Singleton
-  @Component(modules = [KernelModule])
-  static interface ItemFactory {
-
-    ItemVerticle itemVerticle()
-    DeploymentOptions deploymentOptions()
-  }
 }
