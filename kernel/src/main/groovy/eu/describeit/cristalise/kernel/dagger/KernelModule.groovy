@@ -1,6 +1,5 @@
 package eu.describeit.cristalise.kernel.dagger
 
-import dagger.Component
 import dagger.Module
 import dagger.Provides
 import eu.describeit.cristalise.kernel.item.Item
