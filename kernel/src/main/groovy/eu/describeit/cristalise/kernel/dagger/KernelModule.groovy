@@ -6,6 +6,7 @@ import eu.describeit.cristalise.kernel.item.Item
 import eu.describeit.cristalise.kernel.item.ItemService
 import eu.describeit.cristalise.kernel.item.ItemVerticle
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
@@ -15,10 +16,14 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 
 import javax.inject.Singleton
+import java.util.concurrent.TimeUnit
+
+import static java.util.concurrent.TimeUnit.SECONDS
 
 /**
- * Dagger module that provides bindings for Item-related services.
+ * Dagger module that provides bindings for kernel-related services.
  */
+@Slf4j
 @CompileStatic
 @Module
 class KernelModule {
@@ -50,7 +55,8 @@ class KernelModule {
   @Provides
   @Singleton
   static Vertx provideVertx() {
-    return Vertx.currentContext()?.owner()
+    // Fallback to creating a Vertx instance when not running on a Vert.x context (e.g., in tests)
+    return Vertx.currentContext()?.owner() ?: Vertx.vertx()
   }
 
   /**
@@ -59,8 +65,20 @@ class KernelModule {
   @Provides
   @Singleton
   static ConfigRetriever provideConfigRetriever(Vertx vertx, ConfigStoreOptions configStore) {
-    ConfigRetrieverOptions options = new ConfigRetrieverOptions().addStore(configStore)
-    return ConfigRetriever.create(vertx, options)
+    ConfigRetriever retriever = ConfigRetriever.create(vertx)
+    // Eagerly load config so cached config is available to other providers during component creation
+    try {
+      retriever
+        .getConfig()
+        .toCompletionStage()
+        .toCompletableFuture()
+        .get(5, SECONDS)
+    } catch (Exception ignored) {
+      log.debug("", ignored)
+    }
+
+    log.trace('provideConfigRetriever() - {}', retriever.cachedConfig)
+    return retriever
   }
 
   /**

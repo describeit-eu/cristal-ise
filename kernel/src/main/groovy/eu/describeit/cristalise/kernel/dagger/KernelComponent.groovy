@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @CompileStatic
 @Singleton
 @Component(modules = [KernelModule, PersistencyModule])
- interface KernelComponent {
+interface KernelComponent {
 
   ItemVerticle itemVerticle()
 

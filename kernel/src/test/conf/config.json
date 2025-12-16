@@ -1,0 +1,6 @@
+{
+  "database": {
+    "name": "cristalise-test",
+    "image": "postgres:17-ltree"
+  }
+}

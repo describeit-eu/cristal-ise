@@ -11,7 +11,7 @@
   <!-- Slf4j log levels are ERROR, WARN, INFO, DEBUG, TRACE-->
 <!--  <logger name="io.vertx" level="TRACE"/>-->
 
-  <root level="DEBUG">
+  <root level="INFO">
     <appender-ref ref="STDOUT"/>
   </root>
 

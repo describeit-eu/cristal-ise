@@ -11,30 +11,38 @@ import io.vertx.pgclient.PgConnectOptions
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.PoolOptions
 import io.vertx.sqlclient.SqlClient
+import org.testcontainers.postgresql.PostgreSQLContainer
 
 import javax.inject.Singleton
 
-/**
- * Dagger module that provides persistency-related bindings (database connections, pools, etc.).
- */
 @CompileStatic
 @Module
-class PersistencyModule {
+class TestPersistencyModule {
 
-  /**
-   * Provides PgConnectOptions built from Vert.x configuration.
-   */
   @Provides
   @Singleton
-  static PgConnectOptions providePgConnectOptions(ConfigRetriever configRetriever) {
+  static PostgreSQLContainer providePGContainer(ConfigRetriever configRetriever) {
     JsonObject config = configRetriever.getCachedConfig()
     JsonObject db = config.getJsonObject("database", config.getJsonObject("db", new JsonObject()))
 
-    String host     = db.getString("host", "localhost")
-    int port        = db.getInteger("port", 5432)
-    String database = db.getString("name", "cristalise")
-    String user     = db.getString("user", "postgres")
-    String password = db.getString("password", "postgres")
+    String image = db.getString("image", "postgres:17-ltree")
+    String dbName = db.getString("image", "cristalise-test")
+
+    PostgreSQLContainer container = new PostgreSQLContainer(image)
+    container.withDatabaseName(dbName)
+
+    return container
+  }
+
+  @Provides
+  @Singleton
+  static PgConnectOptions providePgConnectOptions(PostgreSQLContainer pgContainer) {
+
+    String host     = pgContainer.getHost()
+    int port        = pgContainer.getMappedPort(5432)
+    String database = pgContainer.getDatabaseName()
+    String user     = pgContainer.getUsername()
+    String password = pgContainer.getPassword()
 
     return new PgConnectOptions()
       .setHost(host)
@@ -83,4 +91,5 @@ class PersistencyModule {
   @Provides
   @Singleton
   static SqlClient provideSqlClient(Pool pool) { return pool }
+
 }

@@ -64,6 +64,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.spockframework:spock-core:$spockVersion")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testAnnotationProcessor ("com.google.dagger:dagger-compiler:${daggerVersion}")
 
   // Integration testing: Testcontainers + Liquibase + PostgreSQL JDBC
   testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainersVersion"))
@@ -81,6 +82,10 @@ dependencies {
 
 tasks {
   compileGroovy {
+    groovyOptions.isJavaAnnotationProcessing = true
+  }
+
+  compileTestGroovy {
     groovyOptions.isJavaAnnotationProcessing = true
   }
 

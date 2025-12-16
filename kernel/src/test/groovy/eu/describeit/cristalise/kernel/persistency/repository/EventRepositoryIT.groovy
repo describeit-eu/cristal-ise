@@ -48,17 +48,17 @@ class EventRepositoryIT extends AbstractRepositoryIT {
     def now = LocalDateTime.now().withNano(0)
 
     def toInsert = new EventDO(
-      null,              // actionDesc
-      null,              // actionVersion
-      null,              // script
-      null,              // scriptVersion
-      null,              // stateMachineDesc
-      null,              // stateMachineVersion
-      "it-user",         // userLogin
-      now,               // timestamp
-      null,              // actionProperties
-      itemId,            // itemId
-      "v1",              // itemVersion
+      null,        // actionDesc
+      null,      // actionVersion
+      null,            // script
+      null,       // scriptVersion
+      null,   // stateMachineDesc
+      null, // stateMachineVersion
+      "it-user",    // userLogin
+      now,                   // timestamp
+      null,     // actionProperties
+      itemId,                 // itemId
+      "v1",                // itemVersion
       "/CityWf/UpdateCity", // actionPath
       "Done"             // transitionName
     )

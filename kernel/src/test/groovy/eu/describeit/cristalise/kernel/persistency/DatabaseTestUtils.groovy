@@ -19,17 +19,6 @@ import static java.util.concurrent.TimeUnit.SECONDS
 @Slf4j
 @CompileStatic
 class DatabaseTestUtils {
-  static final String DB_IMAGE = "postgres:17-ltree"
-  static final String DB_NAME = "cristalise-test"
-
-  static PostgreSQLContainer getPGContainer() {
-    def container = new PostgreSQLContainer(DB_IMAGE)
-    container.withDatabaseName(DB_NAME)
-
-    log.info("getPGContainer() - {}", container)
-
-    return container
-  }
 
   static void liquibaseLoadTestData(PostgreSQLContainer pgContainer) throws Exception {
     liquibaseLoadTestData(pgContainer, null)
@@ -43,26 +32,6 @@ class DatabaseTestUtils {
   static void liquibaseCreateTables(PostgreSQLContainer pgContainer) throws Exception {
     def logFile = "/liquibase/changelog/changelog-master.yaml"
     liquibaseUpdate(pgContainer, logFile, null)
-  }
-
-  static Pool getPool(Vertx vertx, PostgreSQLContainer pgContainer) {
-    def connectOptions = getPgConnectOptions(pgContainer)
-
-    return PgBuilder.pool()
-      .with(new PoolOptions().setMaxSize(5))
-      .connectingTo(connectOptions)
-      .using(vertx)
-      .build()
-  }
-
-  static SqlClient getSqlClient(Vertx vertx, PostgreSQLContainer pgContainer) {
-    def connectOptions = getPgConnectOptions(pgContainer)
-
-    return PgBuilder.client()
-      .with(new PoolOptions().setMaxSize(5))
-      .connectingTo(connectOptions)
-      .using(vertx)
-      .build()
   }
 
   private static void liquibaseUpdate(PostgreSQLContainer pgContainer, String logFile, String context) throws Exception {
@@ -79,15 +48,6 @@ class DatabaseTestUtils {
 
       log.info("liquibaseUpdate() - DONE url: {}", pgContainer.getJdbcUrl())
     })
-  }
-
-  private static PgConnectOptions getPgConnectOptions(PostgreSQLContainer pgContainer) {
-    return new PgConnectOptions()
-      .setPort(pgContainer.getMappedPort(5432))
-      .setHost(pgContainer.getHost())
-      .setDatabase(pgContainer.getDatabaseName())
-      .setUser(pgContainer.getUsername())
-      .setPassword(pgContainer.getPassword())
   }
 
   static <T> T await(Future<T> future) {
