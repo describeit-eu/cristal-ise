@@ -14,7 +14,6 @@ class MainVerticle extends VerticleBase {
   public Future<?> start() {
     Promise<?> promise = Promise.promise()
 
-    // Build DI component and inject dependencies into verticles
     KernelComponent component = DaggerKernelComponent.create()
 
     vertx.deployVerticle(component.itemVerticle(), component.deploymentOptions())
