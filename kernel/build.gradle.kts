@@ -7,6 +7,7 @@ val logbackVersion   = "1.5.21"
 val liquibaseVersion = "5.0.1"
 val groovyVersion    = "4.0.28"
 val daggerVersion    = "2.57.2"
+val psqlVersion      = "42.7.8"
 
 val junitVersion          = "5.13.4"
 val testcontainersVersion = "2.0.2"
@@ -41,7 +42,7 @@ dependencies {
 //  implementation("io.vertx:vertx-auth-properties")
   implementation("io.vertx:vertx-hazelcast")
   implementation("io.vertx:vertx-config")
-  implementation("org.postgresql:postgresql:42.7.4")
+  implementation("org.postgresql:postgresql:$psqlVersion")
   implementation("com.fasterxml.jackson.core:jackson-databind")
 
   // Vert.x codegen dependencies

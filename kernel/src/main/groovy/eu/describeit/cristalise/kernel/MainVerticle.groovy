@@ -18,13 +18,13 @@ class MainVerticle extends VerticleBase {
 
     vertx.deployVerticle(component.itemVerticle(), component.deploymentOptions())
       .onSuccess((String result) -> {
-        log.info("ItemVerticle deployed successfully");
-        promise.complete(result);
+        log.info("ItemVerticle deployed successfully")
+        promise.complete(result)
       })
       .onFailure((Throwable failure) -> {
-        log.error("Error deploying ItemVerticle", failure);
-        promise.fail(failure);
-      });
+        log.error("Error deploying ItemVerticle", failure)
+        promise.fail(failure)
+      })
 
     return promise.future()
   }
