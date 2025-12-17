@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static io.vertx.core.ThreadingModel.VIRTUAL_THREAD;
+
 @Slf4j
 @ExtendWith(VertxExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -28,7 +30,7 @@ class ItemVerticleTest {
   @BeforeAll
   @DisplayName("Deploy ItemVerticle and create service proxy")
   public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
-    DeploymentOptions options = new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER);
+    DeploymentOptions options = new DeploymentOptions().setThreadingModel(VIRTUAL_THREAD);
 
     KernelComponent component = DaggerKernelComponent.create();
 

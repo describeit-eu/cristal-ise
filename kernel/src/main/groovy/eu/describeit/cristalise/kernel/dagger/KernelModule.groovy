@@ -14,6 +14,7 @@ import io.vertx.core.DeploymentOptions
 import io.vertx.core.ThreadingModel
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
+import io.vertx.sqlclient.Pool
 
 import javax.inject.Singleton
 import java.util.concurrent.TimeUnit
@@ -33,20 +34,8 @@ class KernelModule {
    */
   @Provides
   @Singleton
-  static Item provideItemService() {
-    return new ItemService()
-  }
-
-  /**
-   * Provides ConfigStoreOptions for file-based configuration.
-   */
-  @Provides
-  @Singleton
-  static ConfigStoreOptions provideConfigStoreOptions() {
-    return new ConfigStoreOptions()
-      .setType("file")
-      .setFormat("json")
-      .setConfig(new JsonObject().put("path", "config.json"))
+  static Item provideItemService(Pool pool) {
+    return new ItemService(pool)
   }
 
   /**
@@ -89,12 +78,13 @@ class KernelModule {
   static DeploymentOptions provideDeploymentOptions(ConfigRetriever configRetriever) {
     JsonObject config = configRetriever.getCachedConfig()
     JsonObject deploymentConfig = config.getJsonObject("deployment", new JsonObject())
-    ThreadingModel threadingModel = ThreadingModel.valueOf(
-      deploymentConfig.getString("threadingModel", "VIRTUAL_THREAD"))
+
+    String threadingModel = deploymentConfig.getString("threadingModel", "VIRTUAL_THREAD")
+    Integer instances = deploymentConfig.getInteger("instances", 1)
 
     return new DeploymentOptions()
-      .setThreadingModel(threadingModel)
-      .setInstances(deploymentConfig.getInteger("instances", 1))
+      .setThreadingModel(ThreadingModel.valueOf(threadingModel))
+      .setInstances(instances)
   }
 
 }
