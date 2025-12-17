@@ -10,7 +10,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 import java.time.LocalDateTime
 
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.await
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -30,7 +29,7 @@ class EventRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindAll() {
-    def events = await(repository.findAll())
+    def events = repository.findAll().await()
     // From 07-event.csv we inserted at least 10 rows
     assertTrue(events.size() >= 10, "There should be at least 10 events loaded from CSV")
 
@@ -63,21 +62,21 @@ class EventRepositoryIT extends AbstractRepositoryIT {
       "Done"             // transitionName
     )
 
-    def inserted = await(repository.insert(toInsert))
+    def inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
     assertEquals("it-user", inserted.getUserLogin())
     assertEquals(itemId, inserted.getItemId())
     assertEquals("v1", inserted.getItemVersion())
     assertEquals("/CityWf/UpdateCity", inserted.getActionPath())
 
-    def fetchedOpt = await(repository.findById(inserted.getId()))
+    def fetchedOpt = repository.findById(inserted.getId()).await()
     assertTrue(fetchedOpt.isPresent())
     assertEquals(inserted, fetchedOpt.get())
 
     // Update a couple of fields
     inserted.setUserLogin("it-user-upd")
     inserted.setActionVersion("v2")
-    def updatedOpt = await(repository.update(inserted))
+    def updatedOpt = repository.update(inserted).await()
     assertTrue(updatedOpt.isPresent())
     def updated = updatedOpt.get()
     assertEquals(inserted.getId(), updated.getId())
@@ -85,16 +84,16 @@ class EventRepositoryIT extends AbstractRepositoryIT {
     assertEquals("v2", updated.getActionVersion())
 
     // Delete
-    def rows = await(repository.deleteById(updated.getId()))
+    def rows = repository.deleteById(updated.getId()).await()
     assertEquals(1, rows)
-    def afterDelete = await(repository.findById(updated.getId()))
+    def afterDelete = repository.findById(updated.getId()).await()
     assertTrue(afterDelete.isEmpty())
   }
 
   @Test
   void testFindByItemId() {
     def budapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
-    def events = await(repository.findByItemId(budapest))
+    def events = repository.findByItemId(budapest).await()
     assertTrue(events.size() >= 1, "Expected at least one event for Budapest item")
     assertTrue(events.stream().allMatch(e -> budapest.equals(e.getItemId())))
   }
@@ -108,16 +107,16 @@ class EventRepositoryIT extends AbstractRepositoryIT {
     def ev1 = new EventDO(null, null, null, null, null, null, "u1", base, null, delhi, "v1", "/CityWf", "Start")
     def ev2 = new EventDO(null, null, null, null, null, null, "u2", base.plusMinutes(1), null, delhi, "v1", "/CityWf/UpdateCity", "Done")
 
-    await(repository.insert(ev1))
-    await(repository.insert(ev2))
+    repository.insert(ev1).await()
+    repository.insert(ev2).await()
 
-    def before = await(repository.findByItemId(delhi))
+    def before = repository.findByItemId(delhi).await()
     assertEquals(2, before.size())
 
-    def deleted = await(repository.deleteByItemId(delhi))
+    def deleted = repository.deleteByItemId(delhi).await()
     assertEquals(2, deleted)
 
-    def after = await(repository.findByItemId(delhi))
+    def after = repository.findByItemId(delhi).await()
     assertTrue(after.isEmpty())
   }
 }

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
 import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.await
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -28,7 +27,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindAll() {
-    def actions = await(repository.findAll())
+    def actions = repository.findAll().await()
     // From 01-action.csv there are 10 non-header lines
     assertTrue(actions.size() >= 10, "There should be at least 10 actions loaded from CSV")
   }
@@ -45,7 +44,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
       1L // parent CityWf assumed to have id=1 as first inserted
     )
 
-    def inserted = await(repository.insert(toInsert))
+    def inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
     assertEquals(toInsert.getName(), inserted.getName())
     assertEquals(toInsert.getPath(), inserted.getPath())
@@ -55,7 +54,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     assertEquals(toInsert.getLayout(), inserted.getLayout())
     assertEquals(toInsert.getParentId(), inserted.getParentId())
 
-    def fetched = await(repository.findById(inserted.getId()))
+    def fetched = repository.findById(inserted.getId()).await()
     assertTrue(fetched.isPresent())
     assertEquals(inserted, fetched.get())
   }
@@ -72,12 +71,12 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
       null,
       6L // parent CapitalWf assumed id
     )
-    def inserted = await(repository.insert(base))
+    def inserted = repository.insert(base).await()
 
     inserted.setName("TempActionUpdated")
     inserted.setVersion("v2")
 
-    def updatedOpt = await(repository.update(inserted))
+    def updatedOpt = repository.update(inserted).await()
     assertTrue(updatedOpt.isPresent())
     def updated = updatedOpt.get()
 
@@ -101,16 +100,16 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
       null,
       1L
     )
-    def inserted = await(repository.insert(base))
+    def inserted = repository.insert(base).await()
 
-    def rows = await(repository.deleteById(inserted.getId()))
+    def rows = repository.deleteById(inserted.getId()).await()
     assertEquals(1, rows)
 
-    def afterDelete = await(repository.findById(inserted.getId()))
+    def afterDelete = repository.findById(inserted.getId()).await()
     assertTrue(afterDelete.isEmpty())
 
     // also check non-existent id returns empty
-    def none = await(repository.findById(-1L))
+    def none = repository.findById(-1L).await()
     assertTrue(none.isEmpty())
   }
 }

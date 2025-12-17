@@ -8,7 +8,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.await
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -28,7 +27,7 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindAll() {
-    List<OutcomeDO> outcomes = await(repository.findAll())
+    List<OutcomeDO> outcomes = repository.findAll().await()
     // From 08-outcome.csv there are 9 non-header lines
     assertTrue(outcomes.size() >= 9, "There should be at least 9 outcomes loaded from CSV")
   }
@@ -43,7 +42,7 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
       UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
     )
 
-    OutcomeDO inserted = await(repository.insert(toInsert))
+    OutcomeDO inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
     assertEquals(toInsert.getSchema(), inserted.getSchema())
     assertEquals(toInsert.getSchemaVersion(), inserted.getSchemaVersion())
@@ -51,7 +50,7 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
     assertEquals(toInsert.getEventId(), inserted.getEventId())
     assertEquals(toInsert.getItemId(), inserted.getItemId())
 
-    Optional<OutcomeDO> fetched = await(repository.findById(inserted.getId()))
+    Optional<OutcomeDO> fetched = repository.findById(inserted.getId()).await()
     assertTrue(fetched.isPresent())
     assertEquals(inserted, fetched.get())
   }
@@ -66,12 +65,12 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
       1L, // eventId
       UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
     )
-    OutcomeDO inserted = await(repository.insert(base))
+    OutcomeDO inserted = repository.insert(base).await()
 
     inserted.setSchemaVersion("v3")
     inserted.setData(new JsonObject("{\"action\":\"UpdatedAction\",\"status\":\"completed\"}"))
 
-    Optional<OutcomeDO> updatedOpt = await(repository.update(inserted))
+    Optional<OutcomeDO> updatedOpt = repository.update(inserted).await()
     assertTrue(updatedOpt.isPresent())
     OutcomeDO updated = updatedOpt.get()
 
@@ -93,16 +92,16 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
       1L, // eventId
       UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
     )
-    OutcomeDO inserted = await(repository.insert(base))
+    OutcomeDO inserted = repository.insert(base).await()
 
-    int rows = await(repository.deleteById(inserted.getId()))
+    int rows = repository.deleteById(inserted.getId()).await()
     assertEquals(1, rows)
 
-    Optional<OutcomeDO> afterDelete = await(repository.findById(inserted.getId()))
+    Optional<OutcomeDO> afterDelete = repository.findById(inserted.getId()).await()
     assertTrue(afterDelete.isEmpty())
 
     // also check non-existent id returns empty
-    Optional<OutcomeDO> none = await(repository.findById(-1L))
+    Optional<OutcomeDO> none = repository.findById(-1L).await()
     assertTrue(none.isEmpty())
   }
 
@@ -126,10 +125,10 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
       testItemId // itemId
     )
 
-    OutcomeDO inserted1 = await(repository.insert(outcome1))
-    OutcomeDO inserted2 = await(repository.insert(outcome2))
+    OutcomeDO inserted1 = repository.insert(outcome1).await()
+    OutcomeDO inserted2 = repository.insert(outcome2).await()
 
-    List<OutcomeDO> foundOutcomes = await(repository.findByItemId(testItemId))
+    List<OutcomeDO> foundOutcomes = repository.findByItemId(testItemId).await()
     assertEquals(5, foundOutcomes.size())
 
     // Verify both outcomes are present (order may vary)
@@ -157,24 +156,24 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
       testItemId // itemId
     )
 
-    OutcomeDO inserted1 = await(repository.insert(outcome1))
-    OutcomeDO inserted2 = await(repository.insert(outcome2))
+    OutcomeDO inserted1 = repository.insert(outcome1).await()
+    OutcomeDO inserted2 = repository.insert(outcome2).await()
 
     // Verify both outcomes exist
-    List<OutcomeDO> beforeDelete = await(repository.findByItemId(testItemId))
+    List<OutcomeDO> beforeDelete = repository.findByItemId(testItemId).await()
     assertEquals(2, beforeDelete.size())
 
     // Delete by item ID
-    int deletedRows = await(repository.deleteByItemId(testItemId))
+    int deletedRows = repository.deleteByItemId(testItemId).await()
     assertEquals(2, deletedRows)
 
     // Verify outcomes are gone
-    List<OutcomeDO> afterDelete = await(repository.findByItemId(testItemId))
+    List<OutcomeDO> afterDelete = repository.findByItemId(testItemId).await()
     assertTrue(afterDelete.isEmpty())
 
     // Verify individual lookups also return empty
-    Optional<OutcomeDO> outcome1AfterDelete = await(repository.findById(inserted1.getId()))
-    Optional<OutcomeDO> outcome2AfterDelete = await(repository.findById(inserted2.getId()))
+    Optional<OutcomeDO> outcome1AfterDelete = repository.findById(inserted1.getId()).await()
+    Optional<OutcomeDO> outcome2AfterDelete = repository.findById(inserted2.getId()).await()
     assertTrue(outcome1AfterDelete.isEmpty())
     assertTrue(outcome2AfterDelete.isEmpty())
   }
@@ -182,14 +181,14 @@ class OutcomeRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindByItemIdWithNonExistentItem() {
     UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000000")
-    List<OutcomeDO> outcomes = await(repository.findByItemId(nonExistentItemId))
+    List<OutcomeDO> outcomes = repository.findByItemId(nonExistentItemId).await()
     assertTrue(outcomes.isEmpty())
   }
 
   @Test
   void testDeleteByItemIdWithNonExistentItem() {
     UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000001")
-    int deletedRows = await(repository.deleteByItemId(nonExistentItemId))
+    int deletedRows = repository.deleteByItemId(nonExistentItemId).await()
     assertEquals(0, deletedRows)
   }
 }

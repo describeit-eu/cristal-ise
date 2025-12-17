@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.await
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -33,7 +32,7 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindAll() {
-    def found = await(repository.findAll())
+    def found = repository.findAll().await()
     // There are 15 non-header, non-empty lines in 02-domainPath.csv
     assertTrue(found.size() >= 15, "There should be at least 15 DomainPath rows loaded from CSV")
   }
@@ -42,12 +41,12 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   void testInsertAndFindById() {
     def toInsert = new DomainPathDO("Test.City.Capital.Budapest-Alt", idBudapest)
 
-    def inserted = await(repository.insert(toInsert))
+    def inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
     assertEquals(toInsert.getPath(), inserted.getPath())
     assertEquals(toInsert.getItemId(), inserted.getItemId())
 
-    def fetched = await(repository.findById(inserted.getId()))
+    def fetched = repository.findById(inserted.getId()).await()
     assertTrue(fetched.isPresent())
     assertEquals(inserted, fetched.get())
   }
@@ -55,11 +54,11 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testUpdate() {
     // insert one to update
-    def dp = await(repository.insert(new DomainPathDO("Test.City.Michelin.Paris", idParis)))
+    def dp = repository.insert(new DomainPathDO("Test.City.Michelin.Paris", idParis)).await()
 
     dp.setPath("Michelin.History.Paris")
 
-    def updatedOpt = await(repository.update(dp))
+    def updatedOpt = repository.update(dp).await()
     assertTrue(updatedOpt.isPresent())
     def updated = updatedOpt.get()
 
@@ -72,24 +71,24 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testDeleteById() {
     // insert one to delete
-    def dp = await(repository.insert(new DomainPathDO("Michelin.History.Delhi", idDelhi)))
+    def dp = repository.insert(new DomainPathDO("Michelin.History.Delhi", idDelhi)).await()
 
-    def rows = await(repository.deleteById(dp.getId()))
+    def rows = repository.deleteById(dp.getId()).await()
     assertEquals(1, rows)
 
-    def afterDelete = await(repository.findById(dp.getId()))
+    def afterDelete = repository.findById(dp.getId()).await()
     assertTrue(afterDelete.isEmpty())
   }
 
   @Test
   void testFindNoneExistent() {
-    def none = await(repository.findById(-1L))
+    def none = repository.findById(-1L).await()
     assertTrue(none.isEmpty())
   }
 
   @Test
   void testGetChildren() {
-    def actualChildren = await(repository.getChildren("Test.City"))
+    def actualChildren = repository.getChildren("Test.City").await()
 
     assertNotNull(actualChildren)
     assertEquals(childrenOfCity.size(), actualChildren.size())
@@ -134,13 +133,13 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testGetTree() {
-    def treeCity = await(repository.getTree("Test.City"))
+    def treeCity = repository.getTree("Test.City").await()
     // The tree for Test.City should include Test.City itself and all descendants. From CSV these are lines 3-19 => 17 entries
     assertEquals(17, treeCity.size(), "Test.City subtree size should be 17")
     assertTrue(treeCity.stream().anyMatch(dp -> dp.getPath().equals("Test.City")))
     assertTrue(treeCity.stream().allMatch(dp -> dp.getPath().startsWith("Test.City")))
 
-    def treeCapital = await(repository.getTree("Test.City.Capital"))
+    def treeCapital = repository.getTree("Test.City.Capital").await()
     // For Test.City.Capital: include itself and its 6 descendants (Budapest, Paris, London, Bern, Washington) total lines relating: Capital itself + 5 capitals? CSV shows Capitals for Budapest, Paris, London, Bern, Washington => 6 including Capital node
     assertEquals(6, treeCapital.size(), "Test.City.Capital subtree size should be 6")
     assertTrue(treeCapital.stream().allMatch(dp -> dp.getPath().startsWith("Test.City.Capital")))
@@ -149,20 +148,20 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindByItemId() {
     // Budapest appears twice in CSV: Test.City.Budapest and Test.City.Capital.Budapest
-    def budapestPaths = await(repository.findByItemId(idBudapest))
+    def budapestPaths = repository.findByItemId(idBudapest).await()
     assertEquals(2, budapestPaths.size())
     assertTrue(budapestPaths.stream().anyMatch(dp -> dp.getPath().equals("Test.City.Budapest")))
     assertTrue(budapestPaths.stream().anyMatch(dp -> dp.getPath().equals("Test.City.Capital.Budapest")))
 
     // Barcelona appears once
     def idBarcelona = UUID.fromString("1224b816-102a-45da-ab3f-864d991c7f5b")
-    def barcelonaPaths = await(repository.findByItemId(idBarcelona))
+    def barcelonaPaths = repository.findByItemId(idBarcelona).await()
     assertEquals(1, barcelonaPaths.size())
     assertEquals("Test.City.Barcelona", barcelonaPaths.get(0).getPath())
 
     // Non-existent UUID should return an empty list
     def none = UUID.fromString("00000000-0000-0000-0000-000000000001")
-    def nonePaths = await(repository.findByItemId(none))
+    def nonePaths = repository.findByItemId(none).await()
     assertTrue(nonePaths.isEmpty())
   }
 }

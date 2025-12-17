@@ -39,6 +39,18 @@ class KernelModule {
   }
 
   /**
+   * Provides ConfigStoreOptions for file-based configuration.
+   */
+  @Provides
+  @Singleton
+  static ConfigStoreOptions provideConfigStoreOptions() {
+    return new ConfigStoreOptions()
+      .setType("file")
+      .setFormat("json")
+      .setConfig(new JsonObject().put("path", "config.json"))
+  }
+
+  /**
    * Provides the Vertx instance.
    */
   @Provides

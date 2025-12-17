@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.await
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -27,7 +26,7 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindAll() {
-    List<ViewPointDO> viewPoints = await(repository.findAll())
+    List<ViewPointDO> viewPoints = repository.findAll().await()
     // From 11-viewPoint.csv there are 9 non-header lines
     assertTrue(viewPoints.size() >= 9, "There should be at least 9 viewPoints loaded from CSV")
   }
@@ -43,7 +42,7 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
       UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
     )
 
-    ViewPointDO inserted = await(repository.insert(toInsert))
+    ViewPointDO inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
     assertEquals(toInsert.getName(), inserted.getName())
     assertEquals(toInsert.getSchema(), inserted.getSchema())
@@ -52,7 +51,7 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     assertEquals(toInsert.getOutcomeId(), inserted.getOutcomeId())
     assertEquals(toInsert.getItemId(), inserted.getItemId())
 
-    Optional<ViewPointDO> fetched = await(repository.findById(inserted.getId()))
+    Optional<ViewPointDO> fetched = repository.findById(inserted.getId()).await()
     assertTrue(fetched.isPresent())
     assertEquals(inserted, fetched.get())
   }
@@ -68,13 +67,13 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
       1L, // outcomeId
       UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
     )
-    ViewPointDO inserted = await(repository.insert(base))
+    ViewPointDO inserted = repository.insert(base).await()
 
     inserted.setName("UpdatedViewPoint")
     inserted.setSchemaVersion("v3")
     inserted.setSchemaName("UpdatedSchema")
 
-    Optional<ViewPointDO> updatedOpt = await(repository.update(inserted))
+    Optional<ViewPointDO> updatedOpt = repository.update(inserted).await()
     assertTrue(updatedOpt.isPresent())
     ViewPointDO updated = updatedOpt.get()
 
@@ -98,16 +97,16 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
       1L, // outcomeId
       UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
     )
-    ViewPointDO inserted = await(repository.insert(base))
+    ViewPointDO inserted = repository.insert(base).await()
 
-    int rows = await(repository.deleteById(inserted.getId()))
+    int rows = repository.deleteById(inserted.getId()).await()
     assertEquals(1, rows)
 
-    Optional<ViewPointDO> afterDelete = await(repository.findById(inserted.getId()))
+    Optional<ViewPointDO> afterDelete = repository.findById(inserted.getId()).await()
     assertTrue(afterDelete.isEmpty())
 
     // also check non-existent id returns empty
-    Optional<ViewPointDO> none = await(repository.findById(-1L))
+    Optional<ViewPointDO> none = repository.findById(-1L).await()
     assertTrue(none.isEmpty())
   }
 
@@ -133,10 +132,10 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
       testItemId // itemId
     )
 
-    ViewPointDO inserted1 = await(repository.insert(viewPoint1))
-    ViewPointDO inserted2 = await(repository.insert(viewPoint2))
+    ViewPointDO inserted1 = repository.insert(viewPoint1).await()
+    ViewPointDO inserted2 = repository.insert(viewPoint2).await()
 
-    List<ViewPointDO> foundViewPoints = await(repository.findByItemId(testItemId))
+    List<ViewPointDO> foundViewPoints = repository.findByItemId(testItemId).await()
     assertEquals(5, foundViewPoints.size())
 
     // Verify both viewPoints are present (order may vary)
@@ -166,24 +165,24 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
       testItemId // itemId
     )
 
-    ViewPointDO inserted1 = await(repository.insert(viewPoint1))
-    ViewPointDO inserted2 = await(repository.insert(viewPoint2))
+    ViewPointDO inserted1 = repository.insert(viewPoint1).await()
+    ViewPointDO inserted2 = repository.insert(viewPoint2).await()
 
     // Verify both viewPoints exist
-    List<ViewPointDO> beforeDelete = await(repository.findByItemId(testItemId))
+    List<ViewPointDO> beforeDelete = repository.findByItemId(testItemId).await()
     assertEquals(2, beforeDelete.size())
 
     // Delete by item ID
-    int deletedRows = await(repository.deleteByItemId(testItemId))
+    int deletedRows = repository.deleteByItemId(testItemId).await()
     assertEquals(2, deletedRows)
 
     // Verify viewPoints are gone
-    List<ViewPointDO> afterDelete = await(repository.findByItemId(testItemId))
+    List<ViewPointDO> afterDelete = repository.findByItemId(testItemId).await()
     assertTrue(afterDelete.isEmpty())
 
     // Verify individual lookups also return empty
-    Optional<ViewPointDO> viewPoint1AfterDelete = await(repository.findById(inserted1.getId()))
-    Optional<ViewPointDO> viewPoint2AfterDelete = await(repository.findById(inserted2.getId()))
+    Optional<ViewPointDO> viewPoint1AfterDelete = repository.findById(inserted1.getId()).await()
+    Optional<ViewPointDO> viewPoint2AfterDelete = repository.findById(inserted2.getId()).await()
     assertTrue(viewPoint1AfterDelete.isEmpty())
     assertTrue(viewPoint2AfterDelete.isEmpty())
   }
@@ -191,14 +190,14 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindByItemIdWithNonExistentItem() {
     UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000000")
-    List<ViewPointDO> viewPoints = await(repository.findByItemId(nonExistentItemId))
+    List<ViewPointDO> viewPoints = repository.findByItemId(nonExistentItemId).await()
     assertTrue(viewPoints.isEmpty())
   }
 
   @Test
   void testDeleteByItemIdWithNonExistentItem() {
     UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000001")
-    int deletedRows = await(repository.deleteByItemId(nonExistentItemId))
+    int deletedRows = repository.deleteByItemId(nonExistentItemId).await()
     assertEquals(0, deletedRows)
   }
 }

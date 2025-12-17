@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -43,7 +42,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
     def versionBudapest = "v1"
 
     // use findByUuid
-    Optional<ItemDO> foundByUuid = await(repository.findById(idBudapest))
+    Optional<ItemDO> foundByUuid = repository.findById(idBudapest).await()
 
     assertTrue(foundByUuid.isPresent())
     def itemByUuid = foundByUuid.get()
@@ -56,13 +55,13 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindNoneExistent() {
-    Optional<ItemDO> noneExistent = await(repository.findById(idZero))
+    Optional<ItemDO> noneExistent = repository.findById(idZero).await()
     assertTrue(noneExistent.isEmpty())
   }
 
   @Test
   void testFindAll() {
-    List<ItemDO> foundItems = await(repository.findAll())
+    List<ItemDO> foundItems = repository.findAll().await()
     assertTrue(foundItems.size() >= 9, "There should be at least 9 cities in the database")
   }
 
@@ -70,7 +69,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
   void testInsert() {
     ItemDO toInsert = new ItemDO(UUID.randomUUID(), "Tokyo", "megaCity", "v1.1", null)
 
-    ItemDO cityTokyo = await(repository.insert(toInsert))
+    ItemDO cityTokyo = repository.insert(toInsert).await()
 
     assertNotNull(cityTokyo)
     assertEquals(toInsert, cityTokyo)
@@ -78,10 +77,10 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testUpdate() {
-    ItemDO cityDelhi = await(repository.findById(idDelhi)).get()
+    ItemDO cityDelhi = repository.findById(idDelhi).await().get()
     cityDelhi.setName("Mumbai")
 
-    ItemDO cityMumbai = await(repository.update(cityDelhi)).get()
+    ItemDO cityMumbai = repository.update(cityDelhi).await().get()
 
     assertEquals("Mumbai", cityMumbai.getName())
     assertEquals(cityDelhi, cityMumbai)
@@ -89,16 +88,16 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testDeleteById() {
-    def rowsById = await(repository.deleteById(idLondon))
+    def rowsById = repository.deleteById(idLondon).await()
     assertEquals(1, rowsById)
 
-    Optional<ItemDO> afterDelete = await(repository.findById(idLondon))
+    Optional<ItemDO> afterDelete = repository.findById(idLondon).await()
     assertTrue(afterDelete.isEmpty())
   }
 
   @Test
   void testDeleteNoneExistent() {
-    def rowsById = await(repository.deleteById(idZero))
+    def rowsById = repository.deleteById(idZero).await()
     assertEquals(0, rowsById)
   }
 }

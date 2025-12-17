@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.postgresql.PostgreSQLContainer
 
-import static eu.describeit.cristalise.kernel.persistency.DatabaseTestUtils.*
+import static eu.describeit.cristalise.kernel.persistency.LiquibaseTestUtils.*
 
 /**
  * Abstract superclass for repository integration tests.
