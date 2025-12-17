@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -22,7 +24,7 @@ class ActionDO {
 
   ActionDO() {}
 
-  @java.beans.ConstructorProperties(["id", "name", "path", "version", "properties", "type", "layout", "parentId"])
+  @ConstructorProperties(["id", "name", "path", "version", "properties", "type", "layout", "parentId"])
   ActionDO(Long id, String name, String path, String version, String properties, ActionType type, String layout, Long parentId) {
     this.id = id
     this.name = name
@@ -34,7 +36,7 @@ class ActionDO {
     this.parentId = parentId
   }
 
-  @java.beans.ConstructorProperties(["name", "path", "version", "properties", "type", "layout", "parentId"])
+  @ConstructorProperties(["name", "path", "version", "properties", "type", "layout", "parentId"])
   ActionDO(String name, String path, String version, String properties, ActionType type, String layout, Long parentId) {
     this(null, name, path, version, properties, type, layout, parentId)
   }

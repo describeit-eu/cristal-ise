@@ -37,17 +37,8 @@ class ItemService implements Item {
     Promise<String> promise = Promise.promise()
 
     dbPool.withTransaction() {connection ->
-      ItemRepository itemRepo = new ItemRepositoryImpl(connection)
+      def item = new ItemProxy(connection, itemUuid)
 
-      Optional<ItemDO> itemOptional = itemRepo.findById(UUID.fromString(itemUuid)).await()
-
-      if (itemOptional.isPresent()) {
-        String result = String.format("Action '%s' requested for Item %s by Actor %s", actionPath, itemUuid, actorUuid)
-        promise.complete(result)
-      } else {
-        String error = String.format("Item %s does not exists", itemUuid)
-        promise.fail(error)
-      }
     }.onFailure { Throwable t ->
       log.error("Error processing action request", t)
       promise.fail(t)

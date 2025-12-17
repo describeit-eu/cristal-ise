@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -20,7 +22,7 @@ class JobDO {
 
   JobDO() {}
 
-  @java.beans.ConstructorProperties(["id", "actionName", "transition", "itemId"])
+  @ConstructorProperties(["id", "actionName", "transition", "itemId"])
   JobDO(Long id, String actionName, String transition, UUID itemId) {
     this.id = id
     this.actionName = actionName
@@ -28,7 +30,7 @@ class JobDO {
     this.itemId = itemId
   }
 
-  @java.beans.ConstructorProperties(["actionName", "transition", "itemId"])
+  @ConstructorProperties(["actionName", "transition", "itemId"])
   JobDO(String actionName, String transition, UUID itemId) {
     this(null, actionName, transition, itemId)
   }

@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -20,7 +22,7 @@ class OutcomeDO {
 
   OutcomeDO() {}
 
-  @java.beans.ConstructorProperties(["id", "schema", "schemaVersion", "data", "eventId", "itemId"])
+  @ConstructorProperties(["id", "schema", "schemaVersion", "data", "eventId", "itemId"])
   OutcomeDO(Long id, UUID schema, String schemaVersion, JsonObject data, Long eventId, UUID itemId) {
     this.id = id
     this.schema = schema
@@ -30,12 +32,12 @@ class OutcomeDO {
     this.itemId = itemId
   }
 
-  @java.beans.ConstructorProperties(["schema", "schemaVersion", "data", "eventId", "itemId"])
+  @ConstructorProperties(["schema", "schemaVersion", "data", "eventId", "itemId"])
   OutcomeDO(UUID schema, String schemaVersion, String data, Long eventId, UUID itemId) {
     this(null, schema, schemaVersion, new JsonObject(data), eventId, itemId)
   }
 
-  @java.beans.ConstructorProperties(["schema", "schemaVersion", "data", "eventId", "itemId"])
+  @ConstructorProperties(["schema", "schemaVersion", "data", "eventId", "itemId"])
   OutcomeDO(UUID schema, String schemaVersion, JsonObject data, Long eventId, UUID itemId) {
     this(null, schema, schemaVersion, data, eventId, itemId)
   }

@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
 import java.time.LocalDateTime
 
 @CompileStatic
@@ -22,7 +23,7 @@ class EventDO {
 
   EventDO() {}
 
-  @java.beans.ConstructorProperties(["id", "actionDesc", "actionVersion", "script", "scriptVersion", "stateMachineDesc", "stateMachineVersion", "userLogin", "timestamp", "actionProperties", "itemId", "itemVersion", "actionPath", "transitionName"])
+  @ConstructorProperties(["id", "actionDesc", "actionVersion", "script", "scriptVersion", "stateMachineDesc", "stateMachineVersion", "userLogin", "timestamp", "actionProperties", "itemId", "itemVersion", "actionPath", "transitionName"])
   EventDO(Long id, UUID actionDesc, String actionVersion, UUID script, String scriptVersion, UUID stateMachineDesc, String stateMachineVersion, String userLogin, LocalDateTime timestamp, String actionProperties, UUID itemId, String itemVersion, String actionPath, String transitionName) {
     this.id = id
     this.actionDesc = actionDesc
@@ -40,7 +41,7 @@ class EventDO {
     this.transitionName = transitionName
   }
 
-  @java.beans.ConstructorProperties(["actionDesc", "actionVersion", "script", "scriptVersion", "stateMachineDesc", "stateMachineVersion", "userLogin", "timestamp", "actionProperties", "itemId", "itemVersion", "actionPath", "transitionName"])
+  @ConstructorProperties(["actionDesc", "actionVersion", "script", "scriptVersion", "stateMachineDesc", "stateMachineVersion", "userLogin", "timestamp", "actionProperties", "itemId", "itemVersion", "actionPath", "transitionName"])
   EventDO(UUID actionDesc, String actionVersion, UUID script, String scriptVersion, UUID stateMachineDesc, String stateMachineVersion, String userLogin, LocalDateTime timestamp, String actionProperties, UUID itemId, String itemVersion, String actionPath, String transitionName) {
     this(null, actionDesc, actionVersion, script, scriptVersion, stateMachineDesc, stateMachineVersion, userLogin, timestamp, actionProperties, itemId, itemVersion, actionPath, transitionName)
   }

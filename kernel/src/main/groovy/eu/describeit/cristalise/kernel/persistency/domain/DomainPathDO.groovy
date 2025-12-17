@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -20,14 +22,14 @@ class DomainPathDO {
 
   DomainPathDO() {}
 
-  @java.beans.ConstructorProperties(["id", "path", "itemId"])
+  @ConstructorProperties(["id", "path", "itemId"])
   DomainPathDO(Long id, String path, UUID itemId) {
     this.id = id
     this.path = path
     this.itemId = itemId
   }
 
-  @java.beans.ConstructorProperties(["path", "itemId"])
+  @ConstructorProperties(["path", "itemId"])
   DomainPathDO(String path, UUID itemId) {
     this(null, path, itemId)
   }

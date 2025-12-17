@@ -5,7 +5,6 @@ import eu.describeit.cristalise.kernel.dagger.KernelComponent;
 import groovy.transform.CompileStatic;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -44,14 +43,14 @@ class ItemVerticleTest {
 
   @Test
   @DisplayName("Test requestAction method successfully")
-  public void testRequestActionSuccess(Vertx vertx, VertxTestContext testContext) {
+  public void testRequestActionSuccess(VertxTestContext testContext) {
     String itemUuid = UUID.randomUUID().toString();
     String actorUuid = UUID.randomUUID().toString();
     String actionPath = "/some/action";
     String transitionID = "Start";
     String outcome = "{}";
     String fileName = null;
-    List<Byte> attachment = Collections.emptyList(); // Using empty list for simplicity
+    List<Byte> attachment = Collections.emptyList(); // Using an empty list for simplicity
 
     Future<String> future = itemService.requestAction(
       itemUuid,

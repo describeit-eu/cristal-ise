@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 /**
  * Item data object representing the item table in the database.
  */
@@ -23,7 +25,7 @@ class ItemDO {
 
   ItemDO() {}
 
-  @java.beans.ConstructorProperties(["id", "name", "type", "version", "actionId"])
+  @ConstructorProperties(["id", "name", "type", "version", "actionId"])
   ItemDO(UUID id, String name, String type, String version, Long actionId) {
     this.id = id
     this.name = name

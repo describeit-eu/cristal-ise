@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -20,7 +22,7 @@ class ViewPointDO {
 
   ViewPointDO() {}
 
-  @java.beans.ConstructorProperties(["id", "name", "schema", "schemaVersion", "schemaName", "outcomeId", "itemId"])
+  @ConstructorProperties(["id", "name", "schema", "schemaVersion", "schemaName", "outcomeId", "itemId"])
   ViewPointDO(Long id, String name, UUID schema, String schemaVersion, String schemaName, Long outcomeId, UUID itemId) {
     this.id = id
     this.name = name
@@ -31,7 +33,7 @@ class ViewPointDO {
     this.itemId = itemId
   }
 
-  @java.beans.ConstructorProperties(["name", "schema", "schemaVersion", "schemaName", "outcomeId", "itemId"])
+  @ConstructorProperties(["name", "schema", "schemaVersion", "schemaName", "outcomeId", "itemId"])
   ViewPointDO(String name, UUID schema, String schemaVersion, String schemaName, Long outcomeId, UUID itemId) {
     this(null, name, schema, schemaVersion, schemaName, outcomeId, itemId)
   }

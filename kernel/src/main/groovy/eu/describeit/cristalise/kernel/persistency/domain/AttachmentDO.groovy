@@ -10,6 +10,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -21,7 +23,7 @@ class AttachmentDO {
 
   AttachmentDO() {}
 
-  @java.beans.ConstructorProperties(["id", "name", "type", "fileName", "data", "outcomeId"])
+  @ConstructorProperties(["id", "name", "type", "fileName", "data", "outcomeId"])
   AttachmentDO(Long id, String name, String type, String fileName, Buffer data, Long outcomeId) {
     this.id = id
     this.name = name
@@ -31,7 +33,7 @@ class AttachmentDO {
     this.outcomeId = outcomeId
   }
 
-  @java.beans.ConstructorProperties(["name", "type", "fileName", "data", "outcomeId"])
+  @ConstructorProperties(["name", "type", "fileName", "data", "outcomeId"])
   AttachmentDO(String name, String type, String fileName, Buffer data, Long outcomeId) {
     this(null, name, type, fileName, data, outcomeId)
   }

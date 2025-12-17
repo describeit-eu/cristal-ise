@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.templates.annotations.ParametersMapped
 import io.vertx.sqlclient.templates.annotations.RowMapped
 
+import java.beans.ConstructorProperties
+
 @CompileStatic
 @Canonical
 @DataObject
@@ -20,7 +22,7 @@ class CollectionDO {
 
   CollectionDO() {}
 
-  @java.beans.ConstructorProperties(["id", "name", "version", "properties", "itemId"])
+  @ConstructorProperties(["id", "name", "version", "properties", "itemId"])
   CollectionDO(Long id, String name, String version, String properties, UUID itemId) {
     this.id = id
     this.name = name
@@ -29,7 +31,7 @@ class CollectionDO {
     this.itemId = itemId
   }
 
-  @java.beans.ConstructorProperties(["name", "version", "properties", "itemId"])
+  @ConstructorProperties(["name", "version", "properties", "itemId"])
   CollectionDO(String name, String version, String properties, UUID itemId) {
     this(null, name, version, properties, itemId)
   }
