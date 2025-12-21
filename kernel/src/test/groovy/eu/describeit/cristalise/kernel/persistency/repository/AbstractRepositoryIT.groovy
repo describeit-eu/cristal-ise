@@ -10,8 +10,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.postgresql.PostgreSQLContainer
 
-import static eu.describeit.cristalise.kernel.persistency.LiquibaseTestUtils.*
-
 /**
  * Abstract superclass for repository integration tests.
  * Provides common Testcontainers Postgres + Vert.x Pool setup/teardown
@@ -21,6 +19,9 @@ import static eu.describeit.cristalise.kernel.persistency.LiquibaseTestUtils.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @CompileStatic
 abstract class AbstractRepositoryIT {
+
+  final String dbSchemaChangelogFiles = '/liquibase/changelog/changelog-master.yaml'
+  final String testDataChangelogFiles = '/liquibase/changelog/changelog-testData-master.yaml'
 
   protected PostgreSQLContainer pgContainer
   protected Pool pool
@@ -35,8 +36,9 @@ abstract class AbstractRepositoryIT {
 
     pool = component.dbPool()
 
-    liquibaseCreateTables(pgContainer)
-    liquibaseLoadTestData(pgContainer)
+    component.liquibaseCommand()
+      .executeUpdate(pgContainer.jdbcUrl, pgContainer.username, pgContainer.password, dbSchemaChangelogFiles)
+      .executeUpdate(pgContainer.jdbcUrl, pgContainer.username, pgContainer.password, testDataChangelogFiles)
   }
 
   @AfterAll

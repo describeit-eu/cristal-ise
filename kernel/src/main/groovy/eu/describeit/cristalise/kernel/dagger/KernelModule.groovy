@@ -4,11 +4,9 @@ import dagger.Module
 import dagger.Provides
 import eu.describeit.cristalise.kernel.item.Item
 import eu.describeit.cristalise.kernel.item.ItemService
-import eu.describeit.cristalise.kernel.item.ItemVerticle
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.config.ConfigRetriever
-import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.ThreadingModel
@@ -17,7 +15,6 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.Pool
 
 import javax.inject.Singleton
-import java.util.concurrent.TimeUnit
 
 import static java.util.concurrent.TimeUnit.SECONDS
 
