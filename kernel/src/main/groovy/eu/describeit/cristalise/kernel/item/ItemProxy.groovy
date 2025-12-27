@@ -4,8 +4,13 @@ import eu.describeit.cristalise.kernel.persistency.domain.*
 import eu.describeit.cristalise.kernel.persistency.repository.*
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+import io.vertx.core.Future
+import io.vertx.core.Vertx
+import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.SqlClient
 
+@Slf4j
 @CompileStatic
 class ItemProxy {
 
@@ -24,16 +29,64 @@ class ItemProxy {
 
   private final JobRepository jobRepository
 
-  private final ItemDO item
+  private final UUID itemId
+  private ItemDO itemDO
 
-  ItemProxy(SqlClient client, String uuid) {
-    this(client, UUID.fromString(uuid))
+  private final Vertx vertx
+
+  static Future<ItemProxy> create(SqlClient client, String itemId) {
+    return create(client, UUID.fromString(itemId))
   }
 
-  ItemProxy(SqlClient client, UUID itemId) {
+  static Future<ItemProxy> create(SqlClient client, UUID uuid) {
+    ItemProxy proxy = new ItemProxy(client, uuid)
+    return proxy.initialise()
+  }
+
+  private Future<ItemProxy> initialise() {
+    return itemRepository.findById(itemId).compose { Optional<ItemDO> itemOptional ->
+      if (itemOptional.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("Item ${itemId} does not exists"))
+      }
+      this.itemDO = itemOptional.get()
+      return Future.succeededFuture(this)
+    } as Future<ItemProxy>
+  }
+
+  /**
+   * Use this constructor to create ItemProxies without connection to the database.
+   * It
+   * @param v the fully configure Vertx instance
+   * @param uuid the itemId
+   */
+  ItemProxy(Vertx v, UUID uuid) {
+    vertx = v
+    itemId = uuid
+
+    itemDO = null
+
+    itemRepository = null
+    domainPathRepository = null
+    itemPropertyRepository = null
+    actionRepository = null
+    collectionRepository = null
+    collectionMemberRepository = null
+    outcomeRepository = null
+    attachmentRepository = null
+    viewPointRepository =null
+    jobRepository = null
+  }
+
+  /**
+   *
+   * @param client
+   * @param uuid
+   */
+  private ItemProxy(SqlClient client, UUID uuid) {
+    vertx = null
     itemRepository = new ItemRepositoryImpl(client)
 
-    item = checkItem(itemId)
+    itemId = uuid
 
     domainPathRepository = new DomainPathRepositoryImpl(client)
     itemPropertyRepository = new ItemPropertyRepositoryImpl(client)
@@ -49,14 +102,90 @@ class ItemProxy {
     jobRepository = new JobRepositoryImpl(client)
   }
 
-  private ItemDO checkItem(UUID itemId) {
-    Optional<ItemDO> itemOptional = itemRepository.findById(itemId).await()
+  /**
+   * @return
+   */
+  UUID getItemId() {
+    return itemId
+  }
 
-    if (itemOptional.isEmpty()) {
-      throw new IllegalArgumentException("Item ${itemId} does not exists")
+  /**
+   * @return
+   */
+  String getName() {
+    return itemDO?.name
+  }
+
+  /**
+   * @return
+   */
+  String getType() {
+    return itemDO?.type
+  }
+
+  /**
+   * @return
+   */
+  String getVersion() {
+    return itemDO?.version
+  }
+
+  /**
+   *
+   * @param actorId
+   * @param actionPath
+   * @param transitionID
+   * @param outcome
+   * @return
+   */
+  Future<JsonObject> requestAction(
+    UUID       actorId,
+    String     actionPath,
+    String     transitionID,
+    JsonObject outcome
+  ) {
+    String fileName = null
+    List<Byte> attachment = Collections.emptyList()
+
+    requestAction(
+      actorId, actionPath, transitionID, outcome, fileName, attachment
+    ).compose { String result ->
+      return Future.succeededFuture(new JsonObject(result))
+    }.onFailure { Throwable t ->
+      log.debug("requestAction() - could not process request for item: {}", itemId, t)
+      return Future.failedFuture(t)
     }
+  }
 
-    return itemOptional.get()
+  /**
+   *
+   * @param actorId
+   * @param actionPath
+   * @param transitionID
+   * @param outcome
+   * @param fileName
+   * @param attachment
+   * @return
+   */
+  Future<String> requestAction(
+    UUID       actorId,
+    String     actionPath,
+    String     transitionID,
+    JsonObject outcome,
+    String     fileName,
+    List<Byte> attachment
+  ) {
+    Item itemService = Item.createProxy(vertx);
+
+    return itemService.requestAction(
+      itemId.toString(),
+      actorId.toString(),
+      actionPath,
+      transitionID,
+      outcome.encode(),
+      fileName,
+      attachment
+    )
   }
 
 }

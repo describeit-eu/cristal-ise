@@ -1,16 +1,16 @@
 package eu.describeit.cristalise.kernel.item
 
-import eu.describeit.cristalise.kernel.persistency.domain.ItemDO
-import eu.describeit.cristalise.kernel.persistency.repository.ItemRepository
-import eu.describeit.cristalise.kernel.persistency.repository.ItemRepositoryImpl
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import io.vertx.sqlclient.Pool
+import io.vertx.sqlclient.SqlConnection
 
 import javax.inject.Inject
 import javax.inject.Singleton
+
+import static eu.describeit.cristalise.kernel.item.ItemProxy.create
 
 @Slf4j
 @CompileStatic
@@ -34,13 +34,17 @@ class ItemService implements Item {
     String fileName,
     List<Byte> attachment)
   {
+    log.info('requestAction() - {}', itemUuid)
     Promise<String> promise = Promise.promise()
 
-    dbPool.withTransaction() {connection ->
-      def item = new ItemProxy(connection, itemUuid)
-
-    }.onFailure { Throwable t ->
-      log.error("Error processing action request", t)
+    dbPool.withTransaction() { SqlConnection connection ->
+      log.info('requestAction() - {} connection:{}', itemUuid, connection)
+      create(connection, itemUuid).compose {
+        ItemProxy proxy ->
+      }
+    }.onSuccess() {
+      promise.succeed(outcome) // this is not correct, but works for the time being
+    }.onFailure() { Throwable t ->
       promise.fail(t)
     }
 

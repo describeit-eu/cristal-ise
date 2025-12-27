@@ -1,5 +1,3 @@
-kernel/src/test/docker/database/
-
 ### Vert.x ###
 .vertx/
 
@@ -164,3 +162,7 @@ nbdist/
 !.vscode/launch.json
 !.vscode/extensions.json
 **/build
+
+### Testing databases ###
+conf/dev/database/
+kernel/src/test/docker/database/

@@ -17,15 +17,20 @@ class MainVerticle extends VerticleBase {
     KernelComponent component = DaggerKernelComponent.create()
 
     vertx.deployVerticle(component.itemVerticle(), component.deploymentOptions())
-      .onSuccess((String result) -> {
+      .onSuccess { String result ->
         log.info("ItemVerticle deployed successfully")
         promise.complete(result)
-      })
-      .onFailure((Throwable failure) -> {
+      }
+      .onFailure { Throwable failure ->
         log.error("Error deploying ItemVerticle", failure)
         promise.fail(failure)
-      })
+      }
 
     return promise.future()
   }
-}
+
+  @Override
+  public Future<?> stop() throws Exception {
+    log.info("MainVerticle stopped")
+    return super.stop()
+  }}

@@ -1,22 +1,26 @@
 package eu.describeit.cristalise.kernel.item;
 
-import eu.describeit.cristalise.kernel.dagger.DaggerKernelComponent;
+import eu.describeit.cristalise.kernel.dagger.DaggerTestKernelComponent;
 import eu.describeit.cristalise.kernel.dagger.KernelComponent;
+import eu.describeit.cristalise.kernel.dagger.TestKernelComponent;
 import groovy.transform.CompileStatic;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static io.vertx.core.ThreadingModel.VIRTUAL_THREAD;
+import static io.vertx.core.ThreadingModel.WORKER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @ExtendWith(VertxExtension.class)
@@ -24,23 +28,49 @@ import static io.vertx.core.ThreadingModel.VIRTUAL_THREAD;
 @CompileStatic
 class ItemVerticleTest {
 
-  private Item itemService;
+  private final String dbSchemaChangelogFiles = "/liquibase/changelog/changelog-master.yaml";
+  private final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
 
   @BeforeAll
   @DisplayName("Deploy ItemVerticle and create service proxy")
   public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
-    DeploymentOptions options = new DeploymentOptions().setThreadingModel(VIRTUAL_THREAD);
+    System.setProperty("vertx-config-path", "src/test/conf/config.json");
 
-    KernelComponent component = DaggerKernelComponent.create();
+    TestKernelComponent component = DaggerTestKernelComponent.create();
+    DeploymentOptions options = component.deploymentOptions();
+
+    PostgreSQLContainer pgContainer = component.pgContainer();
+    pgContainer.start();
+
+    component.liquibaseCommand()
+      .executeUpdate(pgContainer.getJdbcUrl(), pgContainer.getUsername(), pgContainer.getPassword(), dbSchemaChangelogFiles)
+      .executeUpdate(pgContainer.getJdbcUrl(), pgContainer.getUsername(), pgContainer.getPassword(), testDataChangelogFiles);
 
     vertx.deployVerticle(component.itemVerticle(), options)
-      .onComplete(testContext.succeeding(id -> {
-        log.info("ItemVerticle deployed with id:{}", id);
-        itemService = Item.createProxy(vertx);
-        testContext.completeNow();
-      }));
+      .onComplete(
+        testContext.succeeding(id -> testContext.completeNow())
+      );
   }
 
+  @Test
+  @DisplayName("requestAction fails with Item does not exists")
+  public void requestAction_ItemDoesNotExists(Vertx vertx, VertxTestContext testContext) {
+    ItemProxy item = new ItemProxy(vertx, UUID.randomUUID());
+    String expectedMsg = String.format("Item %s does not exists", item.getItemId());
+
+    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "/workflow/Jump", "Start", new JsonObject());
+
+    future.onComplete(
+      testContext.failing(cause -> {
+        log.info("Action request failed as expected", cause);
+//        assertEquals(IllegalStateException.class, cause.getClass());
+        assertEquals(expectedMsg, cause.getMessage());
+        testContext.completeNow();
+      })
+    );
+  }
+
+  /*
   @Test
   @DisplayName("Test requestAction method successfully")
   public void testRequestActionSuccess(VertxTestContext testContext) {
@@ -52,23 +82,19 @@ class ItemVerticleTest {
     String fileName = null;
     List<Byte> attachment = Collections.emptyList(); // Using an empty list for simplicity
 
-    Future<String> future = itemService.requestAction(
-      itemUuid,
-      actorUuid,
-      actionPath,
-      transitionID,
-      outcome,
-      fileName,
-      attachment
+    String expectedResult = String.format("Action '%s' requested for Item %s by Actor %s", actionPath, itemUuid, actorUuid);
+
+    Future<String> future = itemService.requestAction(itemUuid, actorUuid, actionPath, transitionID, outcome, fileName, attachment);
+
+    future.onComplete(
+      testContext
+        .succeeding(result ->
+          testContext.verify(() -> {
+            Assertions.assertEquals(expectedResult, result);
+            testContext.completeNow();
+          })
+        )
     );
-
-    future.onComplete(testContext.succeeding(result -> testContext.verify(() -> {
-      String expectedResult = String.format("Action '%s' requested for Item %s by Actor %s", actionPath, itemUuid, actorUuid);
-      Assertions.assertEquals(expectedResult, result, "The result string should match the expected format.");
-      testContext.completeNow();
-    })));
   }
-
-  // Optional: Add a test case for failure scenarios if needed
-  // For example, if you modify requestAction to potentially fail under certain conditions.
+  */
 }

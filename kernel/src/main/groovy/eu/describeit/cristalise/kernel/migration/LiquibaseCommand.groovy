@@ -20,7 +20,7 @@ class LiquibaseCommand {
     configRetriever = config
   }
 
-  LiquibaseCommand executeUpdate(String jdbcUrl, String userName, String pwd, String logFile, String context = null) throws Exception {
+  LiquibaseCommand executeUpdate(String jdbcUrl, String userName, String pwd, String logFile, String context = null) {
     execute(jdbcUrl, userName, pwd, logFile, context)
     return this
   }
