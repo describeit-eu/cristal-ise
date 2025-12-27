@@ -1,7 +1,7 @@
 //import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
-val vertxVersion     = "5.0.5"
+val vertxVersion     = "5.0.6"
 val slf4jVersion     = "2.0.17"
 val logbackVersion   = "1.5.21"
 val liquibaseVersion = "5.0.1"
