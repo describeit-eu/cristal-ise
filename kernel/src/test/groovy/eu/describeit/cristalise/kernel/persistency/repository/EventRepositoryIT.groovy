@@ -10,6 +10,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 import java.time.LocalDateTime
 
+import static eu.describeit.cristalise.CommonTestIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -43,7 +44,7 @@ class EventRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testInsertFindUpdateDelete() {
     // Create a new EventDO pointing to an existing item id from 02-item.csv
-    def itemId = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
+    def itemId = BUDAPEST.uuid
     def now = LocalDateTime.now().withNano(0)
 
     def toInsert = new EventDO(
@@ -92,7 +93,7 @@ class EventRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindByItemId() {
-    def budapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
+    def budapest = BUDAPEST.uuid
     def events = repository.findByItemId(budapest).await()
     assertTrue(events.size() >= 1, "Expected at least one event for Budapest item")
     assertTrue(events.stream().allMatch(e -> budapest.equals(e.getItemId())))
@@ -101,7 +102,7 @@ class EventRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testDeleteByItemId() {
     // Use an item that initially has no events in CSV (Delhi)
-    def delhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d")
+    def delhi = DELHI.uuid
 
     def base = LocalDateTime.now().withNano(0)
     def ev1 = new EventDO(null, null, null, null, null, null, "u1", base, null, delhi, "v1", "/CityWf", "Start")

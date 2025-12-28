@@ -1,0 +1,35 @@
+package eu.describeit.cristalise
+
+import groovy.transform.CompileStatic
+
+@CompileStatic
+enum CommonTestIds {
+  BUDAPEST("63f5033b-f427-4c4a-9ab4-2e4ba80589dd"),
+  PARIS("b42800c5-463f-4a9a-be7d-11c792856ced"),
+  DELHI("bbcb31f8-7f4c-47fb-8876-864a61e48d5d"),
+  LONDON("04a71ecd-7cda-439f-bf6e-6517a824f753"),
+  BARCELONA("1224b816-102a-45da-ab3f-864d991c7f5b"),
+
+  NON_EXISTENT("00000000-0000-0000-0000-000000000000"),
+  NON_EXISTENT_2("00000000-0000-0000-0000-000000000001"),
+
+  // Schema IDs
+  SCHEMA_1("33333333-3333-3333-3333-333333333333"),
+  SCHEMA_2("44444444-4444-4444-4444-444444444444"),
+  SCHEMA_3("55555555-5555-5555-5555-555555555555"),
+  SCHEMA_4("66666666-6666-6666-6666-666666666666"),
+  SCHEMA_5("77777777-7777-7777-7777-777777777777"),
+  SCHEMA_6("88888888-8888-8888-8888-888888888888"),
+  SCHEMA_7("99999999-9999-9999-9999-999999999999")
+
+  final UUID uuid
+
+  CommonTestIds(String uuidString) {
+    this.uuid = UUID.fromString(uuidString)
+  }
+
+  @Override
+  String toString() {
+    return uuid.toString()
+  }
+}

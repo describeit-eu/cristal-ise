@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
+import static eu.describeit.cristalise.CommonTestIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -18,9 +19,6 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   private DomainPathRepository repository
 
   // Known item UUIDs from test data
-  final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
-  final UUID idParis    = UUID.fromString("b42800c5-463f-4a9a-be7d-11c792856ced")
-  final UUID idDelhi    = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d")
   final List<String> childrenOfCity = Arrays.asList("Capital", "Budapest", "Paris", "London", "Barcelona", "Munich", "Bristol", "Bern", "Geneva", "Washington", "Delhi")
 
   @BeforeAll
@@ -39,7 +37,7 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testInsertAndFindById() {
-    def toInsert = new DomainPathDO("Test.City.Capital.Budapest-Alt", idBudapest)
+    def toInsert = new DomainPathDO("Test.City.Capital.Budapest-Alt", BUDAPEST.uuid)
 
     def inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
@@ -54,7 +52,7 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testUpdate() {
     // insert one to update
-    def dp = repository.insert(new DomainPathDO("Test.City.Michelin.Paris", idParis)).await()
+    def dp = repository.insert(new DomainPathDO("Test.City.Michelin.Paris", PARIS.uuid)).await()
 
     dp.setPath("Michelin.History.Paris")
 
@@ -71,7 +69,7 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testDeleteById() {
     // insert one to delete
-    def dp = repository.insert(new DomainPathDO("Michelin.History.Delhi", idDelhi)).await()
+    def dp = repository.insert(new DomainPathDO("Michelin.History.Delhi", DELHI.uuid)).await()
 
     def rows = repository.deleteById(dp.getId()).await()
     assertEquals(1, rows)
@@ -102,7 +100,7 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
 
       if ("Budapest".equals(expectedChild)) {
         assertEquals(
-          idBudapest,
+          BUDAPEST.uuid,
           actualChildren.stream()
             .filter(child -> child.getPath().endsWith("Budapest"))
             .findFirst()
@@ -148,19 +146,19 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testFindByItemId() {
     // Budapest appears twice in CSV: Test.City.Budapest and Test.City.Capital.Budapest
-    def budapestPaths = repository.findByItemId(idBudapest).await()
+    def budapestPaths = repository.findByItemId(BUDAPEST.uuid).await()
     assertEquals(2, budapestPaths.size())
     assertTrue(budapestPaths.stream().anyMatch(dp -> dp.getPath().equals("Test.City.Budapest")))
     assertTrue(budapestPaths.stream().anyMatch(dp -> dp.getPath().equals("Test.City.Capital.Budapest")))
 
     // Barcelona appears once
-    def idBarcelona = UUID.fromString("1224b816-102a-45da-ab3f-864d991c7f5b")
+    def idBarcelona = BARCELONA.uuid
     def barcelonaPaths = repository.findByItemId(idBarcelona).await()
     assertEquals(1, barcelonaPaths.size())
     assertEquals("Test.City.Barcelona", barcelonaPaths.get(0).getPath())
 
     // Non-existent UUID should return an empty list
-    def none = UUID.fromString("00000000-0000-0000-0000-000000000001")
+    def none = NON_EXISTENT_2.uuid
     def nonePaths = repository.findByItemId(none).await()
     assertTrue(nonePaths.isEmpty())
   }

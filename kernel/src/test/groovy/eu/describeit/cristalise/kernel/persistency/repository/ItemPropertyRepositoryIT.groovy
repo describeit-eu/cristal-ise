@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
+import static eu.describeit.cristalise.CommonTestIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -16,10 +17,6 @@ import static org.junit.jupiter.api.Assertions.*
 class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
 
   private ItemPropertyRepository repository
-
-  // Known item UUIDs from test data (01-item.csv)
-  final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
-  final UUID idParis = UUID.fromString("b42800c5-463f-4a9a-be7d-11c792856ced")
 
   @BeforeAll
   @Override
@@ -36,7 +33,7 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testInsertAndFindById() {
-    ItemPropertyDO toInsert = new ItemPropertyDO("Population", "1750000", true, idBudapest)
+    ItemPropertyDO toInsert = new ItemPropertyDO("Population", "1750000", true, BUDAPEST.uuid)
 
     ItemPropertyDO inserted = repository.insert(toInsert).await()
     assertNotNull(inserted.getId())
@@ -52,7 +49,7 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindByItemId() {
-    List<ItemPropertyDO> fetchedByItemId = repository.findByItemId(idBudapest).await()
+    List<ItemPropertyDO> fetchedByItemId = repository.findByItemId(BUDAPEST.uuid).await()
     assertEquals(4, fetchedByItemId.size())
   }
 
@@ -65,7 +62,7 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testUpdate() {
     // Insert first to obtain a known id
-    ItemPropertyDO toInsert = new ItemPropertyDO("Nickname", "Buda", false, idBudapest)
+    ItemPropertyDO toInsert = new ItemPropertyDO("Nickname", "Buda", false, BUDAPEST.uuid)
     ItemPropertyDO inserted = repository.insert(toInsert).await()
 
     inserted.setValue("Pest")
@@ -84,7 +81,7 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testDeleteById() {
     // Insert one to delete
-    ItemPropertyDO toInsert = new ItemPropertyDO("Temp", "X", false, idBudapest)
+    ItemPropertyDO toInsert = new ItemPropertyDO("Temp", "X", false, BUDAPEST.uuid)
     ItemPropertyDO inserted = repository.insert(toInsert).await()
 
     int rows = repository.deleteById(inserted.getId()).await()
@@ -96,10 +93,10 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testDeleteByItemId() {
-    int rowsDeleted = repository.deleteByItemId(idParis).await()
+    int rowsDeleted = repository.deleteByItemId(PARIS.uuid).await()
     assertEquals(4, rowsDeleted)
 
-    List<ItemPropertyDO> afterDelete = repository.findByItemId(idParis).await()
+    List<ItemPropertyDO> afterDelete = repository.findByItemId(PARIS.uuid).await()
     assertEquals(0, afterDelete.size())
   }
 }

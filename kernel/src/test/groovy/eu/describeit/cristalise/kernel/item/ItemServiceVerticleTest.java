@@ -16,6 +16,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.util.UUID;
 
+import static eu.describeit.cristalise.CommonTestIds.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
@@ -26,8 +27,6 @@ class ItemServiceVerticleTest {
 
   private final String dbSchemaChangelogFiles = "/liquibase/changelog/changelog-master.yaml";
   private final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
-
-  private final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
 
   @BeforeAll
   @DisplayName("Deploy ItemServiceVerticle and create service proxy")
@@ -71,7 +70,7 @@ class ItemServiceVerticleTest {
   @Test
   @DisplayName("requestAction completes successfully")
   public void testRequestActionSuccess(Vertx vertx, VertxTestContext testContext) {
-    ItemProxy item = new ItemProxy(vertx, idBudapest);
+    ItemProxy item = new ItemProxy(vertx, BUDAPEST.getUuid());
     JsonObject outcome = new JsonObject().put("request", "OK");
     JsonObject expectedOutcome = outcome.copy().put("name", "Budapest");
 

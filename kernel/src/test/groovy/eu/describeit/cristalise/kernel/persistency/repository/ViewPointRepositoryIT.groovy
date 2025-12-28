@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
+import static eu.describeit.cristalise.CommonTestIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -35,11 +36,11 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
   void testInsertAndFindById() {
     ViewPointDO toInsert = new ViewPointDO(
       "TestViewPoint", // name
-      UUID.fromString("33333333-3333-3333-3333-333333333333"), // schema
+      SCHEMA_1.uuid, // schema
       "v2", // schemaVersion
       "TestSchema", // schemaName
       1L, // outcomeId
-      UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
+      BUDAPEST.uuid // itemId
     )
 
     ViewPointDO inserted = repository.insert(toInsert).await()
@@ -61,11 +62,11 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     // insert a row then update it
     ViewPointDO base = new ViewPointDO(
       "OriginalViewPoint", // name
-      UUID.fromString("44444444-4444-4444-4444-444444444444"), // schema
+      SCHEMA_2.uuid, // schema
       "v1", // schemaVersion
       "OriginalSchema", // schemaName
       1L, // outcomeId
-      UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
+      BUDAPEST.uuid // itemId
     )
     ViewPointDO inserted = repository.insert(base).await()
 
@@ -91,11 +92,11 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     // insert one to delete
     ViewPointDO base = new ViewPointDO(
       "ToDeleteViewPoint", // name
-      UUID.fromString("55555555-5555-5555-5555-555555555555"), // schema
+      SCHEMA_3.uuid, // schema
       "v1", // schemaVersion
       "ToDeleteSchema", // schemaName
       1L, // outcomeId
-      UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd") // itemId
+      BUDAPEST.uuid // itemId
     )
     ViewPointDO inserted = repository.insert(base).await()
 
@@ -112,12 +113,12 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindByItemId() {
-    UUID testItemId = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
+    UUID testItemId = BUDAPEST.uuid
 
     // Insert two viewPoints for the same item
     ViewPointDO viewPoint1 = new ViewPointDO(
       "FirstViewPoint", // name
-      UUID.fromString("66666666-6666-6666-6666-666666666666"), // schema
+      SCHEMA_4.uuid, // schema
       "v1", // schemaVersion
       "FirstSchema", // schemaName
       1L, // outcomeId
@@ -125,7 +126,7 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     )
     ViewPointDO viewPoint2 = new ViewPointDO(
       "SecondViewPoint", // name
-      UUID.fromString("77777777-7777-7777-7777-777777777777"), // schema
+      SCHEMA_5.uuid, // schema
       "v1", // schemaVersion
       "SecondSchema", // schemaName
       1L, // outcomeId
@@ -145,12 +146,12 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testDeleteByItemId() {
-    UUID testItemId = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d")
+    UUID testItemId = DELHI.uuid
 
     // Insert two viewPoints for the same item
     ViewPointDO viewPoint1 = new ViewPointDO(
       "ToDeleteViewPoint1", // name
-      UUID.fromString("88888888-8888-8888-8888-888888888888"), // schema
+      SCHEMA_6.uuid, // schema
       "v1", // schemaVersion
       "ToDeleteSchema1", // schemaName
       1L, // outcomeId
@@ -158,7 +159,7 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     )
     ViewPointDO viewPoint2 = new ViewPointDO(
       "ToDeleteViewPoint2", // name
-      UUID.fromString("99999999-9999-9999-9999-999999999999"), // schema
+      SCHEMA_7.uuid, // schema
       "v1", // schemaVersion
       "ToDeleteSchema2", // schemaName
       1L, // outcomeId
@@ -189,14 +190,14 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindByItemIdWithNonExistentItem() {
-    UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000000")
+    UUID nonExistentItemId = NON_EXISTENT.uuid
     List<ViewPointDO> viewPoints = repository.findByItemId(nonExistentItemId).await()
     assertTrue(viewPoints.isEmpty())
   }
 
   @Test
   void testDeleteByItemIdWithNonExistentItem() {
-    UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000001")
+    UUID nonExistentItemId = NON_EXISTENT_2.uuid
     int deletedRows = repository.deleteByItemId(nonExistentItemId).await()
     assertEquals(0, deletedRows)
   }

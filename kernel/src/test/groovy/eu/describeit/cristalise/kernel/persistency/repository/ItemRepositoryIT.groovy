@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
+import static eu.describeit.cristalise.CommonTestIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j
@@ -16,17 +17,6 @@ import static org.junit.jupiter.api.Assertions.*
 class ItemRepositoryIT extends AbstractRepositoryIT {
 
   private ItemRepository repository
-
-  final UUID idZero = UUID.fromString("00000000-0000-0000-0000-000000000000")
-
-  // to be found
-  final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd")
-
-  // to be updated
-  final UUID idDelhi = UUID.fromString("bbcb31f8-7f4c-47fb-8876-864a61e48d5d")
-
-  // to be deleted (choose an item without events to avoid FK violations)
-  final UUID idLondon = UUID.fromString("04a71ecd-7cda-439f-bf6e-6517a824f753")
 
   @BeforeAll
   @Override
@@ -42,12 +32,12 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
     def versionBudapest = "v1"
 
     // use findByUuid
-    Optional<ItemDO> foundByUuid = repository.findById(idBudapest).await()
+    Optional<ItemDO> foundByUuid = repository.findById(BUDAPEST.uuid).await()
 
     assertTrue(foundByUuid.isPresent())
     def itemByUuid = foundByUuid.get()
 
-    assertEquals(idBudapest, itemByUuid.getId())
+    assertEquals(BUDAPEST.uuid, itemByUuid.getId())
     assertEquals(nameBudapest, itemByUuid.getName())
     assertEquals(typeBudapest, itemByUuid.getType())
     assertEquals(versionBudapest, itemByUuid.getVersion())
@@ -55,7 +45,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindNoneExistent() {
-    Optional<ItemDO> noneExistent = repository.findById(idZero).await()
+    Optional<ItemDO> noneExistent = repository.findById(NON_EXISTENT.uuid).await()
     assertTrue(noneExistent.isEmpty())
   }
 
@@ -77,7 +67,7 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testUpdate() {
-    ItemDO cityDelhi = repository.findById(idDelhi).await().get()
+    ItemDO cityDelhi = repository.findById(DELHI.uuid).await().get()
     cityDelhi.setName("Mumbai")
 
     ItemDO cityMumbai = repository.update(cityDelhi).await().get()
@@ -88,16 +78,17 @@ class ItemRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testDeleteById() {
-    def rowsById = repository.deleteById(idLondon).await()
+    // choose an item without events to avoid FK violations
+    def rowsById = repository.deleteById(LONDON.uuid).await()
     assertEquals(1, rowsById)
 
-    Optional<ItemDO> afterDelete = repository.findById(idLondon).await()
+    Optional<ItemDO> afterDelete = repository.findById(LONDON.uuid).await()
     assertTrue(afterDelete.isEmpty())
   }
 
   @Test
   void testDeleteNoneExistent() {
-    def rowsById = repository.deleteById(idZero).await()
+    def rowsById = repository.deleteById(NON_EXISTENT.uuid).await()
     assertEquals(0, rowsById)
   }
 }
