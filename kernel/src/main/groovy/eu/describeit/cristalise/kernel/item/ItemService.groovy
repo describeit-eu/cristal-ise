@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
 import io.vertx.core.Promise
+import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.SqlConnection
 
@@ -35,19 +36,16 @@ class ItemService implements Item {
     List<Byte> attachment)
   {
     log.info('requestAction() - {}', itemUuid)
-    Promise<String> promise = Promise.promise()
+    def outcomeJson = new JsonObject(outcome)
 
     dbPool.withTransaction() { SqlConnection connection ->
-      log.info('requestAction() - {} connection:{}', itemUuid, connection)
-      create(connection, itemUuid).compose {
-        ItemProxy proxy ->
+      return create(connection, itemUuid).compose { ItemProxy item ->
+        log.info('requestAction() - {}', item)
+        outcomeJson.put('name', item.name)
+        return Future.succeededFuture(outcomeJson.encode())
       }
-    }.onSuccess() {
-      promise.succeed(outcome) // this is not correct, but works for the time being
     }.onFailure() { Throwable t ->
-      promise.fail(t)
+      return Future.failedFuture(t)
     }
-
-    return promise.future()
   }
 }

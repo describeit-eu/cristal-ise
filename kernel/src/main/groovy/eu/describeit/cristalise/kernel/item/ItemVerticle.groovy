@@ -23,6 +23,7 @@ class ItemVerticle extends VerticleBase {
   public Future<?> start() throws Exception {
     new ServiceBinder(vertx)
       .setAddress(Item.ADDRESS)
+      .setIncludeDebugInfo(true)
       .register(Item.class, itemService)
 
     log.info("ItemVerticle started")

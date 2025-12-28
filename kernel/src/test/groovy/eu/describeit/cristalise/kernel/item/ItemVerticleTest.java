@@ -31,6 +31,8 @@ class ItemVerticleTest {
   private final String dbSchemaChangelogFiles = "/liquibase/changelog/changelog-master.yaml";
   private final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
 
+  private final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
+
   @BeforeAll
   @DisplayName("Deploy ItemVerticle and create service proxy")
   public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
@@ -70,31 +72,26 @@ class ItemVerticleTest {
     );
   }
 
-  /*
   @Test
-  @DisplayName("Test requestAction method successfully")
-  public void testRequestActionSuccess(VertxTestContext testContext) {
-    String itemUuid = UUID.randomUUID().toString();
-    String actorUuid = UUID.randomUUID().toString();
-    String actionPath = "/some/action";
-    String transitionID = "Start";
-    String outcome = "{}";
-    String fileName = null;
-    List<Byte> attachment = Collections.emptyList(); // Using an empty list for simplicity
+  @DisplayName("requestAction completes successfully")
+  public void testRequestActionSuccess(Vertx vertx, VertxTestContext testContext) {
+    ItemProxy item = new ItemProxy(vertx, idBudapest);
+    JsonObject outcome = new JsonObject().put("request", "OK");
+    JsonObject expectedOutcome = outcome.copy();
+    expectedOutcome.put("name", "Budapest");
 
-    String expectedResult = String.format("Action '%s' requested for Item %s by Actor %s", actionPath, itemUuid, actorUuid);
+    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "/workflow/Jump", "Start", outcome);
 
-    Future<String> future = itemService.requestAction(itemUuid, actorUuid, actionPath, transitionID, outcome, fileName, attachment);
-
-    future.onComplete(
-      testContext
-        .succeeding(result ->
+    future
+      .onComplete(
+        testContext.succeeding(result ->
           testContext.verify(() -> {
-            Assertions.assertEquals(expectedResult, result);
+            log.info("{}", result);
+            assertEquals(expectedOutcome, result);
             testContext.completeNow();
           })
         )
-    );
+      )
+      .onFailure(testContext::failNow);
   }
-  */
 }

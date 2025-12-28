@@ -4,6 +4,7 @@ import eu.describeit.cristalise.kernel.persistency.domain.*
 import eu.describeit.cristalise.kernel.persistency.repository.*
 
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
 import io.vertx.core.Vertx
@@ -11,6 +12,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.SqlClient
 
 @Slf4j
+@ToString(includePackage=false)
 @CompileStatic
 class ItemProxy {
 
@@ -47,9 +49,10 @@ class ItemProxy {
     return itemRepository.findById(itemId).compose { Optional<ItemDO> itemOptional ->
       if (itemOptional.isEmpty()) {
         return Future.failedFuture(new IllegalArgumentException("Item ${itemId} does not exists"))
+      } else {
+        this.itemDO = itemOptional.get()
+        return Future.succeededFuture(this)
       }
-      this.itemDO = itemOptional.get()
-      return Future.succeededFuture(this)
     } as Future<ItemProxy>
   }
 
