@@ -1,7 +1,6 @@
 package eu.describeit.cristalise.kernel.item;
 
 import eu.describeit.cristalise.kernel.dagger.DaggerTestKernelComponent;
-import eu.describeit.cristalise.kernel.dagger.KernelComponent;
 import eu.describeit.cristalise.kernel.dagger.TestKernelComponent;
 import groovy.transform.CompileStatic;
 import io.vertx.core.DeploymentOptions;
@@ -15,18 +14,15 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
-import static io.vertx.core.ThreadingModel.WORKER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @ExtendWith(VertxExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @CompileStatic
-class ItemVerticleTest {
+class ItemServiceVerticleTest {
 
   private final String dbSchemaChangelogFiles = "/liquibase/changelog/changelog-master.yaml";
   private final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
@@ -34,7 +30,7 @@ class ItemVerticleTest {
   private final UUID idBudapest = UUID.fromString("63f5033b-f427-4c4a-9ab4-2e4ba80589dd");
 
   @BeforeAll
-  @DisplayName("Deploy ItemVerticle and create service proxy")
+  @DisplayName("Deploy ItemServiceVerticle and create service proxy")
   public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
     System.setProperty("vertx-config-path", "src/test/conf/config.json");
 
@@ -48,7 +44,7 @@ class ItemVerticleTest {
       .executeUpdate(pgContainer.getJdbcUrl(), pgContainer.getUsername(), pgContainer.getPassword(), dbSchemaChangelogFiles)
       .executeUpdate(pgContainer.getJdbcUrl(), pgContainer.getUsername(), pgContainer.getPassword(), testDataChangelogFiles);
 
-    vertx.deployVerticle(component.itemVerticle(), options)
+    vertx.deployVerticle(component.itemServiceVerticle(), options)
       .onComplete(
         testContext.succeeding(id -> testContext.completeNow())
       );
@@ -77,8 +73,7 @@ class ItemVerticleTest {
   public void testRequestActionSuccess(Vertx vertx, VertxTestContext testContext) {
     ItemProxy item = new ItemProxy(vertx, idBudapest);
     JsonObject outcome = new JsonObject().put("request", "OK");
-    JsonObject expectedOutcome = outcome.copy();
-    expectedOutcome.put("name", "Budapest");
+    JsonObject expectedOutcome = outcome.copy().put("name", "Budapest");
 
     Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "/workflow/Jump", "Start", outcome);
 

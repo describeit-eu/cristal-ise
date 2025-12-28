@@ -3,8 +3,9 @@ package eu.describeit.cristalise.kernel.item
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
-import io.vertx.core.Promise
+import io.vertx.core.VerticleBase
 import io.vertx.core.json.JsonObject
+import io.vertx.serviceproxy.ServiceBinder
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.SqlConnection
 
@@ -16,12 +17,12 @@ import static eu.describeit.cristalise.kernel.item.ItemProxy.create
 @Slf4j
 @CompileStatic
 @Singleton
-class ItemService implements Item {
+class ItemServiceVerticle extends VerticleBase implements Item {
 
   Pool dbPool
 
   @Inject
-  ItemService(Pool pool) {
+  ItemServiceVerticle(Pool pool) {
     dbPool = pool
   }
 
@@ -47,5 +48,22 @@ class ItemService implements Item {
     }.onFailure() { Throwable t ->
       return Future.failedFuture(t)
     }
+  }
+
+  @Override
+  public Future<?> start() throws Exception {
+    new ServiceBinder(vertx)
+      .setAddress(Item.ADDRESS)
+      .setIncludeDebugInfo(true)
+      .register(Item.class, this)
+
+    log.info("ItemServiceVerticle started")
+    return super.start()
+  }
+
+  @Override
+  public Future<?> stop() throws Exception {
+    log.info("ItemServiceVerticle stopped")
+    return super.stop()
   }
 }

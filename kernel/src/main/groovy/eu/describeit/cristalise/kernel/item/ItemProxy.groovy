@@ -178,7 +178,7 @@ class ItemProxy {
     String     fileName,
     List<Byte> attachment
   ) {
-    Item itemService = Item.createProxy(vertx);
+    Item itemService = new ItemVertxEBProxy(vertx, Item.ADDRESS);
 
     return itemService.requestAction(
       itemId.toString(),

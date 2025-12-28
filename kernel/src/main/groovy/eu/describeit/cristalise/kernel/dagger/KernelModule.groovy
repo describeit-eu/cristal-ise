@@ -3,7 +3,7 @@ package eu.describeit.cristalise.kernel.dagger
 import dagger.Module
 import dagger.Provides
 import eu.describeit.cristalise.kernel.item.Item
-import eu.describeit.cristalise.kernel.item.ItemService
+import eu.describeit.cristalise.kernel.item.ItemServiceVerticle
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.config.ConfigRetriever
@@ -31,8 +31,8 @@ class KernelModule {
    */
   @Provides
   @Singleton
-  static Item provideItemService(Pool pool) {
-    return new ItemService(pool)
+  static Item provideItemService(ItemServiceVerticle itemServiceVerticle) {
+    return itemServiceVerticle
   }
 
   /**

@@ -3,7 +3,6 @@ package eu.describeit.cristalise.kernel.item;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 
 import java.util.List;
 
@@ -21,8 +20,4 @@ public interface Item {
             String     fileName,
             List<Byte> attachment
     );
-
-    static Item createProxy(Vertx vertx) {
-        return new ItemVertxEBProxy(vertx, ADDRESS);
-    }
 }

@@ -16,13 +16,13 @@ class MainVerticle extends VerticleBase {
 
     KernelComponent component = DaggerKernelComponent.create()
 
-    vertx.deployVerticle(component.itemVerticle(), component.deploymentOptions())
+    vertx.deployVerticle(component.itemServiceVerticle(), component.deploymentOptions())
       .onSuccess { String result ->
-        log.info("ItemVerticle deployed successfully")
+        log.info("ItemServiceVerticle deployed successfully")
         promise.complete(result)
       }
       .onFailure { Throwable failure ->
-        log.error("Error deploying ItemVerticle", failure)
+        log.error("Error deploying ItemServiceVerticle", failure)
         promise.fail(failure)
       }
 
@@ -33,4 +33,5 @@ class MainVerticle extends VerticleBase {
   public Future<?> stop() throws Exception {
     log.info("MainVerticle stopped")
     return super.stop()
-  }}
+  }
+}
