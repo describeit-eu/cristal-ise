@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @Slf4j
 @CompileStatic
 @Singleton
-class ItemServiceVerticle extends VerticleBase implements Item {
+class ItemServiceVerticle extends VerticleBase implements ItemService {
 
   Pool dbPool
 
@@ -89,9 +89,9 @@ class ItemServiceVerticle extends VerticleBase implements Item {
   @Override
   Future<?> start() throws Exception {
     new ServiceBinder(vertx)
-      .setAddress(Item.ADDRESS)
+      .setAddress(ItemService.ADDRESS)
       .setIncludeDebugInfo(true)
-      .register(Item.class, this)
+      .register(ItemService.class, this)
 
     log.info("ItemServiceVerticle started")
     return super.start()

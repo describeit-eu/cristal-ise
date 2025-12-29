@@ -8,7 +8,7 @@ import java.util.List;
 
 @ProxyGen // Generate the proxy and handler
 @VertxGen // Generate clients in non-java languages
-public interface Item {
+public interface ItemService {
     String ADDRESS = "cristalise-items";
 
     Future<String> requestAction(

@@ -2,7 +2,7 @@ package eu.describeit.cristalise.kernel.dagger
 
 import dagger.Module
 import dagger.Provides
-import eu.describeit.cristalise.kernel.item.Item
+import eu.describeit.cristalise.kernel.item.ItemService
 import eu.describeit.cristalise.kernel.item.ItemServiceVerticle
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -12,7 +12,6 @@ import io.vertx.core.DeploymentOptions
 import io.vertx.core.ThreadingModel
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.sqlclient.Pool
 
 import javax.inject.Singleton
 
@@ -31,7 +30,7 @@ class KernelModule {
    */
   @Provides
   @Singleton
-  static Item provideItemService(ItemServiceVerticle itemServiceVerticle) {
+  static ItemService provideItemService(ItemServiceVerticle itemServiceVerticle) {
     return itemServiceVerticle
   }
 
