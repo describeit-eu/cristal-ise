@@ -8,11 +8,11 @@ import io.vertx.core.json.JsonObject
 import io.vertx.serviceproxy.ServiceBinder
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.SqlConnection
+import io.vertx.sqlclient.Transaction
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import static eu.describeit.cristalise.kernel.item.ItemProxy.create
 
 @Slf4j
 @CompileStatic
@@ -27,7 +27,42 @@ class ItemServiceVerticle extends VerticleBase implements Item {
   }
 
   @Override
-  public Future<String> requestAction(
+  Future<String> requestAction(
+    String itemUuid,
+    String actorUuid,
+    String actionPath,
+    String transitionID,
+    String outcome,
+    String fileName,
+    List<Byte> attachment)
+  {
+    log.info('requestAction() - {}', itemUuid)
+    def outcomeJson = new JsonObject(outcome)
+
+    SqlConnection conn = null
+    Transaction tx = null
+
+    try {
+      conn = dbPool.getConnection().await()
+      tx = conn.begin().await()
+
+      ItemProxy item = ItemProxy.create(conn, itemUuid).await()
+      outcomeJson.put('name', item.name)
+
+      tx.commit().await()
+      conn.close().await()
+      return Future.succeededFuture(outcomeJson.encode())
+    }
+    catch (Throwable t) {
+      if (tx) tx.rollback().await()
+      if (conn) conn.close().await()
+
+      log.info('requestAction() - FAILED item:{}', itemUuid, t)
+      return Future.failedFuture(t)
+    }
+  }
+
+  Future<String> requestActionAsync(
     String itemUuid,
     String actorUuid,
     String actionPath,
@@ -40,18 +75,19 @@ class ItemServiceVerticle extends VerticleBase implements Item {
     def outcomeJson = new JsonObject(outcome)
 
     dbPool.withTransaction() { SqlConnection connection ->
-      return create(connection, itemUuid).compose { ItemProxy item ->
-        log.info('requestAction() - {}', item)
-        outcomeJson.put('name', item.name)
-        return Future.succeededFuture(outcomeJson.encode())
-      }
+      return ItemProxy.create(connection, itemUuid)
+        .compose { ItemProxy item ->
+          log.info('requestAction() - {}', item)
+          outcomeJson.put('name', item.name)
+          return Future.succeededFuture(outcomeJson.encode())
+        }
     }.onFailure() { Throwable t ->
       return Future.failedFuture(t)
     }
   }
 
   @Override
-  public Future<?> start() throws Exception {
+  Future<?> start() throws Exception {
     new ServiceBinder(vertx)
       .setAddress(Item.ADDRESS)
       .setIncludeDebugInfo(true)
@@ -62,7 +98,7 @@ class ItemServiceVerticle extends VerticleBase implements Item {
   }
 
   @Override
-  public Future<?> stop() throws Exception {
+  Future<?> stop() throws Exception {
     log.info("ItemServiceVerticle stopped")
     return super.stop()
   }

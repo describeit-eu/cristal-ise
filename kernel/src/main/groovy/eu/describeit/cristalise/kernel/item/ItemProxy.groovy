@@ -58,7 +58,8 @@ class ItemProxy {
 
   /**
    * Use this constructor to create ItemProxies without connection to the database.
-   * It
+   * It should only be used for testing purposes.
+   *
    * @param v the fully configure Vertx instance
    * @param uuid the itemId
    */

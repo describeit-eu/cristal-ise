@@ -14,5 +14,5 @@ interface DescriptionObject {
   void setVersion(Integer version);
   void setItemID(UUID uuid);
 
-  public BuiltInResources getResourceType();
+  BuiltInResources getResourceType();
 }
