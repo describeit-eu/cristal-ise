@@ -18,11 +18,11 @@ public class ItemRepositoryImpl implements ItemRepository {
   private final SqlClient client
 
   private static final String TABLE = "item"
-  private static final String COLUMNS = "id,name,type,version"
+  private static final String COLUMNS = "id,name,type,version,action_id"
   private static final String SQL_FIND_BY_ID     = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}"
   private static final String SQL_FIND_ALL       = "SELECT " + COLUMNS + " FROM " + TABLE
-  private static final String SQL_INSERT         = "INSERT INTO " + TABLE + " (id, name, type, version) VALUES (#{id}, #{name}, #{type}, #{version}) RETURNING " + COLUMNS
-  private static final String SQL_UPDATE         = "UPDATE "      + TABLE + " SET id=#{id}, name=#{name}, type=#{type}, version=#{version} WHERE id=#{id} RETURNING " + COLUMNS
+  private static final String SQL_INSERT         = "INSERT INTO " + TABLE + " (id, name, type, version, action_id) VALUES (#{id}, #{name}, #{type}, #{version}, #{action_id}) RETURNING " + COLUMNS
+  private static final String SQL_UPDATE         = "UPDATE "      + TABLE + " SET id=#{id}, name=#{name}, type=#{type}, version=#{version}, action_id=#{action_id} WHERE id=#{id} RETURNING " + COLUMNS
   private static final String SQL_DELETE_BY_ID   = "DELETE FROM " + TABLE + " WHERE id=#{id}"
 
   public ItemRepositoryImpl(SqlClient client) {

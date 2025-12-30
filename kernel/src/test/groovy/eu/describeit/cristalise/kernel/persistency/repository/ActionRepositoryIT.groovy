@@ -73,6 +73,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     )
     def inserted = repository.insert(base).await()
 
+    log.info('base:{} inserted:{}', base, inserted)
+
     inserted.setName("TempActionUpdated")
     inserted.setVersion("v2")
 

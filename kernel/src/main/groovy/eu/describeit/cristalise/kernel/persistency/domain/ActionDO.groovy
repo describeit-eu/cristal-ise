@@ -2,6 +2,7 @@ package eu.describeit.cristalise.kernel.persistency.domain
 
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import io.vertx.codegen.annotations.DataObject
 import io.vertx.codegen.format.SnakeCase
 import io.vertx.codegen.json.annotations.JsonGen
@@ -17,12 +18,13 @@ import java.beans.ConstructorProperties
 @JsonGen
 @RowMapped(formatter = SnakeCase)
 @ParametersMapped(formatter = SnakeCase)
+@ToString(includePackage = false, includeNames = true, excludes = 'properties, layout' )
 class ActionDO {
-  enum ActionType { ELEMENTARY, SEQUENCE, LOOP, SPLIT }
-
-  ActionDO(JsonObject json) { ActionDOConverter.fromJson(json, this) }
+  enum ActionType { ELEMENTARY, SEQUENCE, LOOP, SPLIT, SCRIPTED }
 
   ActionDO() {}
+
+  ActionDO(JsonObject json) { ActionDOConverter.fromJson(json, this) }
 
   @ConstructorProperties(["id", "name", "path", "version", "properties", "type", "layout", "parentId"])
   ActionDO(Long id, String name, String path, String version, String properties, ActionType type, String layout, Long parentId) {
@@ -44,7 +46,7 @@ class ActionDO {
   ActionDO(ActionDO other) {
     this(null, other.name, other.path, other.version, other.properties, other.type, other.layout, other.parentId)
   }
-
+/*
   ActionDO setId(Long id) { this.id = id; return this }
   ActionDO setName(String name) { this.name = name; return this }
   ActionDO setPath(String path) { this.path = path; return this }
@@ -62,13 +64,13 @@ class ActionDO {
   ActionType getType() { return type }
   String getLayout() { return layout }
   Long getParentId() { return parentId }
-
-  private Long id
-  private String name
-  private String path
-  private String version
-  private String properties
-  private ActionType type
-  private String layout
-  private Long parentId
+*/
+  Long id
+  String name
+  String path
+  String version
+  String properties
+  ActionType type
+  String layout
+  Long parentId
 }

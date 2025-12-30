@@ -1,5 +1,6 @@
 package eu.describeit.cristalise.kernel.item
 
+import eu.describeit.cristalise.kernel.lifecycle.CompositeAction
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
@@ -70,36 +71,11 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
   private JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final JsonObject inputOutcome) {
     log.info('handleRequest() - {} {}', item, actor)
 
+    CompositeAction lifecycle = item.lifeCycle.await()
+
     def outputOutcome = inputOutcome.copy().put('name', item.name)
 
     return outputOutcome
-  }
-
-  /**
-   *
-   */
-  Future<String> requestActionAsync(
-    String itemUuid,
-    String actorUuid,
-    String actionPath,
-    String transitionID,
-    String outcome,
-    String fileName,
-    List<Byte> attachment)
-  {
-    log.info('requestAction() - {}', itemUuid)
-    def outcomeJson = new JsonObject(outcome)
-
-    dbPool.withTransaction() { SqlConnection connection ->
-      return ItemProxy.create(connection, itemUuid)
-        .compose { ItemProxy item ->
-          log.info('requestAction() - {}', item)
-          outcomeJson.put('name', item.name)
-          return Future.succeededFuture(outcomeJson.encode())
-        }
-    }.onFailure() { Throwable t ->
-      return Future.failedFuture(t)
-    }
   }
 
   @Override

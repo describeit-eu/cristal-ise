@@ -1,5 +1,7 @@
 package eu.describeit.cristalise.kernel.item
 
+import eu.describeit.cristalise.kernel.lifecycle.CompositeAction
+import eu.describeit.cristalise.kernel.lifecycle.SequencingCompositeAction
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import eu.describeit.cristalise.kernel.persistency.repository.*
 
@@ -11,11 +13,12 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.SqlClient
 
+import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.SEQUENCE
+
 @Slf4j
-@ToString(includePackage=false)
+@ToString(includePackage=false,  includeNames=true)
 @CompileStatic
 class ItemProxy {
-
   private final ItemRepository itemRepository
 
   private final DomainPathRepository domainPathRepository
@@ -33,6 +36,8 @@ class ItemProxy {
 
   private final UUID itemId
   private ItemDO itemDO
+
+  private Future<CompositeAction> lifeCycle
 
   private final Vertx vertx
 
@@ -54,6 +59,36 @@ class ItemProxy {
         return Future.succeededFuture(this)
       }
     } as Future<ItemProxy>
+  }
+
+  /**
+   * @return the lifecycle of this item
+   */
+  Future<CompositeAction> getLifeCycle() {
+    if (lifeCycle) return lifeCycle
+
+    Long actionId = itemDO?.actionId
+    if (actionId == null) return Future.succeededFuture(null)
+
+    return actionRepository.findById(actionId).compose { Optional<ActionDO> actionOpt ->
+      if (actionOpt.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("Action id:$actionId does not exists for $this"))
+      } else {
+        ActionDO actionDO = actionOpt.get()
+
+        switch (actionDO.type) {
+          case SEQUENCE:
+            CompositeAction seq = new SequencingCompositeAction(actionDO: actionDO)
+            seq.initialise()
+            lifeCycle = Future.succeededFuture(seq)
+            break
+          default:
+            return Future.failedFuture(new IllegalArgumentException("Unimplemented CompAct type of $actionDO for $this"))
+        }
+
+        return lifeCycle
+      }
+    } as Future<CompositeAction>
   }
 
   /**
@@ -151,12 +186,12 @@ class ItemProxy {
     String fileName = null
     List<Byte> attachment = Collections.emptyList()
 
-    requestAction(
+    callItemService(
       actorId, actionPath, transitionID, outcome, fileName, attachment
     ).compose { String result ->
       return Future.succeededFuture(new JsonObject(result))
     }.onFailure { Throwable t ->
-      log.debug("requestAction() - could not process request for item: {}", itemId, t)
+      log.debug("requestAction() - could not process request for:{}", this, t)
       return Future.failedFuture(t)
     }
   }
@@ -171,7 +206,7 @@ class ItemProxy {
    * @param attachment
    * @return
    */
-  Future<String> requestAction(
+  private Future<String> callItemService(
     UUID       actorId,
     String     actionPath,
     String     transitionID,
