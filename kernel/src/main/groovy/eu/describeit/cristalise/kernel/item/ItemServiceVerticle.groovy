@@ -36,8 +36,9 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
     String fileName,
     List<Byte> attachment)
   {
-    log.info('requestAction() - {}', itemUuid)
-    def outcomeJson = new JsonObject(outcome)
+    // TODO: authn/authz should be based on Interceptors attached to ServiceBinder
+    // TODO: use services like keycloak or Authentik or casdoor
+    def inputOutcome = new JsonObject(outcome)
 
     SqlConnection conn = null
     Transaction tx = null
@@ -46,22 +47,37 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
       conn = dbPool.getConnection().await()
       tx = conn.begin().await()
 
-      ItemProxy item = ItemProxy.create(conn, itemUuid).await()
-      outcomeJson.put('name', item.name)
+      // checks if actor and item exists
+      final ItemProxy actor =  null // ItemProxy.create(conn, actorUuid).await()
+      final ItemProxy item = ItemProxy.create(conn, itemUuid).await()
+
+      final JsonObject outputOutcome = handleRequest(item, actor, inputOutcome)
 
       tx.commit().await()
       conn.close().await()
-      return Future.succeededFuture(outcomeJson.encode())
+
+      return Future.succeededFuture(outputOutcome.encode())
     }
     catch (Throwable t) {
       if (tx) tx.rollback().await()
       if (conn) conn.close().await()
 
-      log.info('requestAction() - FAILED item:{}', itemUuid, t)
+      log.debug('requestAction() - FAILED item:{}', itemUuid, t)
       return Future.failedFuture(t)
     }
   }
 
+  private JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final JsonObject inputOutcome) {
+    log.info('handleRequest() - {} {}', item, actor)
+
+    def outputOutcome = inputOutcome.copy().put('name', item.name)
+
+    return outputOutcome
+  }
+
+  /**
+   *
+   */
   Future<String> requestActionAsync(
     String itemUuid,
     String actorUuid,
@@ -91,15 +107,17 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
     new ServiceBinder(vertx)
       .setAddress(ItemService.ADDRESS)
       .setIncludeDebugInfo(true)
+//      .addInterceptor {JWTAuth.create(it, new JWTAuthOptions())))
+//      .addInterceptor {AuthorizationInterceptor.create(JWTAuthorization.create("permissions")) {...} }
       .register(ItemService.class, this)
 
-    log.info("ItemServiceVerticle started")
+    log.info("start() - DONE")
     return super.start()
   }
 
   @Override
   Future<?> stop() throws Exception {
-    log.info("ItemServiceVerticle stopped")
+    log.info("stop() - DONE")
     return super.stop()
   }
 }

@@ -18,7 +18,7 @@ class MainVerticle extends VerticleBase {
 
     vertx.deployVerticle(component.itemServiceVerticle(), component.deploymentOptions())
       .onSuccess { String result ->
-        log.info("ItemServiceVerticle deployed successfully")
+        log.info("start() - ItemServiceVerticle deployed successfully")
         promise.complete(result)
       }
       .onFailure { Throwable failure ->
@@ -26,12 +26,13 @@ class MainVerticle extends VerticleBase {
         promise.fail(failure)
       }
 
+    log.info("start() - DONE")
     return promise.future()
   }
 
   @Override
   public Future<?> stop() throws Exception {
-    log.info("MainVerticle stopped")
+    log.info("stop() - DONE")
     return super.stop()
   }
 }
