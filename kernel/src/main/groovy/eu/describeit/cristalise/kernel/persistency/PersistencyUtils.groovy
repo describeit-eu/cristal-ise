@@ -1,20 +1,18 @@
-package eu.describeit.cristalise.kernel.persistency.repository
+package eu.describeit.cristalise.kernel.persistency
 
 import groovy.transform.CompileStatic
 import io.vertx.core.Future
 
-import java.util.ArrayList
-import java.util.Iterator
-import java.util.List
-import java.util.Optional
+import java.util.stream.Collectors
+import java.util.stream.StreamSupport
 
 /**
  * Small helper utilities to reduce duplicated code across repository implementations.
  */
 @CompileStatic
-final class RepositoryUtils {
+final class PersistencyUtils {
 
-  private RepositoryUtils() {}
+  private PersistencyUtils() {}
 
   /**
    * Returns the first element of the iterable wrapped in an Optional, or Optional.empty() if none.
@@ -28,9 +26,7 @@ final class RepositoryUtils {
    * Converts an Iterable (e.g., RowSet) to a List preserving iteration order.
    */
   static <T> List<T> toList(Iterable<T> rs) {
-    List<T> list = new ArrayList<>()
-    for (T row : rs) list.add(row)
-    return list
+    return StreamSupport.stream(rs.spliterator(), false).collect(Collectors.toList())
   }
 
   /**

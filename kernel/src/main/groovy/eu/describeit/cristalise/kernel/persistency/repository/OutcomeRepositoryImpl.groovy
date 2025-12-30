@@ -8,9 +8,9 @@ import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOptional
-import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.firstOrFail
-import static eu.describeit.cristalise.kernel.persistency.repository.RepositoryUtils.toList
+import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOptional
+import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOrFail
+import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toList
 
 @CompileStatic
 public class OutcomeRepositoryImpl implements OutcomeRepository {
