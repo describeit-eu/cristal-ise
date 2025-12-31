@@ -1,7 +1,6 @@
 package eu.describeit.cristalise.kernel.item
 
-import eu.describeit.cristalise.kernel.lifecycle.CompositeAction
-import eu.describeit.cristalise.kernel.lifecycle.SequencingCompositeAction
+import eu.describeit.cristalise.kernel.lifecycle.*
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import eu.describeit.cristalise.kernel.persistency.repository.*
 
@@ -13,7 +12,7 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.SqlClient
 
-import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.SEQUENCE
+import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
 
 @Slf4j
 @ToString(includePackage=false,  includeNames=true)
@@ -70,21 +69,34 @@ class ItemProxy {
     Long actionId = itemDO?.actionId
     if (actionId == null) return Future.succeededFuture(null)
 
-    return actionRepository.findById(actionId).compose { Optional<ActionDO> actionOpt ->
+    actionRepository.findById(actionId).compose { Optional<ActionDO> actionOpt ->
       if (actionOpt.isEmpty()) {
         return Future.failedFuture(new IllegalArgumentException("Action id:$actionId does not exists for $this"))
       } else {
         ActionDO actionDO = actionOpt.get()
 
+        CompositeAction compositeAction
         switch (actionDO.type) {
+          case ELEMENTARY:
+            return Future.failedFuture(new IllegalArgumentException("ELEMENTARY Action cannot be used for lifeCycle for $this"))
+            break
           case SEQUENCE:
-            CompositeAction seq = new SequencingCompositeAction(actionDO: actionDO)
-            seq.initialise()
-            lifeCycle = Future.succeededFuture(seq)
+            compositeAction = new SequencingCompositeAction(actionDO: actionDO)
+            break
+          case LOOP:
+            compositeAction = new LoopingCompositeAction(actionDO: actionDO)
+            break
+          case SPLIT:
+            compositeAction = new SplittingCompositeAction(actionDO: actionDO)
+            break
+          case SCRIPTED:
+            compositeAction = new ScriptedCompositeAction(actionDO: actionDO)
             break
           default:
             return Future.failedFuture(new IllegalArgumentException("Unimplemented CompAct type of $actionDO for $this"))
         }
+        compositeAction.initialise()
+        lifeCycle = Future.succeededFuture(compositeAction)
 
         return lifeCycle
       }
