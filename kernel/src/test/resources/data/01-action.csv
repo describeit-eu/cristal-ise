@@ -4,7 +4,7 @@ UpdateCity;/CityWf/UpdateCity;v1;null;ELEMENTARY;null;1
 ChangeState;/CityWf/ChangeState;v1;null;LOOP;null;1
 Activate;/CityWf/ChangeState/Activate;v1;null;ELEMENTARY;null;3
 DeActivate;/CityWf/ChangeState/DeActivate;v1;null;ELEMENTARY;null;3
-CapitalWf;/CapitalWf;v2;null;SEQUENCE;null;null
+CapitalWf;/CapitalWf;v2;null;SPLIT;null;null
 UpdateCapital;/CapitalWf/UpdateCapital;v1;null;ELEMENTARY;null;6
 ChangeState;/CapitalWf/ChangeState;v1;null;LOOP;null;6
 Activate;/CapitalWf/ChangeState/Activate;v1;null;ELEMENTARY;null;8

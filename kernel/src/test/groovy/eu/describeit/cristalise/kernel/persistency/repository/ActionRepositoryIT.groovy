@@ -60,6 +60,27 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
+  void testFindByParentId() {
+    def parentId = 1L
+    def actionsBefore = repository.findByParentId(parentId).await()
+
+    def toInsert = new ActionDO(
+      "ChildAction",
+      "/CityWf/ChildAction",
+      "v1",
+      null,
+      ELEMENTARY,
+      null,
+      parentId
+    )
+    def inserted = repository.insert(toInsert).await()
+
+    def actionsAfter = repository.findByParentId(parentId).await()
+    assertEquals(actionsBefore.size() + 1, actionsAfter.size())
+    assertTrue(actionsAfter.any { it.id == inserted.id })
+  }
+
+  @Test
   void testUpdate() {
     // insert a row then update it
     def base = new ActionDO(

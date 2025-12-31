@@ -9,6 +9,8 @@ interface ActionRepository {
 
   Future<Optional<ActionDO>> findById(Long id)
 
+  Future<List<ActionDO>> findByParentId(Long parentId)
+
   Future<List<ActionDO>> findAll()
 
   /**
