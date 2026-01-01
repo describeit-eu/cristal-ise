@@ -29,5 +29,7 @@ class ItemProxyIT extends AbstractRepositoryIT {
     assertNotNull(lifecycle)
     assertEquals("CapitalWf", lifecycle.name)
     assertEquals("/CapitalWf", lifecycle.path)
+    assertEquals(2, lifecycle.actions.size())
+    assertEquals(['ChangeState','UpdateCapital'], lifecycle.actions.collect {it.name}.sort())
   }
 }

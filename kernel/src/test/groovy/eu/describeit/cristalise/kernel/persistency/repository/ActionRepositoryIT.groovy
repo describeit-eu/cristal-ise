@@ -64,6 +64,9 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     def parentId = 1L
     def actionsBefore = repository.findByParentId(parentId).await()
 
+    // TODO: Action with parentId=1 is inserted during previous test method
+    assertEquals(3, actionsBefore.size())
+
     def toInsert = new ActionDO(
       "ChildAction",
       "/CityWf/ChildAction",

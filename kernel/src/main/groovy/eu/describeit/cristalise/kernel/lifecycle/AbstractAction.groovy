@@ -3,25 +3,29 @@ package eu.describeit.cristalise.kernel.lifecycle
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import io.vertx.core.Future
 
 @Slf4j
 @CompileStatic
 abstract class AbstractAction implements Action {
-  ActionDO actionDO
+  ActionDO dataObject
 
   @Override
   Long getId() {
-    return actionDO?.id
+    return dataObject?.id
   }
 
   @Override
   String getName() {
-    return actionDO?.name
+    return dataObject?.name
   }
 
   @Override
   String getPath() {
-    return actionDO?.path
+    return dataObject?.path
+  }
+
+  @Override
+  ActionDO.ActionType getType() {
+    return dataObject?.type
   }
 }
