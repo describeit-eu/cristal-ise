@@ -35,26 +35,65 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
     final String transitionID,
     final JsonObject inputOutcome)
   {
-    log.warn('request() - DUMB IMPLEMENTATION item:{}/{} action({}):{} ', item.type, item.name, dataObject.type, actionPath)
+    log.info('request() - item:{}/{} action({}):{} ', item.type, item.name, dataObject.type, actionPath)
 
-    def outputOutcome = inputOutcome.copy().put('name', item.name)
-
-    return Future.succeededFuture(outputOutcome)
+    return findAction(actionPath).compose { Action action ->
+      return action.request(item, actor, actionPath, transitionID, inputOutcome)
+    }
+    .onFailure {
+      return Future.failedFuture(it)
+    }
   }
 
   @Override
   Future<Void> initialise(ActionRepository repo) {
     return repo.findByParentId(dataObject.id).compose { actionDOList ->
+      List<Future<Void>> initFutures = []
+
       for (def actionDO: actionDOList) {
-        log.debug('initialise() - adding:{}', actionDO)
-        actions.add(createAction(actionDO))
+        Action childAction = createAction(actionDO)
+        actions.add(childAction)
+
+        if (childAction.type != ELEMENTARY) {
+          def ca = (CompositeAction) childAction
+          initFutures.add(ca.initialise(repo))
+        }
       }
-      return Future.succeededFuture()
+
+      log.info('initialise() - actions:{}', actions.collect {it.name})
+
+      return Future.all(initFutures).mapEmpty()
     } as Future<Void>
   }
 
   @Override
   Future<Action> findAction(String actionPath) {
-    return Future.failedFuture('Unimplemented feature: findAction()')
+    if (actionPath.startsWith('/')) actionPath = actionPath.substring(1)
+    return handleFindAction(actionPath.split('/'))
+      .compose { Action action ->
+        if (action) return Future.succeededFuture(action)
+        else        return Future.failedFuture("Action:$actionPath not found")
+      } as Future<Action>
+  }
+
+  private Future<Action> handleFindAction(String ... actionPath) {
+    if (actionPath[0] == this.name) actionPath = actionPath.drop(1)
+
+    log.debug('findAction() - name:{} actionPath:{}', name, actionPath)
+
+    if (actionPath.size() == 0) {
+      return Future.succeededFuture((Action)this)
+    } else if (actionPath.size() == 1) {
+      Action foundAction = actions.find {it.name == actionPath[0] }
+
+      if (foundAction) {
+        log.debug('findAction() - FOUND action:{}', foundAction.name)
+        return Future.succeededFuture(foundAction)
+      } else {
+        return Future.succeededFuture(null)
+      }
+    } else {
+      return handleFindAction(actionPath)
+    }
   }
 }

@@ -74,7 +74,7 @@ class ItemServiceVerticleTest {
     JsonObject outcome = new JsonObject().put("request", "OK");
     JsonObject expectedOutcome = outcome.copy().put("name", "Budapest");
 
-    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "/workflow/Jump", "Start", outcome);
+    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "CapitalWf/UpdateCapital", "Start", outcome);
 
     future
       .onComplete(

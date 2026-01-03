@@ -118,7 +118,7 @@ class StateMachineBuilderSpecs extends Specification {
     }
     def json = JsonObject.mapFrom(builder.sm)
     def smCopy = json.mapTo(StateMachine.class)
-    log.info "smCopy:\n{}", JsonObject.mapFrom(smCopy).encodePrettily()
+    log.debug "smCopy:\n{}", JsonObject.mapFrom(smCopy).encodePrettily()
 
     then:
     builder.sm && builder.sm.validate()

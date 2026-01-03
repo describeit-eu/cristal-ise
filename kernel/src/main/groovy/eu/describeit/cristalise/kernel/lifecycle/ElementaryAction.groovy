@@ -19,6 +19,10 @@ class ElementaryAction extends AbstractAction {
     final String transitionID,
     final JsonObject inputOutcome)
   {
-    return Future.failedFuture('Unimplemented')
+    log.warn('request() - DUMB IMPLEMENTATION item:{}/{} action({}):{} ', item.type, item.name, dataObject.type, actionPath)
+
+    def outputOutcome = inputOutcome.copy().put('name', item.name)
+
+    return Future.succeededFuture(outputOutcome)
   }
 }

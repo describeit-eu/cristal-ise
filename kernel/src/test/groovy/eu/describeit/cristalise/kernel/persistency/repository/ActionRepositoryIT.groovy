@@ -1,6 +1,8 @@
 package eu.describeit.cristalise.kernel.persistency.repository
 
+import eu.describeit.cristalise.kernel.lifecycle.LoopingCompositeAction
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
+import eu.describeit.cristalise.kernel.lifecycle.SplittingCompositeAction
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.*
@@ -137,5 +139,39 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     // also check non-existent id returns empty
     def none = repository.findById(-1L).await()
     assertTrue(none.isEmpty())
+  }
+
+  @Test
+  void testCompositeActionInitialise() {
+    // 1. Fetch 'CapitalWf' which is the root Action with ID=6 in CSV/Liquibase test data
+    def capitalWfDO = repository.findById(6L).await().orElseThrow()
+    assertEquals("CapitalWf", capitalWfDO.name)
+
+    // 2. Instantiate SplittingCompositeAction (as it is the type for CapitalWf in CSV)
+    def compositeAction = new SplittingCompositeAction(dataObject: capitalWfDO)
+
+    // 3. Initialise the composite action and its children recursively
+    compositeAction.initialise(repository).await()
+
+    // 4. Verify children loading (UpdateCapital, ChangeState)
+    def children = compositeAction.getActions()
+    assertNotNull(children)
+    // From CSV: CapitalWf(6) has children UpdateCapital(7) and ChangeState(8)
+    assertEquals(2, children.size(), "CapitalWf should have 2 direct children")
+
+    def updateCapital = children.find { it.name == "UpdateCapital" }
+    assertNotNull(updateCapital)
+    assertEquals(ELEMENTARY, updateCapital.type)
+
+    def changeState = children.find { it.name == "ChangeState" }
+    assertNotNull(changeState)
+    assertEquals(LOOP, changeState.type)
+
+    // 5. Verify grandchildren for ChangeState(8) (Activate, DeActivate)
+    // ChangeState is a CompositeAction, so its actions should also be loaded
+    def grandchildren = ((LoopingCompositeAction) changeState).getActions()
+    assertEquals(2, grandchildren.size(), "ChangeState should have 2 children")
+    assertTrue(grandchildren.any { it.name == "Activate" })
+    assertTrue(grandchildren.any { it.name == "DeActivate" })
   }
 }
