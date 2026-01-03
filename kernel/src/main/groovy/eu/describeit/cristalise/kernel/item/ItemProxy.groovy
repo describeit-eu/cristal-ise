@@ -15,7 +15,7 @@ import io.vertx.sqlclient.SqlClient
 import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
 
 @Slf4j
-@ToString(includePackage=false,  includeNames=true)
+@ToString(includePackage=false,  includeNames=true, excludes = 'lifeCycle')
 @CompileStatic
 class ItemProxy {
   private final ItemRepository itemRepository
@@ -69,24 +69,27 @@ class ItemProxy {
     Long actionId = itemDO?.actionId
     if (actionId == null) return Future.succeededFuture(null)
 
-    return (Future<CompositeAction>) actionRepository.findById(actionId).compose { Optional<ActionDO> actionDOOpt ->
-      if (actionDOOpt.isEmpty()) {
-        return Future.failedFuture(new IllegalArgumentException("Action id:$actionId does not exists for $this"))
-      } else {
-        Action newAction = AbstractCompositeAction.createAction(actionDOOpt.get())
-
-        if (newAction.type == ELEMENTARY) {
-          return Future.failedFuture(new IllegalArgumentException("ELEMENTARY Action cannot be used for lifeCycle $this"))
+    return (Future<CompositeAction>) actionRepository.findById(actionId)
+      .compose { Optional<ActionDO> actionDOOpt ->
+        if (actionDOOpt.isEmpty()) {
+          return Future.failedFuture(new IllegalArgumentException("Action id:$actionId does not exists for $this"))
         } else {
-          CompositeAction compositeAction = (CompositeAction)newAction
-          return compositeAction.initialise(actionRepository)
-            .compose {
-              lifeCycle = Future.succeededFuture(compositeAction)
-              return lifeCycle
-            }
+          def actionDO = actionDOOpt.get()
+          log.info('getLifeCycle() - creating {}', actionDO)
+          Action newAction = AbstractCompositeAction.createAction(actionDO)
+
+          if (newAction.type == ELEMENTARY) {
+            return Future.failedFuture(new IllegalArgumentException("ELEMENTARY Action cannot be used for lifeCycle $this"))
+          } else {
+            CompositeAction compositeAction = (CompositeAction)newAction
+            return compositeAction.initialise(actionRepository)
+              .compose {
+                lifeCycle = Future.succeededFuture(compositeAction)
+                return lifeCycle
+              }
+          }
         }
       }
-    }
   }
 
   /**

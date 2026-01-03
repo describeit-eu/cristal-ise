@@ -39,10 +39,10 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
   {
     // TODO: authn/authz should be based on Interceptors attached to ServiceBinder
     // TODO: use services like keycloak or Authentik or casdoor
-    def inputOutcome = new JsonObject(outcome)
+    final def inputOutcome = new JsonObject(outcome)
 
-    SqlConnection conn = null
-    Transaction tx = null
+    final SqlConnection conn
+    final Transaction tx
 
     try {
       conn = dbPool.getConnection().await()
@@ -52,7 +52,7 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
       final ItemProxy actor =  null // ItemProxy.create(conn, actorUuid).await()
       final ItemProxy item = ItemProxy.create(conn, itemUuid).await()
 
-      final JsonObject outputOutcome = handleRequest(item, actor, inputOutcome)
+      final JsonObject outputOutcome = handleRequest(item, actor, actionPath, transitionID, inputOutcome)
 
       tx.commit().await()
       conn.close().await()
@@ -63,19 +63,14 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
       if (tx) tx.rollback().await()
       if (conn) conn.close().await()
 
-      log.debug('requestAction() - FAILED item:{}', itemUuid, t)
+      log.error('requestAction() - FAILED item:{}', itemUuid, t)
       return Future.failedFuture(t)
     }
   }
 
-  private JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final JsonObject inputOutcome) {
-    log.info('handleRequest() - {} {}', item, actor)
-
+  private JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final String actionPath, final String transitionId, final JsonObject inputOutcome) {
     CompositeAction lifecycle = item.lifeCycle.await()
-
-    def outputOutcome = inputOutcome.copy().put('name', item.name)
-
-    return outputOutcome
+    return lifecycle.request(item, actor, actionPath, transitionId, inputOutcome).await()
   }
 
   @Override

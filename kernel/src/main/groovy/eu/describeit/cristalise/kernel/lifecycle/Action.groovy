@@ -11,8 +11,13 @@ interface Action {
   Long getId()
   String getName()
   String getPath()
-
   ActionType getType()
 
-  Future<JsonObject> request(final ItemProxy item, final ItemProxy actor, final JsonObject inputOutcome, final  String transitionID)
+  Future<JsonObject> request(
+    final ItemProxy item,
+    final ItemProxy actor,
+    final String actionPath,
+    final String transitionID,
+    final JsonObject inputOutcome
+  )
 }

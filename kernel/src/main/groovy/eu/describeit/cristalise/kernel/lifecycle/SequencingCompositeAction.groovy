@@ -9,9 +9,4 @@ import io.vertx.core.json.JsonObject
 @Slf4j
 @CompileStatic
 class SequencingCompositeAction extends AbstractCompositeAction {
-
-  @Override
-  Future<JsonObject> request(ItemProxy item, ItemProxy actor, JsonObject inputOutcome, String transitionID) {
-    return null
-  }
 }

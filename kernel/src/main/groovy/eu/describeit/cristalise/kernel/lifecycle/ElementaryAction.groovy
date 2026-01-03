@@ -10,8 +10,15 @@ import io.vertx.core.json.JsonObject
 @CompileStatic
 class ElementaryAction extends AbstractAction {
 
+
   @Override
-  Future<JsonObject> request(ItemProxy item, ItemProxy actor, JsonObject inputOutcome, String transitionID) {
-    return null
+  Future<JsonObject> request(
+    final ItemProxy item,
+    final ItemProxy actor,
+    final String actionPath,
+    final String transitionID,
+    final JsonObject inputOutcome)
+  {
+    return Future.failedFuture('Unimplemented')
   }
 }

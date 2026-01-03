@@ -1,10 +1,12 @@
 package eu.describeit.cristalise.kernel.lifecycle
 
+import eu.describeit.cristalise.kernel.item.ItemProxy
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import eu.describeit.cristalise.kernel.persistency.repository.ActionRepository
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
+import io.vertx.core.json.JsonObject
 
 import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
 
@@ -26,9 +28,25 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   }
 
   @Override
+  Future<JsonObject> request(
+    final ItemProxy item,
+    final ItemProxy actor,
+    final String actionPath,
+    final String transitionID,
+    final JsonObject inputOutcome)
+  {
+    log.warn('request() - DUMB IMPLEMENTATION item:{}/{} action({}):{} ', item.type, item.name, dataObject.type, actionPath)
+
+    def outputOutcome = inputOutcome.copy().put('name', item.name)
+
+    return Future.succeededFuture(outputOutcome)
+  }
+
+  @Override
   Future<Void> initialise(ActionRepository repo) {
     return repo.findByParentId(dataObject.id).compose { actionDOList ->
       for (def actionDO: actionDOList) {
+        log.debug('initialise() - adding:{}', actionDO)
         actions.add(createAction(actionDO))
       }
       return Future.succeededFuture()
@@ -37,6 +55,6 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
 
   @Override
   Future<Action> findAction(String actionPath) {
-    return null
+    return Future.failedFuture('Unimplemented feature: findAction()')
   }
 }
