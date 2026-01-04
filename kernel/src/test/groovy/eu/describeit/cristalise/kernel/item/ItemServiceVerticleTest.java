@@ -16,7 +16,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.util.UUID;
 
-import static eu.describeit.cristalise.CommonTestIds.*;
+import static eu.describeit.cristalise.CommonTestItemIds.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j

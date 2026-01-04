@@ -7,7 +7,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
-import static eu.describeit.cristalise.CommonTestIds.*
+import static eu.describeit.cristalise.CommonTestItemIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j

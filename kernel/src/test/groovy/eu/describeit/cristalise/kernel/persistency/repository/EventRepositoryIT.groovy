@@ -10,7 +10,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 import java.time.LocalDateTime
 
-import static eu.describeit.cristalise.CommonTestIds.*
+import static eu.describeit.cristalise.CommonTestItemIds.*
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j

@@ -1,13 +1,13 @@
 package eu.describeit.cristalise.kernel.item
 
-import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
+
 import eu.describeit.cristalise.kernel.persistency.repository.AbstractRepositoryIT
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.Test
 import org.testcontainers.junit.jupiter.Testcontainers
 
-import static eu.describeit.cristalise.CommonTestIds.BUDAPEST
+import static eu.describeit.cristalise.CommonTestItemIds.BUDAPEST
 import static org.junit.jupiter.api.Assertions.*
 
 @Slf4j

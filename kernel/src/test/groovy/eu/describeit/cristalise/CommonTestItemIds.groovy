@@ -3,7 +3,7 @@ package eu.describeit.cristalise
 import groovy.transform.CompileStatic
 
 @CompileStatic
-enum CommonTestIds {
+enum CommonTestItemIds {
   BUDAPEST("63f5033b-f427-4c4a-9ab4-2e4ba80589dd"),
   PARIS("b42800c5-463f-4a9a-be7d-11c792856ced"),
   DELHI("bbcb31f8-7f4c-47fb-8876-864a61e48d5d"),
@@ -24,7 +24,7 @@ enum CommonTestIds {
 
   final UUID uuid
 
-  CommonTestIds(String uuidString) {
+  CommonTestItemIds(String uuidString) {
     this.uuid = UUID.fromString(uuidString)
   }
 
