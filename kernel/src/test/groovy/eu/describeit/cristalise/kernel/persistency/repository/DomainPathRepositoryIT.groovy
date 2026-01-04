@@ -80,7 +80,7 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindNoneExistent() {
-    def none = repository.findById(-1L).await()
+    def none = repository.findById(1000L).await()
     assertTrue(none.isEmpty())
   }
 

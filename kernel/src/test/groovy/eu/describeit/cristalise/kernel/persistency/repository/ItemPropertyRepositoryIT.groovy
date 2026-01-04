@@ -55,7 +55,7 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindNoneExistent() {
-    Optional<ItemPropertyDO> none = repository.findById(0L).await()
+    Optional<ItemPropertyDO> none = repository.findById(1000L).await()
     assertTrue(none.isEmpty())
   }
 

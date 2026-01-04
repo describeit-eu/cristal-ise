@@ -1,5 +1,6 @@
 package eu.describeit.cristalise.kernel.persistency.repository
 
+
 import eu.describeit.cristalise.kernel.lifecycle.LoopingCompositeAction
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import eu.describeit.cristalise.kernel.lifecycle.SplittingCompositeAction
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.testcontainers.junit.jupiter.Testcontainers
 
+import static eu.describeit.cristalise.TestDataIdUtils.getActionId
 import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
 import static org.junit.jupiter.api.Assertions.*
 
@@ -63,7 +65,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testFindByParentId() {
-    def parentId = 1L
+    def parentId = getActionId('CityWf')
     def actionsBefore = repository.findByParentId(parentId).await()
 
     // TODO: Action with parentId=1 is inserted during previous test method
@@ -144,7 +146,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testCompositeActionInitialise() {
     // 1. Fetch 'CapitalWf' which is the root Action with ID=6 in CSV/Liquibase test data
-    def capitalWfDO = repository.findById(6L).await().orElseThrow()
+    def capitalWfDO = repository.findById(getActionId('CapitalWf')).await().orElseThrow()
     assertEquals("CapitalWf", capitalWfDO.name)
 
     // 2. Instantiate SplittingCompositeAction (as it is the type for CapitalWf in CSV)

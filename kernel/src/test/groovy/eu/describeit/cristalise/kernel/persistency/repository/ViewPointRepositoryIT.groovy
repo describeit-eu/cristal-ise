@@ -107,7 +107,7 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     assertTrue(afterDelete.isEmpty())
 
     // also check non-existent id returns empty
-    Optional<ViewPointDO> none = repository.findById(-1L).await()
+    Optional<ViewPointDO> none = repository.findById(1000L).await()
     assertTrue(none.isEmpty())
   }
 
