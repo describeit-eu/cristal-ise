@@ -1,8 +1,6 @@
 package eu.describeit.cristalise.kernel.statemachine
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import eu.describeit.cristalise.dsl.statemachine.StateMachineBuilder
-import eu.describeit.cristalise.dsl.statemachine.StateMachineDelegate
 import eu.describeit.cristalise.kernel.BuiltInResources
 import eu.describeit.cristalise.kernel.DescriptionObject
 import groovy.transform.Canonical

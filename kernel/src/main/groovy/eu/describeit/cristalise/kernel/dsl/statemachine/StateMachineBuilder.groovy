@@ -1,4 +1,4 @@
-package eu.describeit.cristalise.dsl.statemachine
+package eu.describeit.cristalise.kernel.dsl.statemachine
 
 import eu.describeit.cristalise.kernel.persistency.domain.DomainPathDO
 import eu.describeit.cristalise.kernel.statemachine.StateMachine

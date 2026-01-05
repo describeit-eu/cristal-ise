@@ -1,4 +1,4 @@
-package eu.describeit.cristalise.dsl.statemachine
+package eu.describeit.cristalise.kernel.dsl.statemachine
 
 import eu.describeit.cristalise.kernel.statemachine.Transition
 import groovy.transform.CompileDynamic

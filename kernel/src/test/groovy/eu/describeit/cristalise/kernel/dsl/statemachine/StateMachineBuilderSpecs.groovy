@@ -18,7 +18,7 @@
  *
  * http://www.fsf.org/licensing/licenses/lgpl.html
  */
-package eu.describeit.cristalise.dsl.statemachine
+package eu.describeit.cristalise.kernel.dsl.statemachine
 
 import eu.describeit.cristalise.kernel.statemachine.StateMachine
 import groovy.util.logging.Slf4j
