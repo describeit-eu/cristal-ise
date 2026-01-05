@@ -15,7 +15,7 @@ import io.vertx.core.json.JsonObject
 class StateMachineBuilder {
   String module = ""
   String name = ""
-  int version = -1
+  String version = -1
 
   StateMachine sm
 
@@ -29,7 +29,7 @@ class StateMachineBuilder {
    * @param name
    * @param version
    */
-  public StateMachineBuilder(String module, String name, int version) {
+  public StateMachineBuilder(String module, String name, String version) {
     this.module = module
     this.name = name
     this.version = version
@@ -45,12 +45,12 @@ class StateMachineBuilder {
     this.sm = delegate.sm
   }
 
-  public static StateMachine create(String module, String name, int version, @DelegatesTo(StateMachineDelegate) Closure cl) {
+  public static StateMachine create(String module, String name, String version, @DelegatesTo(StateMachineDelegate) Closure cl) {
     def builder = build(module, name, version, cl)
     return builder.sm
   }
 
-  public static StateMachineBuilder build(String module, String name, int version, @DelegatesTo(StateMachineDelegate) Closure cl) {
+  public static StateMachineBuilder build(String module, String name, String version, @DelegatesTo(StateMachineDelegate) Closure cl) {
     def delegate = new StateMachineDelegate(module, name, version)
 
     delegate.processClosure(cl)
@@ -61,5 +61,11 @@ class StateMachineBuilder {
     log.info('build() - json:\n{}', JsonObject.mapFrom(builder.sm).encodePrettily())
 
     return builder
+  }
+
+  static StateMachine StateMachine(Map<String, Object> args, @DelegatesTo(StateMachineDelegate) Closure cl) {
+    log.info('StateMachine() - name:{} version:{}', args.name, args.version)
+
+    return build((String)args.ns, (String)args.name, (String)args.version, cl).sm
   }
 }

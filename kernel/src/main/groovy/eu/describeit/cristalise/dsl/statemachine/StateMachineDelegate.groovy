@@ -12,17 +12,17 @@ import groovy.util.logging.Slf4j
 @CompileStatic
 @Slf4j
 class StateMachineDelegate {
-  String ns = ""
+  String module = ""
   String name = ""
-  int version = -1
+  String version = -1
 
   StateMachine sm = null
 
   Map<String, State> stateCache = [:]
   Map<String, Transition> transCache = [:]
 
-  public StateMachineDelegate(String ns, String n, int v) {
-    ns = ns
+  public StateMachineDelegate(String ns, String n, String v) {
+    module = ns
     name = n
     version = v
 

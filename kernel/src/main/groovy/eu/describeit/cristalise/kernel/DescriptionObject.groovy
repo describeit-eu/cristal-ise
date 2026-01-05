@@ -6,12 +6,12 @@ import groovy.transform.CompileStatic
 interface DescriptionObject {
   String getNamespace()
   String getName()
-  Integer getVersion()
+  String getVersion()
   UUID getItemID()
 
   void setNamespace(String ns);
   void setName(String name);
-  void setVersion(Integer version);
+  void setVersion(String version);
   void setItemID(UUID uuid);
 
   BuiltInResources getResourceType();

@@ -35,7 +35,7 @@ class StateMachineBuilderSpecs extends Specification {
 
   def 'SM containing a single State is valid'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "dummySM", 0) {
+    def builder = StateMachineBuilder.build("testing", "dummySM", 'v0') {
       state("Idle")
       initialState("Idle")
     }
@@ -49,7 +49,7 @@ class StateMachineBuilderSpecs extends Specification {
 
   def 'SM containing a single State and Transition is valid'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "dummySM", 0) {
+    def builder = StateMachineBuilder.build("testing", "dummySM", 'v0') {
       transition("Fire", [origin: 'Idle', target: 'Idle'])
       initialState("Idle")
     }
@@ -65,7 +65,7 @@ class StateMachineBuilderSpecs extends Specification {
 
   def 'SM containing a single Transition is NOT valid'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "dummySM", 0) {
+    def builder = StateMachineBuilder.build("testing", "dummySM", 'v0') {
       transition("Useless")
     }
 
@@ -90,7 +90,7 @@ class StateMachineBuilderSpecs extends Specification {
     when:
 //  StateMachine defaultSM = (StateMachine)Gateway.getMarshaller().unmarshall(Gateway.getResource().getTextResource(null, "boot/SM/Default.xml"));
 
-    def builder = StateMachineBuilder.build("testing", "Default", 0) {
+    def builder = StateMachineBuilder.build("testing", "Default", 'v0') {
       transition("Done", [origin: "Waiting", target: "Finished"]) {
         outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
         script(name: "\${ScriptName}", version: "\${ScriptVersion}")
@@ -118,7 +118,6 @@ class StateMachineBuilderSpecs extends Specification {
     }
     def json = JsonObject.mapFrom(builder.sm)
     def smCopy = json.mapTo(StateMachine.class)
-    log.debug "smCopy:\n{}", JsonObject.mapFrom(smCopy).encodePrettily()
 
     then:
     builder.sm && builder.sm.validate()
@@ -128,50 +127,50 @@ class StateMachineBuilderSpecs extends Specification {
 
   def 'Build Trigger StateMachine'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "TriggerStateMachine", 0) {
-      transition("Done", [origin: "Waiting", target: "Finished"]) {
-        outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
-        script(name: "\${ScriptName}", version: "\${ScriptVersion}")
-        query(name: "\${QueryName}", version: "\${QueryVersion}")
+    def builder = StateMachineBuilder.build('testing', 'TriggerStateMachine', 'v0') {
+      transition('Done', [origin: 'Waiting', target: 'Finished']) {
+        outcome(name: '${SchemaType}', version: '${SchemaVersion}')
+        script(name: '${ScriptName}', version: '${ScriptVersion}')
+        query(name: '${QueryName}', version: '${QueryVersion}')
       }
-      transition("Start", [origin: "Waiting", target: "Started"]) {
-        property reservation: "set"
+      transition('Start', [origin: 'Waiting', target: 'Started']) {
+        property reservation: 'set'
       }
-      transition("Complete", [origin: "Started", target: "Finished"]) {
-        outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
-        script(name: "\${ScriptName}", version: "\${ScriptVersion}")
-        query(name: "\${QueryName}", version: "\${QueryVersion}")
-        property(reservation: "clear")
+      transition('Complete', [origin: 'Started', target: 'Finished']) {
+        outcome(name: '${SchemaType}', version: '${SchemaVersion}')
+        script(name: '${ScriptName}', version: '${ScriptVersion}')
+        query(name: '${QueryName}', version: '${QueryVersion}')
+        property(reservation: 'clear')
       }
-      transition("Warning", [origin: "Started", target: "Started"]) {
-        outcome(name: "\${WarningSchemaType}", version: "\${WarningSchemaVersion}")
-        script(name: "\${WarningScriptName}", version: "\${WarningScriptVersion}")
-        query(name: "\${WarningQueryName}", version: "\${WarningQueryVersion}")
-        property(enablerProp: "WarningOn")
-        property(reservation: "preserve")
+      transition('Warning', [origin: 'Started', target: 'Started']) {
+        outcome(name: '${WarningSchemaType}', version: '${WarningSchemaVersion}')
+        script(name: '${WarningScriptName}', version: '${WarningScriptVersion}')
+        query(name: '${WarningQueryName}', version: '${WarningQueryVersion}')
+        property(enablerProp: 'WarningOn')
+        property(reservation: 'preserve')
       }
-      transition("Timeout", [origin: "Started", target: "Paused"]) {
-        outcome(name: "\${TimeoutSchemaType}", version: "\${TimeoutSchemaVersion}")
-        script(name: "\${TimeoutScriptName}", version: "\${TimeoutScriptVersion}")
-        query(name: "\${TimeoutQueryName}", version: "\${TimeoutQueryVersion}")
-        property(enablerProp: "TimeoutOn")
+      transition('Timeout', [origin: 'Started', target: 'Paused']) {
+        outcome(name: '${TimeoutSchemaType}', version: '${TimeoutSchemaVersion}')
+        script(name: '${TimeoutScriptName}', version: '${TimeoutScriptVersion}')
+        query(name: '${TimeoutQueryName}', version: '${TimeoutQueryVersion}')
+        property(enablerProp: 'TimeoutOn')
       }
-      transition("Resolve", [origin: "Paused", target: "Started"]) {
-        property(reservation: "clear")
+      transition('Resolve', [origin: 'Paused', target: 'Started']) {
+        property(reservation: 'clear')
       }
-      transition("Interrupt", [origin: "Paused", target: "Finished"]) {
-        property(reservation: "clear")
+      transition('Interrupt', [origin: 'Paused', target: 'Finished']) {
+        property(reservation: 'clear')
       }
-      transition("Suspend", [origin: "Started", target: "Suspended"]) {
-        outcome(name: "Errors", version: "0")
+      transition('Suspend', [origin: 'Started', target: 'Suspended']) {
+        outcome(name: 'Errors', version: '0')
       }
-      transition("Resume", [origin: "Suspended", target: "Started"]) {
-        property(reservation: "preserve")
+      transition('Resume', [origin: 'Suspended', target: 'Started']) {
+        property(reservation: 'preserve')
       }
-      transition("Proceed", [origin: "Finished", target: "Finished"])
+      transition('Proceed', [origin: 'Finished', target: 'Finished'])
 
-      initialState("Waiting")
-      finishingState("Finished")
+      initialState('Waiting')
+      finishingState('Finished')
     }
     def json = JsonObject.mapFrom(builder.sm)
 
@@ -180,9 +179,9 @@ class StateMachineBuilderSpecs extends Specification {
     json.mapTo(StateMachine.class) == builder.sm
   }
 
-  def 'Build SkipStateMachine using builder methods'() {
+  def 'Build Skippable StateMachine using builder methods'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "SkipStateMachine", 0) {
+    def builder = StateMachineBuilder.build("testing", "Skippable", 'v0') {
       transition("Start", [origin: "Waiting", target: "Started"]) {
         property reservation: "set"
       }
