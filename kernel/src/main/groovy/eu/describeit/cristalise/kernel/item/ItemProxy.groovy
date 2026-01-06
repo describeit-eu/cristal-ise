@@ -1,6 +1,7 @@
 package eu.describeit.cristalise.kernel.item
 
 import eu.describeit.cristalise.kernel.lifecycle.*
+import eu.describeit.cristalise.kernel.persistency.Storage
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import eu.describeit.cristalise.kernel.persistency.repository.*
 
@@ -18,21 +19,7 @@ import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.Action
 @ToString(includePackage=false,  includeNames=true, excludes = 'lifeCycle')
 @CompileStatic
 class ItemProxy {
-  private final ItemRepository itemRepository
-
-  private final DomainPathRepository domainPathRepository
-  private final ItemPropertyRepository itemPropertyRepository
-
-  private final ActionRepository actionRepository
-  private final CollectionRepository collectionRepository
-  private final CollectionMemberRepository collectionMemberRepository
-
-  private final OutcomeRepository outcomeRepository
-  private final AttachmentRepository attachmentRepository
-  private final ViewPointRepository viewPointRepository
-
-  private final JobRepository jobRepository
-
+  private final Storage storage
   private final UUID itemId
   private ItemDO itemDO
 
@@ -50,13 +37,9 @@ class ItemProxy {
   }
 
   private Future<ItemProxy> initialise() {
-    return itemRepository.findById(itemId).compose { Optional<ItemDO> itemOptional ->
-      if (itemOptional.isEmpty()) {
-        return Future.failedFuture(new IllegalArgumentException("Item ${itemId} does not exists"))
-      } else {
-        this.itemDO = itemOptional.get()
-        return Future.succeededFuture(this)
-      }
+    return storage.getItemDO(itemId).compose { ItemDO itemDO ->
+      this.itemDO = itemDO
+      return Future.succeededFuture(this)
     } as Future<ItemProxy>
   }
 
@@ -69,25 +52,20 @@ class ItemProxy {
     Long actionId = itemDO?.actionId
     if (actionId == null) return Future.succeededFuture(null)
 
-    return (Future<CompositeAction>) actionRepository.findById(actionId)
-      .compose { Optional<ActionDO> actionDOOpt ->
-        if (actionDOOpt.isEmpty()) {
-          return Future.failedFuture(new IllegalArgumentException("Action id:$actionId does not exists for $this"))
-        } else {
-          def actionDO = actionDOOpt.get()
-          log.info('getLifeCycle() - creating {}', actionDO)
-          Action newAction = AbstractCompositeAction.createAction(actionDO)
+    return (Future<CompositeAction>) storage.getActionDO(actionId)
+      .compose { ActionDO actionDO ->
+        log.info('getLifeCycle() - creating {}', actionDO)
+        Action newAction = AbstractCompositeAction.createAction(actionDO)
 
-          if (newAction.type == ELEMENTARY) {
-            return Future.failedFuture(new IllegalArgumentException("ELEMENTARY Action cannot be used for lifeCycle $this"))
-          } else {
-            CompositeAction compositeAction = (CompositeAction)newAction
-            return compositeAction.initialise(actionRepository)
-              .compose {
-                lifeCycle = Future.succeededFuture(compositeAction)
-                return lifeCycle
-              }
-          }
+        if (newAction.type == ELEMENTARY) {
+          return Future.failedFuture(new IllegalArgumentException("ELEMENTARY Action cannot be used for lifeCycle $this"))
+        } else {
+          CompositeAction compositeAction = (CompositeAction) newAction
+          return compositeAction.initialise(storage)
+            .compose {
+              lifeCycle = Future.succeededFuture(compositeAction)
+              return lifeCycle
+            }
         }
       }
   }
@@ -104,17 +82,7 @@ class ItemProxy {
     itemId = uuid
 
     itemDO = null
-
-    itemRepository = null
-    domainPathRepository = null
-    itemPropertyRepository = null
-    actionRepository = null
-    collectionRepository = null
-    collectionMemberRepository = null
-    outcomeRepository = null
-    attachmentRepository = null
-    viewPointRepository =null
-    jobRepository = null
+    storage = null
   }
 
   /**
@@ -124,22 +92,8 @@ class ItemProxy {
    */
   private ItemProxy(SqlClient client, UUID uuid) {
     vertx = null
-    itemRepository = new ItemRepositoryImpl(client)
-
     itemId = uuid
-
-    domainPathRepository = new DomainPathRepositoryImpl(client)
-    itemPropertyRepository = new ItemPropertyRepositoryImpl(client)
-
-    actionRepository = new ActionRepositoryImpl(client)
-    collectionRepository = new CollectionRepositoryImpl(client)
-    collectionMemberRepository = new CollectionMemberRepositoryImpl(client)
-
-    outcomeRepository = new OutcomeRepositoryImpl(client)
-    attachmentRepository = new AttachmentRepositoryImpl(client)
-    viewPointRepository = new ViewPointRepositoryImpl(client)
-
-    jobRepository = new JobRepositoryImpl(client)
+    storage = new Storage(client)
   }
 
   /**

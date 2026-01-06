@@ -2,6 +2,7 @@ package eu.describeit.cristalise.kernel.persistency.repository
 
 
 import eu.describeit.cristalise.kernel.lifecycle.LoopingCompositeAction
+import eu.describeit.cristalise.kernel.persistency.Storage
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import eu.describeit.cristalise.kernel.lifecycle.SplittingCompositeAction
 import groovy.transform.CompileStatic
@@ -27,6 +28,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
   void setUpAll() throws Exception {
     super.setUpAll()
     repository = new ActionRepositoryImpl(pool)
+
   }
 
   @Test
@@ -145,7 +147,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testCompositeActionInitialise() {
-    // 1. Fetch 'CapitalWf' which is the root Action with ID=6 in CSV/Liquibase test data
+    // 1. Fetch 'CapitalWf' which is the root Action in Liquibase test data
     def capitalWfDO = repository.findById(getActionId('CapitalWf')).await().orElseThrow()
     assertEquals("CapitalWf", capitalWfDO.name)
 
@@ -153,12 +155,13 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     def compositeAction = new SplittingCompositeAction(dataObject: capitalWfDO)
 
     // 3. Initialise the composite action and its children recursively
-    compositeAction.initialise(repository).await()
+    compositeAction.initialise(new Storage(pool)).await()
 
     // 4. Verify children loading (UpdateCapital, ChangeState)
     def children = compositeAction.getActions()
     assertNotNull(children)
-    // From CSV: CapitalWf(6) has children UpdateCapital(7) and ChangeState(8)
+
+    // From CSV: CapitalWf has children UpdateCapital and ChangeState
     assertEquals(2, children.size(), "CapitalWf should have 2 direct children")
 
     def updateCapital = children.find { it.name == "UpdateCapital" }
@@ -169,7 +172,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     assertNotNull(changeState)
     assertEquals(LOOP, changeState.type)
 
-    // 5. Verify grandchildren for ChangeState(8) (Activate, DeActivate)
+    // 5. Verify grandchildren for ChangeState (Activate, DeActivate)
     // ChangeState is a CompositeAction, so its actions should also be loaded
     def grandchildren = ((LoopingCompositeAction) changeState).getActions()
     assertEquals(2, grandchildren.size(), "ChangeState should have 2 children")

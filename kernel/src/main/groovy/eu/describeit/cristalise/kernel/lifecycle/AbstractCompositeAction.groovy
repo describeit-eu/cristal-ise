@@ -1,6 +1,7 @@
 package eu.describeit.cristalise.kernel.lifecycle
 
 import eu.describeit.cristalise.kernel.item.ItemProxy
+import eu.describeit.cristalise.kernel.persistency.Storage
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import eu.describeit.cristalise.kernel.persistency.repository.ActionRepository
 import groovy.transform.CompileStatic
@@ -46,8 +47,8 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   }
 
   @Override
-  Future<Void> initialise(ActionRepository repo) {
-    return repo.findByParentId(dataObject.id).compose { actionDOList ->
+  Future<Void> initialise(Storage storage) {
+    return storage.actionRepository.findByParentId(dataObject.id).compose { actionDOList ->
       List<Future<Void>> initFutures = []
 
       for (def actionDO: actionDOList) {
@@ -56,7 +57,7 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
 
         if (childAction.type != ELEMENTARY) {
           def ca = (CompositeAction) childAction
-          initFutures.add(ca.initialise(repo))
+          initFutures.add(ca.initialise(storage))
         }
       }
 
