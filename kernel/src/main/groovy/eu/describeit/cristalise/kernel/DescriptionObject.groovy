@@ -1,11 +1,13 @@
 package eu.describeit.cristalise.kernel
 
 import groovy.transform.CompileStatic
+import io.vertx.core.json.JsonObject
 
 @CompileStatic
 interface DescriptionObject {
   String getNamespace()
   String getName()
+  String getType()
   String getVersion()
   UUID getItemID()
 
@@ -15,4 +17,6 @@ interface DescriptionObject {
   void setItemID(UUID uuid);
 
   BuiltInResources getResourceType();
+
+  JsonObject toJson()
 }

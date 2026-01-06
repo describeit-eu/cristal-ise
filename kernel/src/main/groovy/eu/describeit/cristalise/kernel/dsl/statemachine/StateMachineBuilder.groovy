@@ -62,10 +62,4 @@ class StateMachineBuilder {
 
     return builder
   }
-
-  static StateMachine StateMachine(Map<String, Object> args, @DelegatesTo(StateMachineDelegate) Closure cl) {
-    log.info('StateMachine() - name:{} version:{}', args.name, args.version)
-
-    return build((String)args.ns, (String)args.name, (String)args.version, cl).sm
-  }
 }
