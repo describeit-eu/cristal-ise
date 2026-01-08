@@ -5,6 +5,7 @@ import eu.describeit.cristalise.kernel.BuiltInResources
 import eu.describeit.cristalise.kernel.DescriptionObject
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.vertx.core.json.JsonObject
 
@@ -13,6 +14,7 @@ import static eu.describeit.cristalise.kernel.BuiltInResources.STATE_MACHINE_RES
 @Slf4j
 @CompileStatic
 @Canonical
+@ToString(includePackage=false)
 class StateMachine implements DescriptionObject {
   String namespace
   String name

@@ -16,7 +16,7 @@ import io.vertx.sqlclient.SqlClient
 import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
 
 @Slf4j
-@ToString(includePackage=false,  includeNames=true, excludes = 'lifeCycle')
+@ToString(includePackage=false,  includeNames=true, excludes = 'storage, lifeCycle')
 @CompileStatic
 class ItemProxy {
   private final Storage storage
@@ -41,6 +41,13 @@ class ItemProxy {
       this.itemDO = itemDO
       return Future.succeededFuture(this)
     } as Future<ItemProxy>
+  }
+
+  /**
+   * @return the storage
+   */
+  Storage getStorage() {
+    return storage
   }
 
   /**
@@ -90,7 +97,7 @@ class ItemProxy {
    * @param client
    * @param uuid
    */
-  private ItemProxy(SqlClient client, UUID uuid) {
+  public ItemProxy(SqlClient client, UUID uuid) {
     vertx = null
     itemId = uuid
     storage = new Storage(client)

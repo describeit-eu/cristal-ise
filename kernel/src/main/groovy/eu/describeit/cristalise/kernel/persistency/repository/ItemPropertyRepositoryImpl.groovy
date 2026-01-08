@@ -5,8 +5,12 @@ import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDOParamete
 import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDORowMapper
 import groovy.transform.CompileStatic
 import io.vertx.core.Future
+import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.SqlClient
 import io.vertx.sqlclient.templates.SqlTemplate
+
+import java.util.function.Function
+import java.util.stream.Collectors
 
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOptional
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOrFail
@@ -65,6 +69,29 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(itemProperty)
       .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for item_property name:"+itemProperty.getName()))
+  }
+
+  @Override
+  public Future<List<ItemPropertyDO>> insertMany(List<ItemPropertyDO> itemProperties) {
+    if (itemProperties.isEmpty()) {
+      return Future.succeededFuture((List<ItemPropertyDO>) new ArrayList<ItemPropertyDO>())
+    }
+    SqlTemplate<ItemPropertyDO, RowSet<ItemPropertyDO>> template = SqlTemplate
+      .forUpdate(client, SQL_INSERT)
+      .mapFrom(ItemPropertyDOParametersMapper.INSTANCE)
+      .mapTo(ItemPropertyDORowMapper.INSTANCE)
+
+    Future<RowSet<ItemPropertyDO>> future = template.executeBatch(itemProperties)
+
+    return future.map({ RowSet<ItemPropertyDO> rs ->
+      List<ItemPropertyDO> all = new ArrayList<ItemPropertyDO>()
+      RowSet<ItemPropertyDO> current = rs
+      while (current != null) {
+        all.addAll(toList(current))
+        current = current.next()
+      }
+      return (List<ItemPropertyDO>) all
+    } as Function<RowSet<ItemPropertyDO>, List<ItemPropertyDO>>)
   }
 
   @Override

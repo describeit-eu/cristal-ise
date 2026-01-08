@@ -25,6 +25,7 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
   private static final String SQL_UPDATE       = "UPDATE "      + TABLE + " SET path=#{path}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}"
   private static final String SQL_FIND_BY_ITEM_ID = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{item_id}"
+  private static final String SQL_FIND_BY_PATH = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE path = text2ltree(#{path})"
   private static final String SQL_GET_CHILDREN = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE path <@ text2ltree(#{path}) AND nlevel(path) = nlevel(text2ltree(#{path})) + 1"
   private static final String SQL_GET_TREE     = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE path <@ text2ltree(#{path})"
 
@@ -83,6 +84,15 @@ public class DomainPathRepositoryImpl implements DomainPathRepository {
       .mapTo(DomainPathDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("item_id", (Object)itemId))
       .map(rs -> toList(rs))
+  }
+
+  @Override
+  public Future<Optional<DomainPathDO>> findByPath(String path) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_BY_PATH)
+      .mapTo(DomainPathDORowMapper.INSTANCE)
+      .execute(Collections.singletonMap("path", (Object)path))
+      .map(rs -> firstOptional(rs))
   }
 
   @Override

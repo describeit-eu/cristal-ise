@@ -53,4 +53,94 @@ class Storage {
       }
     } as Future<ActionDO>
   }
+
+  // --- Item ---
+
+  Future<ItemDO> addItemDO(ItemDO item) {
+    return itemRepository.insert(item)
+  }
+
+  // --- Action ---
+
+  Future<List<ActionDO>> getChildActionDOs(Long parentId) {
+    return actionRepository.findByParentId(parentId)
+  }
+
+  // --- DomainPath ---
+
+  Future<DomainPathDO> insertDomainPath(DomainPathDO domainPath) {
+    return domainPathRepository.insert(domainPath)
+  }
+
+  Future<Optional<DomainPathDO>> findDomainPathByPath(String path) {
+    return domainPathRepository.findByPath(path)
+  }
+
+  // --- ItemProperty ---
+
+  Future<ItemPropertyDO> insertItemProperty(ItemPropertyDO itemProperty) {
+    return itemPropertyRepository.insert(itemProperty)
+  }
+
+  Future<List<ItemPropertyDO>> insertItemProperties(List<ItemPropertyDO> itemProperties) {
+    return itemPropertyRepository.insertMany(itemProperties)
+  }
+
+  Future<List<ItemPropertyDO>> findItemPropertiesByItemId(UUID itemId) {
+    return itemPropertyRepository.findByItemId(itemId)
+  }
+
+  // --- Event ---
+
+  Future<EventDO> insertEvent(EventDO event) {
+    return eventRepository.insert(event)
+  }
+
+  Future<List<EventDO>> findAllEvents() {
+    return eventRepository.findAll()
+  }
+
+  // --- Outcome ---
+
+  Future<OutcomeDO> insertOutcome(OutcomeDO outcome) {
+    return outcomeRepository.insert(outcome)
+  }
+
+  Future<List<OutcomeDO>> findOutcomesByItemId(UUID itemId) {
+    return outcomeRepository.findByItemId(itemId)
+  }
+
+  // --- Attachment ---
+
+  Future<AttachmentDO> insertAttachment(AttachmentDO attachment) {
+    return attachmentRepository.insert(attachment)
+  }
+
+  // --- ViewPoint ---
+
+  Future<ViewPointDO> insertViewPoint(ViewPointDO viewPoint) {
+    return viewPointRepository.insert(viewPoint)
+  }
+
+  Future<List<ViewPointDO>> findAllViewPoints() {
+    return viewPointRepository.findAll()
+  }
+
+  // --- Collection ---
+
+  Future<CollectionDO> insertCollection(CollectionDO collection) {
+    return collectionRepository.insert(collection)
+  }
+
+  // --- CollectionMember ---
+
+  Future<CollectionMemberDO> insertCollectionMember(CollectionMemberDO member) {
+    return collectionMemberRepository.insert(member)
+  }
+
+  // --- Job ---
+
+  Future<JobDO> insertJob(JobDO job) {
+    return jobRepository.insert(job)
+  }
 }

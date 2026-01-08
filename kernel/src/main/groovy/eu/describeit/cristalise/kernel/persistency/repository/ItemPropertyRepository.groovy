@@ -15,6 +15,8 @@ public interface ItemPropertyRepository {
 
   Future<ItemPropertyDO> insert(ItemPropertyDO itemProperty)
 
+  Future<List<ItemPropertyDO>> insertMany(List<ItemPropertyDO> itemProperties)
+
   Future<Optional<ItemPropertyDO>> update(ItemPropertyDO itemProperty)
 
   Future<Integer> deleteById(Long id)

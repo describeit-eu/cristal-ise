@@ -166,3 +166,4 @@ nbdist/
 ### Testing databases ###
 conf/dev/database/
 kernel/src/test/docker/database/
+/.output.txt

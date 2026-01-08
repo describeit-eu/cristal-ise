@@ -53,11 +53,11 @@ class StateMachineBuilderSpecs extends Specification {
       transition("Fire", [origin: 'Idle', target: 'Idle'])
       initialState("Idle")
     }
-    def json = JsonObject.mapFrom(builder.sm)
 
     then:
     builder.sm
     builder.sm.validate()
+    builder.sm.toJson()
     builder.sm.states.find { it.name == "Idle" }
     builder.sm.getTransition("Fire").originStateId == 0
     builder.sm.getTransition("Fire").targetStateId == 0

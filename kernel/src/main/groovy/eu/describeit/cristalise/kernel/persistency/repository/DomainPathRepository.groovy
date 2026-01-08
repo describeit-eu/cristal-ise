@@ -19,6 +19,8 @@ public interface DomainPathRepository {
 
   Future<List<DomainPathDO>> findByItemId(UUID itemId)
 
+  Future<Optional<DomainPathDO>> findByPath(String path)
+
   // Returns direct children one level below the given path
   Future<List<DomainPathDO>> getChildren(String path)
 

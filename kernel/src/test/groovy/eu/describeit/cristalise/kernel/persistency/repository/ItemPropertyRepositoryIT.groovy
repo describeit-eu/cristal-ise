@@ -48,6 +48,31 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
+  void testInsertMany() {
+    List<ItemPropertyDO> props = [
+      new ItemPropertyDO("Prop1", "Val1", false, PARIS.uuid),
+      new ItemPropertyDO("Prop2", "Val2", true, PARIS.uuid)
+    ]
+
+    List<ItemPropertyDO> before = repository.findByItemId(PARIS.uuid).await()
+    List<ItemPropertyDO> inserted = repository.insertMany(props).await()
+    log.info('{}', inserted)
+    assertEquals(2, inserted.size())
+
+    inserted.eachWithIndex { ItemPropertyDO item, int i ->
+      assertNotNull(item.getId())
+      assertEquals(props[i].name, item.name)
+      assertEquals(props[i].value, item.value)
+      assertEquals(props[i].itemId, item.itemId)
+    }
+
+    List<ItemPropertyDO> after = repository.findByItemId(PARIS.uuid).await()
+    assertEquals(before.size() + 2, after.size())
+    assertTrue(after.any { it.name == "Prop1" })
+    assertTrue(after.any { it.name == "Prop2" })
+  }
+
+  @Test
   void testFindByItemId() {
     List<ItemPropertyDO> fetchedByItemId = repository.findByItemId(BUDAPEST.uuid).await()
     assertEquals(4, fetchedByItemId.size())
