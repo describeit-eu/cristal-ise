@@ -58,6 +58,37 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
+  void testInsertMany() {
+    ViewPointDO vp1 = new ViewPointDO(
+      "VP1", // name
+      SCHEMA_1.uuid, // schema
+      "v1", // schemaVersion
+      "TestSchema", // schemaName
+      1L, // outcomeId
+      BUDAPEST.uuid // itemId
+    )
+    ViewPointDO vp2 = new ViewPointDO(
+      "VP2", // name
+      SCHEMA_2.uuid, // schema
+      "v2", // schemaVersion
+      "TestSchema2", // schemaName
+      2L, // outcomeId
+      BUDAPEST.uuid // itemId
+    )
+
+    List<ViewPointDO> inserted = repository.insertMany([vp1, vp2]).await()
+    assertEquals(2, inserted.size())
+    assertNotNull(inserted[0].getId())
+    assertNotNull(inserted[1].getId())
+    assertEquals("VP1", inserted[0].getName())
+    assertEquals("VP2", inserted[1].getName())
+
+    List<ViewPointDO> found = repository.findByItemId(BUDAPEST.uuid).await()
+    assertTrue(found.stream().anyMatch { it.name == "VP1" })
+    assertTrue(found.stream().anyMatch { it.name == "VP2" })
+  }
+
+  @Test
   void testUpdate() {
     // insert a row then update it
     ViewPointDO base = new ViewPointDO(

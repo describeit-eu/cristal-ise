@@ -9,9 +9,7 @@ import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.SqlClient
 import io.vertx.sqlclient.templates.SqlTemplate
 
-import java.util.function.Function
-import java.util.stream.Collectors
-
+import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.batchToList
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOptional
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOrFail
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toList
@@ -74,24 +72,14 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
   @Override
   public Future<List<ItemPropertyDO>> insertMany(List<ItemPropertyDO> itemProperties) {
     if (itemProperties.isEmpty()) {
-      return Future.succeededFuture((List<ItemPropertyDO>) new ArrayList<ItemPropertyDO>())
+      return Future.succeededFuture(Collections.emptyList())
     }
-    SqlTemplate<ItemPropertyDO, RowSet<ItemPropertyDO>> template = SqlTemplate
+    return SqlTemplate
       .forUpdate(client, SQL_INSERT)
       .mapFrom(ItemPropertyDOParametersMapper.INSTANCE)
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
-
-    Future<RowSet<ItemPropertyDO>> future = template.executeBatch(itemProperties)
-
-    return future.map({ RowSet<ItemPropertyDO> rs ->
-      List<ItemPropertyDO> all = new ArrayList<ItemPropertyDO>()
-      RowSet<ItemPropertyDO> current = rs
-      while (current != null) {
-        all.addAll(toList(current))
-        current = current.next()
-      }
-      return (List<ItemPropertyDO>) all
-    } as Function<RowSet<ItemPropertyDO>, List<ItemPropertyDO>>)
+      .executeBatch(itemProperties)
+      .map(rs -> batchToList(rs))
   }
 
   @Override

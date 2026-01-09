@@ -57,7 +57,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     return storage.insertDomainPath(new DomainPathDO(fullPath, newItemId))
   }
 
-  private Future<?> createItemProperties(UUID newItemId, DescriptionObject descObject) {
+  private Future<List<ItemPropertyDO>> createItemProperties(UUID newItemId, DescriptionObject descObject) {
     List<ItemPropertyDO> props = []
     props << new ItemPropertyDO('Name', descObject.name, false, newItemId)
     props << new ItemPropertyDO('Type', descObject.type, false, newItemId)
@@ -90,11 +90,11 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     return storage.insertOutcome(outcome)
   }
 
-  private Future<?> createViewPoints(UUID newItemId, OutcomeDO createdOutcome, DescriptionObject descObject) {
-    List<Future<ViewPointDO>> vpFutures = []
-    vpFutures << storage.insertViewPoint(new ViewPointDO('v0', createdOutcome.schema, descObject.version, descObject.type, createdOutcome.id, newItemId))
-    vpFutures << storage.insertViewPoint(new ViewPointDO('last', createdOutcome.schema, descObject.version, descObject.type, createdOutcome.id, newItemId))
-    return Future.all(vpFutures)
+  private Future<List<ViewPointDO>> createViewPoints(UUID newItemId, OutcomeDO createdOutcome, DescriptionObject descObject) {
+    List<ViewPointDO> viewPoints = []
+    viewPoints << new ViewPointDO('v0', createdOutcome.schema, descObject.version, descObject.type, createdOutcome.id, newItemId)
+    viewPoints << new ViewPointDO('last', createdOutcome.schema, descObject.version, descObject.type, createdOutcome.id, newItemId)
+    return storage.insertViewPoints(viewPoints)
   }
 
   private Future<DomainPathDO> ensurePathExists(String path) {

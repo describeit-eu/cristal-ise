@@ -13,6 +13,8 @@ public interface ViewPointRepository {
 
   Future<ViewPointDO> insert(ViewPointDO viewPoint)
 
+  Future<List<ViewPointDO>> insertMany(List<ViewPointDO> viewPoints)
+
   Future<Optional<ViewPointDO>> update(ViewPointDO viewPoint)
 
   Future<Integer> deleteById(Long id)

@@ -5,9 +5,11 @@ import eu.describeit.cristalise.kernel.persistency.domain.ViewPointDOParametersM
 import eu.describeit.cristalise.kernel.persistency.domain.ViewPointDORowMapper
 import groovy.transform.CompileStatic
 import io.vertx.core.Future
+import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.SqlClient
 import io.vertx.sqlclient.templates.SqlTemplate
 
+import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.batchToList
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOptional
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOrFail
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toList
@@ -55,6 +57,19 @@ import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toLis
       .mapTo(ViewPointDORowMapper.INSTANCE)
       .execute(viewPoint)
       .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for viewPoint id:"+viewPoint.getId()))
+  }
+
+  @Override
+  public Future<List<ViewPointDO>> insertMany(List<ViewPointDO> viewPoints) {
+    if (viewPoints.isEmpty()) {
+      return Future.succeededFuture(Collections.emptyList())
+    }
+    return SqlTemplate
+      .forUpdate(client, SQL_INSERT)
+      .mapFrom(ViewPointDOParametersMapper.INSTANCE)
+      .mapTo(ViewPointDORowMapper.INSTANCE)
+      .executeBatch(viewPoints)
+      .map(rs -> batchToList(rs))
   }
 
   @Override

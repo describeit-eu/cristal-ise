@@ -122,6 +122,10 @@ class Storage {
     return viewPointRepository.insert(viewPoint)
   }
 
+  Future<List<ViewPointDO>> insertViewPoints(List<ViewPointDO> viewPoints) {
+    return viewPointRepository.insertMany(viewPoints)
+  }
+
   Future<List<ViewPointDO>> findAllViewPoints() {
     return viewPointRepository.findAll()
   }
