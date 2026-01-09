@@ -1,7 +1,7 @@
 package eu.describeit.cristalise.kernel.lifecycle
 
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.persistency.Storage
+import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -46,7 +46,7 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   }
 
   @Override
-  Future<Void> initialise(Storage storage) {
+  Future<Void> initialise(ItemStorage storage) {
     return storage.getChildActionDOs(dataObject.id).compose { actionDOList ->
       List<Future<Void>> initFutures = []
 

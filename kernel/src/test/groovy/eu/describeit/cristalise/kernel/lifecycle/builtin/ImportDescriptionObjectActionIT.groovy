@@ -1,9 +1,8 @@
 package eu.describeit.cristalise.kernel.lifecycle.builtin
 
-import eu.describeit.cristalise.CommonTestItemIds
-import eu.describeit.cristalise.TestDataIdUtils
+
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.persistency.Storage
+import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.repository.AbstractRepositoryIT
 import eu.describeit.cristalise.kernel.statemachine.StateMachine
 import groovy.transform.CompileStatic
@@ -48,7 +47,7 @@ class ImportDescriptionObjectActionIT extends AbstractRepositoryIT {
     assertNotNull(resultId)
 
     // Verify it was created
-    Storage storage = item.getStorage()
+    ItemStorage storage = item.getStorage()
     def createdItem = storage.getItemDO(resultId).await()
     assertEquals("TestSM", createdItem.name)
     assertEquals("StateMachine", createdItem.type)

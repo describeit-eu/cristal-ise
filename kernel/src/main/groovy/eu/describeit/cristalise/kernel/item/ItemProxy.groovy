@@ -1,10 +1,8 @@
 package eu.describeit.cristalise.kernel.item
 
 import eu.describeit.cristalise.kernel.lifecycle.*
-import eu.describeit.cristalise.kernel.persistency.Storage
+import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.domain.*
-import eu.describeit.cristalise.kernel.persistency.repository.*
-
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -19,7 +17,7 @@ import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.Action
 @ToString(includePackage=false,  includeNames=true, excludes = 'storage, lifeCycle')
 @CompileStatic
 class ItemProxy {
-  private final Storage storage
+  private final ItemStorage storage
   private final UUID itemId
   private ItemDO itemDO
 
@@ -46,7 +44,7 @@ class ItemProxy {
   /**
    * @return the storage
    */
-  Storage getStorage() {
+  ItemStorage getStorage() {
     return storage
   }
 
@@ -100,7 +98,7 @@ class ItemProxy {
   public ItemProxy(SqlClient client, UUID uuid) {
     vertx = null
     itemId = uuid
-    storage = new Storage(client)
+    storage = new ItemStorage(client)
   }
 
   /**

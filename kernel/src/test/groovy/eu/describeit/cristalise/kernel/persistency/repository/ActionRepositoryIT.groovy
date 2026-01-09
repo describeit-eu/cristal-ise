@@ -2,7 +2,7 @@ package eu.describeit.cristalise.kernel.persistency.repository
 
 
 import eu.describeit.cristalise.kernel.lifecycle.LoopingCompositeAction
-import eu.describeit.cristalise.kernel.persistency.Storage
+import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import eu.describeit.cristalise.kernel.lifecycle.SplittingCompositeAction
 import groovy.transform.CompileStatic
@@ -155,7 +155,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     def compositeAction = new SplittingCompositeAction(dataObject: capitalWfDO)
 
     // 3. Initialise the composite action and its children recursively
-    compositeAction.initialise(new Storage(pool)).await()
+    compositeAction.initialise(new ItemStorage(pool)).await()
 
     // 4. Verify children loading (UpdateCapital, ChangeState)
     def children = compositeAction.getActions()

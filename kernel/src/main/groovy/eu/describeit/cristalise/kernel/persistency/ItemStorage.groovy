@@ -7,7 +7,7 @@ import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
 
 @CompileStatic
-class Storage {
+class ItemStorage {
   final ItemRepository itemRepository
   final DomainPathRepository domainPathRepository
   final ItemPropertyRepository itemPropertyRepository
@@ -20,7 +20,7 @@ class Storage {
   final JobRepository jobRepository
   final EventRepository eventRepository
 
-  Storage(SqlClient client) {
+  ItemStorage(SqlClient client) {
     itemRepository = new ItemRepositoryImpl(client)
     domainPathRepository = new DomainPathRepositoryImpl(client)
     itemPropertyRepository = new ItemPropertyRepositoryImpl(client)
@@ -56,7 +56,12 @@ class Storage {
 
   // --- Item ---
 
-  Future<ItemDO> addItemDO(ItemDO item) {
+  Future<ItemDO> putItemDO(ItemDO item) {
+    if (item.id != null) {
+      return itemRepository.update(item).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : itemRepository.insert(item)
+      }
+    }
     return itemRepository.insert(item)
   }
 
@@ -68,7 +73,12 @@ class Storage {
 
   // --- DomainPath ---
 
-  Future<DomainPathDO> insertDomainPath(DomainPathDO domainPath) {
+  Future<DomainPathDO> putDomainPath(DomainPathDO domainPath) {
+    if (domainPath.id != null) {
+      return domainPathRepository.update(domainPath).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : domainPathRepository.insert(domainPath)
+      }
+    }
     return domainPathRepository.insert(domainPath)
   }
 
@@ -78,12 +88,18 @@ class Storage {
 
   // --- ItemProperty ---
 
-  Future<ItemPropertyDO> insertItemProperty(ItemPropertyDO itemProperty) {
+  Future<ItemPropertyDO> putItemProperty(ItemPropertyDO itemProperty) {
+    if (itemProperty.id != null) {
+      return itemPropertyRepository.update(itemProperty).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : itemPropertyRepository.insert(itemProperty)
+      }
+    }
     return itemPropertyRepository.insert(itemProperty)
   }
 
-  Future<List<ItemPropertyDO>> insertItemProperties(List<ItemPropertyDO> itemProperties) {
-    return itemPropertyRepository.insertMany(itemProperties)
+  Future<List<ItemPropertyDO>> putItemProperties(List<ItemPropertyDO> itemProperties) {
+    List<Future<ItemPropertyDO>> futures = itemProperties.collect { putItemProperty(it) }
+    return Future.all(futures).map { it.list() as List<ItemPropertyDO> }
   }
 
   Future<List<ItemPropertyDO>> findItemPropertiesByItemId(UUID itemId) {
@@ -92,7 +108,12 @@ class Storage {
 
   // --- Event ---
 
-  Future<EventDO> insertEvent(EventDO event) {
+  Future<EventDO> putEvent(EventDO event) {
+    if (event.id != null) {
+      return eventRepository.update(event).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : eventRepository.insert(event)
+      }
+    }
     return eventRepository.insert(event)
   }
 
@@ -102,7 +123,12 @@ class Storage {
 
   // --- Outcome ---
 
-  Future<OutcomeDO> insertOutcome(OutcomeDO outcome) {
+  Future<OutcomeDO> putOutcome(OutcomeDO outcome) {
+    if (outcome.id != null) {
+      return outcomeRepository.update(outcome).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : outcomeRepository.insert(outcome)
+      }
+    }
     return outcomeRepository.insert(outcome)
   }
 
@@ -112,18 +138,29 @@ class Storage {
 
   // --- Attachment ---
 
-  Future<AttachmentDO> insertAttachment(AttachmentDO attachment) {
+  Future<AttachmentDO> putAttachment(AttachmentDO attachment) {
+    if (attachment.id != null) {
+      return attachmentRepository.update(attachment).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : attachmentRepository.insert(attachment)
+      }
+    }
     return attachmentRepository.insert(attachment)
   }
 
   // --- ViewPoint ---
 
-  Future<ViewPointDO> insertViewPoint(ViewPointDO viewPoint) {
+  Future<ViewPointDO> putViewPoint(ViewPointDO viewPoint) {
+    if (viewPoint.id != null) {
+      return viewPointRepository.update(viewPoint).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : viewPointRepository.insert(viewPoint)
+      }
+    }
     return viewPointRepository.insert(viewPoint)
   }
 
-  Future<List<ViewPointDO>> insertViewPoints(List<ViewPointDO> viewPoints) {
-    return viewPointRepository.insertMany(viewPoints)
+  Future<List<ViewPointDO>> putViewPoints(List<ViewPointDO> viewPoints) {
+    List<Future<ViewPointDO>> futures = viewPoints.collect { putViewPoint(it) }
+    return Future.all(futures).map { it.list() as List<ViewPointDO> }
   }
 
   Future<List<ViewPointDO>> findAllViewPoints() {
@@ -132,19 +169,34 @@ class Storage {
 
   // --- Collection ---
 
-  Future<CollectionDO> insertCollection(CollectionDO collection) {
+  Future<CollectionDO> putCollection(CollectionDO collection) {
+    if (collection.id != null) {
+      return collectionRepository.update(collection).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : collectionRepository.insert(collection)
+      }
+    }
     return collectionRepository.insert(collection)
   }
 
   // --- CollectionMember ---
 
-  Future<CollectionMemberDO> insertCollectionMember(CollectionMemberDO member) {
+  Future<CollectionMemberDO> putCollectionMember(CollectionMemberDO member) {
+    if (member.id != null) {
+      return collectionMemberRepository.update(member).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : collectionMemberRepository.insert(member)
+      }
+    }
     return collectionMemberRepository.insert(member)
   }
 
   // --- Job ---
 
-  Future<JobDO> insertJob(JobDO job) {
+  Future<JobDO> putJob(JobDO job) {
+    if (job.id != null) {
+      return jobRepository.update(job).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : jobRepository.insert(job)
+      }
+    }
     return jobRepository.insert(job)
   }
 }

@@ -2,7 +2,7 @@ package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 import eu.describeit.cristalise.kernel.DescriptionObject
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.persistency.Storage
+import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 class ImportDescriptionObjectAction implements BuiltInAction {
   protected ItemProxy item
   protected ItemProxy actor
-  protected Storage storage
+  protected ItemStorage storage
 
   @Override
   Future<UUID> request(ItemProxy item, ItemProxy actor, Object input) {
@@ -49,12 +49,12 @@ class ImportDescriptionObjectAction implements BuiltInAction {
 
   private Future<ItemDO> createItem(UUID newItemId, DescriptionObject descObject) {
     ItemDO newItem = new ItemDO(newItemId, descObject.name, descObject.type, descObject.version, null)
-    return storage.addItemDO(newItem)
+    return storage.putItemDO(newItem)
   }
 
   private Future<DomainPathDO> createItemDomainPath(UUID newItemId, DescriptionObject descObject, String parentPath) {
     String fullPath = "${parentPath}.${descObject.name}"
-    return storage.insertDomainPath(new DomainPathDO(fullPath, newItemId))
+    return storage.putDomainPath(new DomainPathDO(fullPath, newItemId))
   }
 
   private Future<List<ItemPropertyDO>> createItemProperties(UUID newItemId, DescriptionObject descObject) {
@@ -63,7 +63,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     props << new ItemPropertyDO('Type', descObject.type, false, newItemId)
     props << new ItemPropertyDO('Module', descObject.namespace ?: "", false, newItemId)
     props << new ItemPropertyDO('Version', descObject.version, false, newItemId)
-    return storage.insertItemProperties(props)
+    return storage.putItemProperties(props)
   }
 
   private Future<EventDO> createImportEvent(UUID newItemId, DescriptionObject descObject) {
@@ -75,7 +75,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     event.actionPath = "import"
     event.stateMachineVersion = descObject.version
 
-    return storage.insertEvent(event)
+    return storage.putEvent(event)
   }
 
   private Future<OutcomeDO> createStateMachineOutcome(UUID newItemId, EventDO createdEvent, DescriptionObject descObject) {
@@ -87,14 +87,14 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     outcome.schema = UUID.fromString('00000000-0000-0000-0000-000000000000')
     outcome.schemaVersion = descObject.version
 
-    return storage.insertOutcome(outcome)
+    return storage.putOutcome(outcome)
   }
 
   private Future<List<ViewPointDO>> createViewPoints(UUID newItemId, OutcomeDO createdOutcome, DescriptionObject descObject) {
     List<ViewPointDO> viewPoints = []
     viewPoints << new ViewPointDO('v0', createdOutcome.schema, descObject.version, descObject.type, createdOutcome.id, newItemId)
     viewPoints << new ViewPointDO('last', createdOutcome.schema, descObject.version, descObject.type, createdOutcome.id, newItemId)
-    return storage.insertViewPoints(viewPoints)
+    return storage.putViewPoints(viewPoints)
   }
 
   private Future<DomainPathDO> ensurePathExists(String path) {
@@ -107,10 +107,10 @@ class ImportDescriptionObjectAction implements BuiltInAction {
       if (lastDot > 0) {
         String parent = path.substring(0, lastDot)
         return ensurePathExists(parent).compose {
-          storage.insertDomainPath(new DomainPathDO(path, (UUID)null))
+          storage.putDomainPath(new DomainPathDO(path, (UUID)null))
         }
       } else {
-        return storage.insertDomainPath(new DomainPathDO(path, (UUID)null))
+        return storage.putDomainPath(new DomainPathDO(path, (UUID)null))
       }
     }
   }
