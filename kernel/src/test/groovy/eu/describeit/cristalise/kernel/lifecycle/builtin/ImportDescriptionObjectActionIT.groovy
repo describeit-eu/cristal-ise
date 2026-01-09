@@ -54,7 +54,7 @@ class ImportDescriptionObjectActionIT extends AbstractRepositoryIT {
     assertEquals("v1.0", createdItem.version)
 
     // Verify properties
-    def props = storage.findItemPropertiesByItemId(resultId).await()
+    def props = storage.getItemPropertiesByItemId(resultId).await()
     assertEquals(4, props.size())
     assertTrue(props.any { it.name == 'Name' && it.value == 'TestSM' })
     assertTrue(props.any { it.name == 'Type' && it.value == 'StateMachine' })
@@ -62,12 +62,12 @@ class ImportDescriptionObjectActionIT extends AbstractRepositoryIT {
     assertTrue(props.any { it.name == 'Version' && it.value == 'v1.0' })
 
     // Verify DomainPath
-    def dp = storage.findDomainPathByPath("kernel.description.statemachine.TestSM").await()
-    assertTrue(dp.isPresent())
-    assertEquals(resultId, dp.get().itemId)
+    def dp = storage.getDomainPathByPath("kernel.description.statemachine.TestSM").await()
+    assertNotNull(dp)
+    assertEquals(resultId, dp.itemId)
 
     // Verify Event
-    def events = storage.findAllEvents().await()
+    def events = storage.getAllEvents().await()
     def event = events.find { it.itemId == resultId }
     assertNotNull(event)
     assertEquals("import", event.actionPath)
@@ -75,7 +75,7 @@ class ImportDescriptionObjectActionIT extends AbstractRepositoryIT {
     assertEquals("v1.0", event.stateMachineVersion)
 
     // Verify Outcome
-    def outcomes = storage.findOutcomesByItemId(resultId).await()
+    def outcomes = storage.getOutcomesByItemId(resultId).await()
     assertEquals(1, outcomes.size())
     def outcome = outcomes[0]
     assertEquals(event.id, outcome.eventId)
@@ -84,7 +84,7 @@ class ImportDescriptionObjectActionIT extends AbstractRepositoryIT {
     assertEquals("TestSM", outcome.data.getString("name"))
 
     // Verify ViewPoints
-    def vps = storage.findAllViewPoints().await()
+    def vps = storage.getAllViewPoints().await()
     def itemVps = vps.findAll { it.itemId == resultId }
     assertEquals(2, itemVps.size())
     assertTrue(itemVps.any { it.name == 'v0' && it.outcomeId == outcome.id })

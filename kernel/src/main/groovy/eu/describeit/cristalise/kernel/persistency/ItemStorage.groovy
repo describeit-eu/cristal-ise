@@ -65,13 +65,15 @@ class ItemStorage {
     return itemRepository.insert(item)
   }
 
-  // --- Action ---
-
   Future<List<ActionDO>> getChildActionDOs(Long parentId) {
-    return actionRepository.findByParentId(parentId)
+    return actionRepository.findByParentId(parentId).compose { List<ActionDO> list ->
+      if (list.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("Child Action for parent id:${parentId} does not exists"))
+      } else {
+        return Future.succeededFuture(list)
+      }
+    } as Future<List<ActionDO>>
   }
-
-  // --- DomainPath ---
 
   Future<DomainPathDO> putDomainPath(DomainPathDO domainPath) {
     if (domainPath.id != null) {
@@ -82,11 +84,15 @@ class ItemStorage {
     return domainPathRepository.insert(domainPath)
   }
 
-  Future<Optional<DomainPathDO>> findDomainPathByPath(String path) {
-    return domainPathRepository.findByPath(path)
+  Future<DomainPathDO> getDomainPathByPath(String path) {
+    return domainPathRepository.findByPath(path).compose { Optional<DomainPathDO> domainPathOptional ->
+      if (domainPathOptional.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("DomainPath ${path} does not exists"))
+      } else {
+        return Future.succeededFuture(domainPathOptional.get())
+      }
+    } as Future<DomainPathDO>
   }
-
-  // --- ItemProperty ---
 
   Future<ItemPropertyDO> putItemProperty(ItemPropertyDO itemProperty) {
     if (itemProperty.id != null) {
@@ -102,11 +108,15 @@ class ItemStorage {
     return Future.all(futures).map { it.list() as List<ItemPropertyDO> }
   }
 
-  Future<List<ItemPropertyDO>> findItemPropertiesByItemId(UUID itemId) {
-    return itemPropertyRepository.findByItemId(itemId)
+  Future<List<ItemPropertyDO>> getItemPropertiesByItemId(UUID itemId) {
+    return itemPropertyRepository.findByItemId(itemId).compose { List<ItemPropertyDO> list ->
+      if (list.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("ItemProperty for item ${itemId} does not exists"))
+      } else {
+        return Future.succeededFuture(list)
+      }
+    } as Future<List<ItemPropertyDO>>
   }
-
-  // --- Event ---
 
   Future<EventDO> putEvent(EventDO event) {
     if (event.id != null) {
@@ -117,11 +127,15 @@ class ItemStorage {
     return eventRepository.insert(event)
   }
 
-  Future<List<EventDO>> findAllEvents() {
-    return eventRepository.findAll()
+  Future<List<EventDO>> getAllEvents() {
+    return eventRepository.findAll().compose { List<EventDO> list ->
+      if (list.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("Events do not exists"))
+      } else {
+        return Future.succeededFuture(list)
+      }
+    } as Future<List<EventDO>>
   }
-
-  // --- Outcome ---
 
   Future<OutcomeDO> putOutcome(OutcomeDO outcome) {
     if (outcome.id != null) {
@@ -132,11 +146,15 @@ class ItemStorage {
     return outcomeRepository.insert(outcome)
   }
 
-  Future<List<OutcomeDO>> findOutcomesByItemId(UUID itemId) {
-    return outcomeRepository.findByItemId(itemId)
+  Future<List<OutcomeDO>> getOutcomesByItemId(UUID itemId) {
+    return outcomeRepository.findByItemId(itemId).compose { List<OutcomeDO> list ->
+      if (list.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("Outcome for item ${itemId} does not exists"))
+      } else {
+        return Future.succeededFuture(list)
+      }
+    } as Future<List<OutcomeDO>>
   }
-
-  // --- Attachment ---
 
   Future<AttachmentDO> putAttachment(AttachmentDO attachment) {
     if (attachment.id != null) {
@@ -146,8 +164,6 @@ class ItemStorage {
     }
     return attachmentRepository.insert(attachment)
   }
-
-  // --- ViewPoint ---
 
   Future<ViewPointDO> putViewPoint(ViewPointDO viewPoint) {
     if (viewPoint.id != null) {
@@ -163,11 +179,15 @@ class ItemStorage {
     return Future.all(futures).map { it.list() as List<ViewPointDO> }
   }
 
-  Future<List<ViewPointDO>> findAllViewPoints() {
-    return viewPointRepository.findAll()
+  Future<List<ViewPointDO>> getAllViewPoints() {
+    return viewPointRepository.findAll().compose { List<ViewPointDO> list ->
+      if (list.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("ViewPoints do not exists"))
+      } else {
+        return Future.succeededFuture(list)
+      }
+    } as Future<List<ViewPointDO>>
   }
-
-  // --- Collection ---
 
   Future<CollectionDO> putCollection(CollectionDO collection) {
     if (collection.id != null) {
@@ -178,8 +198,6 @@ class ItemStorage {
     return collectionRepository.insert(collection)
   }
 
-  // --- CollectionMember ---
-
   Future<CollectionMemberDO> putCollectionMember(CollectionMemberDO member) {
     if (member.id != null) {
       return collectionMemberRepository.update(member).compose { opt ->
@@ -188,8 +206,6 @@ class ItemStorage {
     }
     return collectionMemberRepository.insert(member)
   }
-
-  // --- Job ---
 
   Future<JobDO> putJob(JobDO job) {
     if (job.id != null) {

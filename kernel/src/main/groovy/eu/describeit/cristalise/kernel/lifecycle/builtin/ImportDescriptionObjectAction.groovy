@@ -98,15 +98,11 @@ class ImportDescriptionObjectAction implements BuiltInAction {
   }
 
   private Future<DomainPathDO> ensurePathExists(String path) {
-    return storage.findDomainPathByPath(path).compose { opt ->
-      if (opt.isPresent()) {
-        return Future.succeededFuture(opt.get())
-      }
-
+    return (Future<DomainPathDO>) storage.getDomainPathByPath(path).recover { Throwable err ->
       int lastDot = path.lastIndexOf('.')
       if (lastDot > 0) {
         String parent = path.substring(0, lastDot)
-        return ensurePathExists(parent).compose {
+        return (Future<DomainPathDO>) ensurePathExists(parent).compose {
           storage.putDomainPath(new DomainPathDO(path, (UUID)null))
         }
       } else {
