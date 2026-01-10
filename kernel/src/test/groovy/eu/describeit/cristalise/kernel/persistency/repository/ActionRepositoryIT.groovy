@@ -90,6 +90,20 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
+  void testInsertMany() {
+    def a1 = new ActionDO("ActionBatch1", "pb1", "v1", "{}", ELEMENTARY, "{}", null)
+    def a2 = new ActionDO("ActionBatch2", "pb2", "v1", "{}", ELEMENTARY, "{}", null)
+
+    def inserted = repository.insertMany([a1, a2]).await()
+
+    assertEquals(2, inserted.size())
+    assertNotNull(inserted[0].id)
+    assertNotNull(inserted[1].id)
+    assertEquals("ActionBatch1", inserted[0].name)
+    assertEquals("ActionBatch2", inserted[1].name)
+  }
+
+  @Test
   void testUpdate() {
     // insert a row then update it
     def base = new ActionDO(

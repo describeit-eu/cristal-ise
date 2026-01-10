@@ -19,6 +19,11 @@ interface ActionRepository {
   Future<ActionDO> insert(ActionDO action)
 
   /**
+   * Insert multiple Actions. Returns the inserted rows (including generated ids).
+   */
+  Future<List<ActionDO>> insertMany(List<ActionDO> actions)
+
+  /**
    * Update an existing Action by id. Returns the updated row.
    */
   Future<Optional<ActionDO>> update(ActionDO action)

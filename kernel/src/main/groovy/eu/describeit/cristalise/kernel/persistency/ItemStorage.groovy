@@ -75,6 +75,24 @@ class ItemStorage {
     } as Future<List<ActionDO>>
   }
 
+  Future<ActionDO> putAction(ActionDO action) {
+    if (action.id != null) {
+      return actionRepository.update(action).compose { opt ->
+        opt.isPresent() ? Future.succeededFuture(opt.get()) : actionRepository.insert(action)
+      }
+    }
+    return actionRepository.insert(action)
+  }
+
+  Future<List<ActionDO>> putActions(List<ActionDO> actions) {
+    if (actions.isEmpty()) return Future.succeededFuture([])
+    if (actions.every { it.id == null }) {
+      return actionRepository.insertMany(actions)
+    }
+    List<Future<ActionDO>> futures = actions.collect { putAction(it) }
+    return Future.all(futures).map { it.list() as List<ActionDO> }
+  }
+
   Future<DomainPathDO> putDomainPath(DomainPathDO domainPath) {
     if (domainPath.id != null) {
       return domainPathRepository.update(domainPath).compose { opt ->

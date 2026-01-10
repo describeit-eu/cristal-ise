@@ -55,16 +55,17 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
       final JsonObject outputOutcome = handleRequest(item, actor, actionPath, transitionID, inputOutcome)
 
       tx.commit().await()
-      conn.close().await()
 
       return Future.succeededFuture(outputOutcome.encode())
     }
     catch (Throwable t) {
       log.error('requestAction() - FAILED item:{}', itemUuid, t)
+
+      if (tx) tx.rollback().await()
+
       return Future.failedFuture(t)
     }
     finally {
-      if (tx) tx.rollback().await()
       if (conn) conn.close().await()
     }
   }

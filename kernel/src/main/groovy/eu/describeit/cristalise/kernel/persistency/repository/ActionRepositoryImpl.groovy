@@ -8,6 +8,7 @@ import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
 import io.vertx.sqlclient.templates.SqlTemplate
 
+import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.batchToList
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOptional
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.firstOrFail
 import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toList
@@ -64,6 +65,19 @@ public class ActionRepositoryImpl implements ActionRepository {
       .mapTo(ActionDORowMapper.INSTANCE)
       .execute(action)
       .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row for action name:"+action.getName()))
+  }
+
+  @Override
+  public Future<List<ActionDO>> insertMany(List<ActionDO> actions) {
+    if (actions.isEmpty()) {
+      return Future.succeededFuture(Collections.emptyList())
+    }
+    return SqlTemplate
+      .forUpdate(client, SQL_INSERT)
+      .mapFrom(ActionDOParametersMapper.INSTANCE)
+      .mapTo(ActionDORowMapper.INSTANCE)
+      .executeBatch(actions)
+      .map(rs -> batchToList(rs))
   }
 
   @Override

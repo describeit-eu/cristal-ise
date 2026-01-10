@@ -2,6 +2,7 @@ package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 import eu.describeit.cristalise.kernel.DescriptionObject
 import eu.describeit.cristalise.kernel.item.ItemProxy
+import eu.describeit.cristalise.kernel.lifecycle.CompositeAction
 import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import groovy.transform.CompileStatic
@@ -41,6 +42,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
       .compose { createItem(newItemId, descObject) }
       .compose { createItemDomainPath(newItemId, descObject, parentPath) }
       .compose { createItemProperties(newItemId, descObject) }
+//      .compose { createLifeCycle(newItemId, descObject) }
       .compose { createImportEvent(newItemId, descObject) }
       .compose { createdEvent -> createStateMachineOutcome(newItemId, createdEvent, descObject) }
       .compose { createdOutcome -> createViewPoints(newItemId, createdOutcome, descObject) }
@@ -50,6 +52,11 @@ class ImportDescriptionObjectAction implements BuiltInAction {
   private Future<ItemDO> createItem(UUID newItemId, DescriptionObject descObject) {
     ItemDO newItem = new ItemDO(newItemId, descObject.name, descObject.type, descObject.version, null)
     return storage.putItemDO(newItem)
+  }
+
+  private Future<ActionDO> createLifeCycle(UUID newItemId, DescriptionObject descObject) {
+    descObject.resourceType.workflowDef
+    return Future.failedFuture('Unimplemented')
   }
 
   private Future<DomainPathDO> createItemDomainPath(UUID newItemId, DescriptionObject descObject, String parentPath) {
