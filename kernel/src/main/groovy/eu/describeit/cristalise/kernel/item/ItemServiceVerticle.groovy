@@ -38,8 +38,8 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
     List<Byte> attachment)
   {
     // TODO: authn/authz should be based on Interceptors attached to ServiceBinder
-    // TODO: use services like keycloak or Authentik or casdoor
-    final def inputOutcome = new JsonObject(outcome)
+    // TODO: use services like keycloak / Authentik / casdoor
+    final JsonObject inputOutcome = new JsonObject(outcome)
 
     final SqlConnection conn
     final Transaction tx
@@ -60,17 +60,25 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
       return Future.succeededFuture(outputOutcome.encode())
     }
     catch (Throwable t) {
-      if (tx) tx.rollback().await()
-      if (conn) conn.close().await()
-
       log.error('requestAction() - FAILED item:{}', itemUuid, t)
       return Future.failedFuture(t)
     }
+    finally {
+      if (tx) tx.rollback().await()
+      if (conn) conn.close().await()
+    }
   }
 
-  private JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final String actionPath, final String transitionId, final JsonObject inputOutcome) {
+  private static JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final String actionPath, final String transitionId, final JsonObject inputOutcome) {
     CompositeAction lifecycle = item.lifeCycle.await()
-    return lifecycle.request(item, actor, actionPath, transitionId, inputOutcome).await()
+
+    final JsonObject outputOutcome = lifecycle.request(item, actor, actionPath, transitionId, inputOutcome).await()
+
+//    sendEvents(changes) how????
+//    def jobs = lifecycle.calculateNextJobs().await()
+//    sendEvents(jobs)
+
+    return outputOutcome
   }
 
   @Override
