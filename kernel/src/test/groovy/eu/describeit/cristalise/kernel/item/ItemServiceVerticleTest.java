@@ -29,8 +29,8 @@ class ItemServiceVerticleTest {
   private final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
 
   @BeforeAll
-  @DisplayName("Deploy ItemServiceVerticle and create service proxy")
-  public void deployVerticleAndCreateProxy(Vertx vertx, VertxTestContext testContext) {
+  @DisplayName("Deploy ItemServiceVerticle")
+  public void deployVerticle(Vertx vertx, VertxTestContext testContext) {
     System.setProperty("vertx-config-path", "src/test/conf/config.json");
 
     TestKernelComponent component = DaggerTestKernelComponent.create();

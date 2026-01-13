@@ -2,7 +2,7 @@ package eu.describeit.cristalise.kernel.module
 
 StateMachine(name: 'Default', version: 'v0') {
   transition('Done', [origin: 'Waiting', target: 'Finished']) {
-    outcome(name: '\${SchemaType}', version: '\${SchemaVersion}')
+    schema(name: '\${SchemaType}', version: '\${SchemaVersion}')
     script(name: '\${ScriptName}', version: '\${ScriptVersion}')
     query(name: '\${QueryName}', version: '\${QueryVersion}')
   }
@@ -11,12 +11,12 @@ StateMachine(name: 'Default', version: 'v0') {
   }
   transition('Complete', [origin: 'Started', target: 'Finished']) {
     property(reservation: 'clear')
-    outcome(name: '\${SchemaType}', version: '\${SchemaVersion}')
+    schema(name: '\${SchemaType}', version: '\${SchemaVersion}')
     script(name: '\${ScriptName}', version: '\${ScriptVersion}')
     query(name: '\${QueryName}', version: '\${QueryVersion}')
   }
   transition('Suspend', [origin: 'Started', target: 'Suspended']) {
-    outcome(name: 'Errors', version: '0')
+    schema(name: 'Errors', version: '0')
   }
   transition('Resume', [origin: 'Suspended', target: 'Started']) {
     property(reservation: 'preserve')
@@ -28,7 +28,7 @@ StateMachine(name: 'Default', version: 'v0') {
 
 StateMachine(name: 'Simple', version: 'v0') {
   transition('Done', [origin: 'Waiting', target: 'Finished']) {
-    outcome(name: '${SchemaType}', version: '${SchemaVersion}')
+    schema(name: '${SchemaType}', version: '${SchemaVersion}')
     script(name: '${ScriptName}', version: '${ScriptVersion}')
     query(name: '${QueryName}', version: '${QueryVersion}')
   }

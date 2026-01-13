@@ -35,86 +35,73 @@ class StateMachineBuilderSpecs extends Specification {
 
   def 'SM containing a single State is valid'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "dummySM", 'v0') {
-      state("Idle")
-      initialState("Idle")
+    def builder = StateMachineBuilder.build('testing', 'dummySM', 'v0') {
+      state('Idle')
+      initialState('Idle')
     }
     def json = JsonObject.mapFrom(builder.sm)
 
     then:
     builder.sm && builder.sm.validate()
-    builder.sm.getState("Idle")
+    builder.sm.getState('Idle')
     json.mapTo(StateMachine.class) == builder.sm
   }
 
   def 'SM containing a single State and Transition is valid'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "dummySM", 'v0') {
-      transition("Fire", [origin: 'Idle', target: 'Idle'])
-      initialState("Idle")
+    def builder = StateMachineBuilder.build('testing', 'dummySM', 'v0') {
+      transition('Fire', [origin: 'Idle', target: 'Idle'])
+      initialState('Idle')
     }
 
     then:
     builder.sm
     builder.sm.validate()
     builder.sm.toJson()
-    builder.sm.states.find { it.name == "Idle" }
-    builder.sm.getTransition("Fire").originStateId == 0
-    builder.sm.getTransition("Fire").targetStateId == 0
+    builder.sm.states.find { it.name == 'Idle' }
+    builder.sm.getTransition('Fire').originStateId == 0
+    builder.sm.getTransition('Fire').targetStateId == 0
   }
 
   def 'SM containing a single Transition is NOT valid'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "dummySM", 'v0') {
-      transition("Useless")
+    def builder = StateMachineBuilder.build('testing', 'dummySM', 'v0') {
+      transition('Useless')
     }
 
     then:
     builder.sm && !builder.sm.validate()
   }
 
-  @Ignore("unimplemented")
-  def 'Builder can edit existing StateMachine'() {
-    when: "the Skip transition is added"
-    def builder = StateMachineBuilder.update("", "Default", 0) {
-      transition("Skip", [origin: "Waiting", target: "Finished"]) {
-        property(enablerProp: "Skippable", reservation: "clear")
-      }
-    }
-
-    then:
-    builder.sm && builder.sm.validate()
-  }
-
   def 'Build Default StateMachine and crosscheck it with Kernel version'() {
     when:
-//  StateMachine defaultSM = (StateMachine)Gateway.getMarshaller().unmarshall(Gateway.getResource().getTextResource(null, "boot/SM/Default.xml"));
+//  StateMachine defaultSM = (StateMachine)Gateway.getMarshaller().unmarshall(Gateway.getResource().getTextResource(null, 'boot/SM/Default.xml'));
 
-    def builder = StateMachineBuilder.build("testing", "Default", 'v0') {
-      transition("Done", [origin: "Waiting", target: "Finished"]) {
-        outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
-        script(name: "\${ScriptName}", version: "\${ScriptVersion}")
-        query(name: "\${QueryName}", version: "\${QueryVersion}")
+    def builder = StateMachineBuilder.build('testing', 'Default', 'v0') {
+      transition('Done', [origin: 'Waiting', target: 'Finished']) {
+        schema(name: '${SchemaType}', version: '${SchemaVersion}')
+        script(name: '${ScriptName}', version: '${ScriptVersion}')
+        query(name: '${QueryName}', version: '${QueryVersion}')
       }
-      transition("Start", [origin: "Waiting", target: "Started"]) {
-        property reservation: "set"
+      transition('Start', [origin: 'Waiting', target: 'Started']) {
+        property reservation: 'set'
       }
-      transition("Complete", [origin: "Started", target: "Finished"]) {
-        property(reservation: "clear")
-        outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
-        script(name: "\${ScriptName}", version: "\${ScriptVersion}")
-        query(name: "\${QueryName}", version: "\${QueryVersion}")
+      transition('Complete', [origin: 'Started', target: 'Finished']) {
+        property(reservation: 'clear')
+        schema(name: '${SchemaType}', version: '${SchemaVersion}')
+        script(name: '${ScriptName}', version: '${ScriptVersion}')
+        query(name: '${QueryName}', version: '${QueryVersion}')
       }
-      transition("Suspend", [origin: "Started", target: "Suspended"]) {
-        outcome(name: "Errors", version: "0")
+      transition('Suspend', [origin: 'Started', target: 'Suspended']) {
+        schema(name: 'Errors', version: '0')
       }
-      transition("Resume", [origin: "Suspended", target: "Started"]) {
-        property(reservation: "preserve")
+      transition('Resume', [origin: 'Suspended', target: 'Started']) {
+        property(reservation: 'preserve')
       }
-      transition("Proceed", [origin: "Finished", target: "Finished"])
+      transition('Proceed', [origin: 'Finished', target: 'Finished'])
 
-      initialState("Waiting")
-      finishingState("Finished")
+      initialState('Waiting')
+      finishingState('Finished')
     }
     def json = JsonObject.mapFrom(builder.sm)
     def smCopy = json.mapTo(StateMachine.class)
@@ -129,7 +116,7 @@ class StateMachineBuilderSpecs extends Specification {
     when:
     def builder = StateMachineBuilder.build('testing', 'TriggerStateMachine', 'v0') {
       transition('Done', [origin: 'Waiting', target: 'Finished']) {
-        outcome(name: '${SchemaType}', version: '${SchemaVersion}')
+        schema(name: '${SchemaType}', version: '${SchemaVersion}')
         script(name: '${ScriptName}', version: '${ScriptVersion}')
         query(name: '${QueryName}', version: '${QueryVersion}')
       }
@@ -137,20 +124,20 @@ class StateMachineBuilderSpecs extends Specification {
         property reservation: 'set'
       }
       transition('Complete', [origin: 'Started', target: 'Finished']) {
-        outcome(name: '${SchemaType}', version: '${SchemaVersion}')
+        schema(name: '${SchemaType}', version: '${SchemaVersion}')
         script(name: '${ScriptName}', version: '${ScriptVersion}')
         query(name: '${QueryName}', version: '${QueryVersion}')
         property(reservation: 'clear')
       }
       transition('Warning', [origin: 'Started', target: 'Started']) {
-        outcome(name: '${WarningSchemaType}', version: '${WarningSchemaVersion}')
+        schema(name: '${WarningSchemaType}', version: '${WarningSchemaVersion}')
         script(name: '${WarningScriptName}', version: '${WarningScriptVersion}')
         query(name: '${WarningQueryName}', version: '${WarningQueryVersion}')
         property(enablerProp: 'WarningOn')
         property(reservation: 'preserve')
       }
       transition('Timeout', [origin: 'Started', target: 'Paused']) {
-        outcome(name: '${TimeoutSchemaType}', version: '${TimeoutSchemaVersion}')
+        schema(name: '${TimeoutSchemaType}', version: '${TimeoutSchemaVersion}')
         script(name: '${TimeoutScriptName}', version: '${TimeoutScriptVersion}')
         query(name: '${TimeoutQueryName}', version: '${TimeoutQueryVersion}')
         property(enablerProp: 'TimeoutOn')
@@ -162,7 +149,7 @@ class StateMachineBuilderSpecs extends Specification {
         property(reservation: 'clear')
       }
       transition('Suspend', [origin: 'Started', target: 'Suspended']) {
-        outcome(name: 'Errors', version: '0')
+        schema(name: 'Errors', version: '0')
       }
       transition('Resume', [origin: 'Suspended', target: 'Started']) {
         property(reservation: 'preserve')
@@ -181,47 +168,58 @@ class StateMachineBuilderSpecs extends Specification {
 
   def 'Build Skippable StateMachine using builder methods'() {
     when:
-    def builder = StateMachineBuilder.build("testing", "Skippable", 'v0') {
-      transition("Start", [origin: "Waiting", target: "Started"]) {
-        property reservation: "set"
+    def builder = StateMachineBuilder.build('testing', 'Skippable', 'v0') {
+      transition('Start', [origin: 'Waiting', target: 'Started']) {
+        property reservation: 'set'
       }
-      transition("Done", [origin: "Waiting", target: "Finished"]) {
-        property(reservation: "clear")
-        outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
-        script(name: "\${ScriptName}", version: "\${ScriptVersion}")
+      transition('Done', [origin: 'Waiting', target: 'Finished']) {
+        property(reservation: 'clear')
+        schema(name: '${SchemaType}', version: '${SchemaVersion}')
+        script(name: '${ScriptName}', version: '${ScriptVersion}')
       }
-      transition("Skip", [origin: "Waiting", target: "Skipped"]) {
-        property(reservation: "clear")
-        property(enablerProp: "Skippable")
-        outcome(name: 'Errors', version: "0")
+      transition('Skip', [origin: 'Waiting', target: 'Skipped']) {
+        property(reservation: 'clear')
+        property(enablerProp: 'Skippable')
+        schema(name: 'Errors', version: '0')
       }
-      transition("Complete", [origin: "Started", target: "Finished"]) {
-        property(reservation: "clear")
-        outcome(name: "\${SchemaType}", version: "\${SchemaVersion}")
-        script(name: "\${ScriptName}", version: "\${ScriptVersion}")
+      transition('Complete', [origin: 'Started', target: 'Finished']) {
+        property(reservation: 'clear')
+        schema(name: '${SchemaName}', version: '${SchemaVersion}')
+        script(name: '${ScriptName}', version: '${ScriptVersion}')
+        query(name: '${QueryName}', version: '${QueryVersion}')
       }
-      transition("Suspend", [origin: "Started", target: "Suspended"]) {
-        property(reservation: "set")
-        outcome(name: "Errors", version: "0")
+      transition('Suspend', [origin: 'Started', target: 'Suspended']) {
+        property(reservation: 'set')
+        schema(name: 'Errors', version: '0')
       }
-      transition("Resume", [origin: "Suspended", target: "Started"]) {
-        property(reservation: "preserve")
+      transition('Resume', [origin: 'Suspended', target: 'Started']) {
+        property(reservation: 'preserve')
       }
 
-      initialState("Waiting")
+      initialState('Waiting')
       finishingState('Finished', 'Skipped')
     }
     def sm = builder.sm
     def json = JsonObject.mapFrom(sm)
 
     then:
-    sm && builder.sm.validate()
-    sm.getState(sm.getTransition("Start").originStateId).name == "Waiting"
-    sm.getState(sm.getTransition("Start").targetStateId).name == "Started"
-    sm.getState(sm.getTransition("Skip").originStateId).name == "Waiting"
-    sm.getState(sm.getTransition("Skip").targetStateId).name == "Skipped"
-    sm.getState("Finished").isFinishing()
-    sm.getState("Skipped").isFinishing()
+    sm
+    builder.sm.validate()
     json.mapTo(StateMachine.class) == builder.sm
+
+    sm.getState(sm.getTransition('Start').originStateId).name == 'Waiting'
+    sm.getState(sm.getTransition('Start').targetStateId).name == 'Started'
+    sm.getState(sm.getTransition('Skip').originStateId).name  == 'Waiting'
+    sm.getState(sm.getTransition('Skip').targetStateId).name  == 'Skipped'
+
+    sm.getState('Finished').isFinishing()
+    sm.getState('Skipped').isFinishing()
+
+    sm.getTransition('Complete').schema.name    == '${SchemaName}'
+    sm.getTransition('Complete').schema.version == '${SchemaVersion}'
+    sm.getTransition('Complete').script.name     == '${ScriptName}'
+    sm.getTransition('Complete').script.version  == '${ScriptVersion}'
+    sm.getTransition('Complete').query.name      == '${QueryName}'
+    sm.getTransition('Complete').query.version   == '${QueryVersion}'
   }
 }

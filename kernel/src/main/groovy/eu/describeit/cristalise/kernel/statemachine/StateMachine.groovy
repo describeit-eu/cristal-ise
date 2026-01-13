@@ -28,14 +28,6 @@ class StateMachine implements DescriptionObject {
   Integer initialStateId
   List<Integer> finalStateIds
 
-  StateMachine() {
-  }
-
-  StateMachine(String name, String version) {
-    this.name = name
-    this.version = version
-  }
-
   /**
    * Stores the next State id. -1 means that the value was not initialized yet
    * (e.g. after unmarshall from xml)

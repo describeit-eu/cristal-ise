@@ -34,24 +34,21 @@ class TransitionDelegate {
     attrs.each { String k, v -> trans."$k" = v }
   }
 
-  public void outcome(Map attrs) {
+  public void schema(Map attrs) {
     log.debug "outcome() - attrs:{}", attrs
-    assert attrs && attrs.name && attrs.version, "Transition Property Name or Version is null"
-
-    //trans.outcome = new TransitionOutcome(attrs.name, attrs.version)
+    assert attrs && attrs.name && attrs.version, 'Schema name and version shall not be null'
+    trans.schema = attrs
   }
 
   public void script(Map attrs) {
     log.debug "script() - attrs:{}", attrs
-    assert attrs && attrs.name && attrs.version
-
-    //trans.script = new TransitionScript(attrs.name, attrs.version)
+    assert attrs && attrs.name && attrs.version, 'Script name and version shall not be null'
+    trans.script = attrs
   }
 
   public void query(Map attrs) {
     log.debug "query() - attrs:{}", attrs
-    assert attrs && attrs.name && attrs.version
-
-    //trans.query = new TransitionQuery(attrs.name, attrs.version)
+    assert attrs && attrs.name && attrs.version, 'Query name and version shall not be null'
+    trans.query = attrs
   }
 }
