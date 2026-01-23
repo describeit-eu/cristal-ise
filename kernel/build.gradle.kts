@@ -62,6 +62,7 @@ dependencies {
   // Test dependencies
   testImplementation(platform("org.junit:junit-bom:$junitVersion"))
   testImplementation("io.vertx:vertx-junit5")
+  testImplementation("io.vertx:vertx-json-schema")
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.spockframework:spock-core:$spockVersion")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 @Testcontainers(disabledWithoutDocker = true)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @CompileStatic
-class ImportDescriptionObjectActionIT extends AbstractRepositoryIT {
+class ImportStateMachineIT extends AbstractRepositoryIT {
 
   private ImportDescriptionObjectAction action
 
