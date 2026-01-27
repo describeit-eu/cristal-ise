@@ -36,21 +36,11 @@ class CollectionMemberDO {
   }
 
   CollectionMemberDO(CollectionMemberDO other) {
-    this(null, other.childItem, other.properties, other.collectionId)
+    this(null, other.childItem, other.properties as String, other.collectionId)
   }
 
-  CollectionMemberDO setId(Long id) { this.id = id; return this }
-  CollectionMemberDO setChildItem(UUID childItem) { this.childItem = childItem; return this }
-  CollectionMemberDO setProperties(String properties) { this.properties = properties; return this }
-  CollectionMemberDO setCollectionId(Long collectionId) { this.collectionId = collectionId; return this }
-
-  Long getId() { return id }
-  UUID getChildItem() { return childItem }
-  String getProperties() { return properties }
-  Long getCollectionId() { return collectionId }
-
-  private Long id
-  private UUID childItem
-  private String properties
-  private Long collectionId
+  Long id
+  UUID childItem
+  String properties
+  Long collectionId
 }

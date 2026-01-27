@@ -38,15 +38,7 @@ class DomainPathDO {
     this(null, other.path, other.itemId)
   }
 
-  DomainPathDO setId(Long id) { this.id = id; return this }
-  DomainPathDO setPath(String path) { this.path = path; return this }
-  DomainPathDO setItemId(UUID itemId) { this.itemId = itemId; return this }
-
-  Long getId() { return id }
-  String getPath() { return path }
-  UUID getItemId() { return itemId }
-
-  private Long id
-  private String path
-  private UUID itemId
+  Long id
+  String path
+  UUID itemId
 }

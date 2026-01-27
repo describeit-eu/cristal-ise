@@ -46,24 +46,10 @@ class OutcomeDO {
     this(null, other.schema, other.schemaVersion, other.data, other.eventId, other.itemId)
   }
 
-  OutcomeDO setId(Long id) { this.id = id; return this }
-  OutcomeDO setSchema(UUID schema) { this.schema = schema; return this }
-  OutcomeDO setSchemaVersion(String schemaVersion) { this.schemaVersion = schemaVersion; return this }
-  OutcomeDO setData(JsonObject data) { this.data = data; return this }
-  OutcomeDO setEventId(Long eventId) { this.eventId = eventId; return this }
-  OutcomeDO setItemId(UUID itemId) { this.itemId = itemId; return this }
-
-  Long getId() { return id }
-  UUID getSchema() { return schema }
-  String getSchemaVersion() { return schemaVersion }
-  JsonObject getData() { return data }
-  Long getEventId() { return eventId }
-  UUID getItemId() { return itemId }
-
-  private Long id
-  private UUID schema
-  private String schemaVersion
-  private JsonObject data
-  private Long eventId
-  private UUID itemId
+  Long id
+  UUID schema
+  String schemaVersion
+  JsonObject data
+  Long eventId
+  UUID itemId
 }

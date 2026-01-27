@@ -42,24 +42,10 @@ class AttachmentDO {
     this(null, other.name, other.type, other.fileName, other.data, other.outcomeId)
   }
 
-  AttachmentDO setId(Long id) { this.id = id; return this }
-  AttachmentDO setName(String name) { this.name = name; return this }
-  AttachmentDO setType(String type) { this.type = type; return this }
-  AttachmentDO setFileName(String fileName) { this.fileName = fileName; return this }
-  AttachmentDO setData(Buffer data) { this.data = data; return this }
-  AttachmentDO setOutcomeId(Long outcomeId) { this.outcomeId = outcomeId; return this }
-
-  Long getId() { return id }
-  String getName() { return name }
-  String getType() { return type }
-  String getFileName() { return fileName }
-  Buffer getData() { return data }
-  Long getOutcomeId() { return outcomeId }
-
-  private Long id
-  private String name
-  private String type
-  private String fileName
-  private Buffer data
-  private Long outcomeId
+  Long id
+  String name
+  String type
+  String fileName
+  Buffer data
+  Long outcomeId
 }

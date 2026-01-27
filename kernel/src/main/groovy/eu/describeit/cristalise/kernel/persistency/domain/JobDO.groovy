@@ -39,18 +39,8 @@ class JobDO {
     this(null, other.actionName, other.transition, other.itemId)
   }
 
-  JobDO setId(Long id) { this.id = id; return this }
-  JobDO setActionName(String actionName) { this.actionName = actionName; return this }
-  JobDO setTransition(String transition) { this.transition = transition; return this }
-  JobDO setItemId(UUID itemId) { this.itemId = itemId; return this }
-
-  Long getId() { return id }
-  String getActionName() { return actionName }
-  String getTransition() { return transition }
-  UUID getItemId() { return itemId }
-
-  private Long id
-  private String actionName
-  private String transition
-  private UUID itemId
+  Long id
+  String actionName
+  String transition
+  UUID itemId
 }

@@ -54,7 +54,7 @@ public class ItemRepositoryImpl implements ItemRepository {
       .mapFrom(ItemDOParametersMapper.INSTANCE)
       .mapTo(ItemDORowMapper.INSTANCE)
       .execute(item)
-      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row id:"+item.getId()))
+      .compose(rowSet -> firstOrFail(rowSet, "Insert did not return a row id:"+item.id))
   }
 
   @Override

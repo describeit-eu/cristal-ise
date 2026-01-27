@@ -38,21 +38,9 @@ class ItemDO {
     this(other.id, other.name, other.type, other.version, other.actionId)
   }
 
-  ItemDO setId(UUID id) { this.id = id; return this }
-  ItemDO setName(String name) { this.name = name; return this }
-  ItemDO setType(String type) { this.type = type; return this }
-  ItemDO setVersion(String version) { this.version = version; return this }
-  ItemDO setActionId(Long actionId) { this.actionId = actionId; return this }
-
-  UUID getId() { return id }
-  String getName() { return name }
-  String getType() { return type }
-  String getVersion() { return version }
-  Long getActionId() { return actionId }
-
-  private UUID id
-  private String name
-  private String type
-  private String version
-  private Long actionId
+  UUID id
+  String name
+  String type
+  String version
+  Long actionId
 }

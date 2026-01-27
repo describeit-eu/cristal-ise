@@ -42,27 +42,11 @@ class ViewPointDO {
     this(null, other.name, other.schema, other.schemaVersion, other.schemaName, other.outcomeId, other.itemId)
   }
 
-  ViewPointDO setId(Long id) { this.id = id; return this }
-  ViewPointDO setName(String name) { this.name = name; return this }
-  ViewPointDO setSchema(UUID schema) { this.schema = schema; return this }
-  ViewPointDO setSchemaVersion(String schemaVersion) { this.schemaVersion = schemaVersion; return this }
-  ViewPointDO setSchemaName(String schemaName) { this.schemaName = schemaName; return this }
-  ViewPointDO setOutcomeId(Long outcomeId) { this.outcomeId = outcomeId; return this }
-  ViewPointDO setItemId(UUID itemId) { this.itemId = itemId; return this }
-
-  Long getId() { return id }
-  String getName() { return name }
-  UUID getSchema() { return schema }
-  String getSchemaVersion() { return schemaVersion }
-  String getSchemaName() { return schemaName }
-  Long getOutcomeId() { return outcomeId }
-  UUID getItemId() { return itemId }
-
-  private Long id
-  private String name
-  private UUID schema
-  private String schemaVersion
-  private String schemaName
-  private Long outcomeId
-  private UUID itemId
+  Long id
+  String name
+  UUID schema
+  String schemaVersion
+  String schemaName
+  Long outcomeId
+  UUID itemId
 }

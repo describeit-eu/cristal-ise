@@ -40,21 +40,9 @@ class ItemPropertyDO {
     this(null, other.name, other.value, other.isMutable, other.itemId)
   }
 
-  ItemPropertyDO setId(Long id) { this.id = id; return this }
-  ItemPropertyDO setName(String name) { this.name = name; return this }
-  ItemPropertyDO setValue(String value) { this.value = value; return this }
-  ItemPropertyDO setIsMutable(Boolean isMutable) { this.isMutable = isMutable; return this }
-  ItemPropertyDO setItemId(UUID itemId) { this.itemId = itemId; return this }
-
-  Long getId() { return id }
-  String getName() { return name }
-  String getValue() { return value }
-  Boolean getIsMutable() { return isMutable }
-  UUID getItemId() { return itemId }
-
-  private Long id
-  private String name
-  private String value
-  private Boolean isMutable
-  private UUID itemId
+  Long id
+  String name
+  String value
+  Boolean isMutable
+  UUID itemId
 }

@@ -37,24 +37,12 @@ class CollectionDO {
   }
 
   CollectionDO(CollectionDO other) {
-    this(null, other.name, other.version, other.properties, other.itemId)
+    this(null, other.name, other.version, other.properties as String, other.itemId)
   }
 
-  CollectionDO setId(Long id) { this.id = id; return this }
-  CollectionDO setName(String name) { this.name = name; return this }
-  CollectionDO setVersion(String version) { this.version = version; return this }
-  CollectionDO setProperties(String properties) { this.properties = properties; return this }
-  CollectionDO setItemId(UUID itemId) { this.itemId = itemId; return this }
-
-  Long getId() { return id }
-  String getName() { return name }
-  String getVersion() { return version }
-  String getProperties() { return properties }
-  UUID getItemId() { return itemId }
-
-  private Long id
-  private String name
-  private String version
-  private String properties
-  private UUID itemId
+  Long id
+  String name
+  String version
+  String properties
+  UUID itemId
 }

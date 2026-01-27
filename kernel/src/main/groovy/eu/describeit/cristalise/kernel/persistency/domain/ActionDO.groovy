@@ -46,25 +46,7 @@ class ActionDO {
   ActionDO(ActionDO other) {
     this(null, other.name, other.path, other.version, other.properties, other.type, other.layout, other.parentId)
   }
-/*
-  ActionDO setId(Long id) { this.id = id; return this }
-  ActionDO setName(String name) { this.name = name; return this }
-  ActionDO setPath(String path) { this.path = path; return this }
-  ActionDO setVersion(String version) { this.version = version; return this }
-  ActionDO setProperties(String properties) { this.properties = properties; return this }
-  ActionDO setType(ActionType type) { this.type = type; return this }
-  ActionDO setLayout(String layout) { this.layout = layout; return this }
-  ActionDO setParentId(Long parentId) { this.parentId = parentId; return this }
 
-  Long getId() { return id }
-  String getName() { return name }
-  String getPath() { return path }
-  String getVersion() { return version }
-  String getProperties() { return properties }
-  ActionType getType() { return type }
-  String getLayout() { return layout }
-  Long getParentId() { return parentId }
-*/
   Long id
   String name
   String path
@@ -73,4 +55,6 @@ class ActionDO {
   ActionType type
   String layout
   Long parentId
+  UUID stateMachine
+  String stateMachineVersion
 }
