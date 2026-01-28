@@ -21,5 +21,7 @@ public interface ViewPointRepository {
 
   Future<List<ViewPointDO>> findByItemId(UUID itemId)
 
+  Future<Optional<ViewPointDO>> findByItemIdAndSchemaNameAndName(UUID itemId, String schemaName, String name)
+
   Future<Integer> deleteByItemId(UUID itemId)
 }

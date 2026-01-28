@@ -162,4 +162,20 @@ class DomainPathRepositoryIT extends AbstractRepositoryIT {
     def nonePaths = repository.findByItemId(none).await()
     assertTrue(nonePaths.isEmpty())
   }
+
+  @Test
+  void testFindByPath() {
+    def budapestOpt = repository.findByPath("Test.City.Budapest").await()
+    assertTrue(budapestOpt.isPresent())
+    assertEquals("Test.City.Budapest", budapestOpt.get().getPath())
+    assertEquals(BUDAPEST.uuid, budapestOpt.get().getItemId())
+
+    def capitalOpt = repository.findByPath("Test.City.Capital").await()
+    assertTrue(capitalOpt.isPresent())
+    assertEquals("Test.City.Capital", capitalOpt.get().getPath())
+    assertNull(capitalOpt.get().getItemId())
+
+    def missingOpt = repository.findByPath("Test.City.Unknown").await()
+    assertTrue(missingOpt.isEmpty())
+  }
 }

@@ -176,6 +176,31 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
   }
 
   @Test
+  void testFindByItemIdAndSchemaNameAndName() {
+    UUID testItemId = BUDAPEST.uuid
+    String viewPointName = "FindByItemIdAndName"
+    String schemaName = "FindByItemIdAndNameSchema"
+    String schemaVersion = 'v1'
+
+    ViewPointDO viewPoint = new ViewPointDO(
+      viewPointName,
+      SCHEMA_6.uuid, // schema
+      schemaVersion,
+      schemaName,
+      1L, // outcomeId
+      testItemId // itemId
+    )
+
+    ViewPointDO inserted = repository.insert(viewPoint).await()
+    Optional<ViewPointDO> found = repository.findByItemIdAndSchemaNameAndName(testItemId, schemaName, viewPointName).await()
+
+    assertTrue(found.isPresent())
+    assertEquals(inserted.getId(), found.get().getId())
+    assertEquals(viewPointName, found.get().getName())
+    assertEquals(testItemId, found.get().getItemId())
+  }
+
+  @Test
   void testDeleteByItemId() {
     UUID testItemId = DELHI.uuid
 

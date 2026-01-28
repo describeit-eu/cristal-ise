@@ -34,6 +34,52 @@ class RepositoryWrapper {
     eventRepository = new EventRepositoryImpl(client)
   }
 
+  Future<UUID> getItemId(DomainPathDO dpDO) {
+    String path = dpDO.path
+
+    return domainPathRepository.findByPath(path).compose { Optional<DomainPathDO> domainPathOptional ->
+      if (domainPathOptional.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("DomainPath ${path} does not exists"))
+      }
+
+      UUID itemId = domainPathOptional.get().itemId
+
+      if (itemId == null) {
+        return Future.failedFuture(new IllegalArgumentException("DomainPath ${path} does not reference an item"))
+      } else {
+        return Future.succeededFuture(itemId)
+      }
+    } as Future<UUID>
+  }
+
+  Future<ViewPointDO> getViewPointDO(UUID itemId, String schemaName, String vpName) {
+    Future<Optional<ViewPointDO>> vpFuture = viewPointRepository.findByItemIdAndSchemaNameAndName(itemId, schemaName, vpName)
+
+    return vpFuture.compose { Optional<ViewPointDO> vpOpt ->
+      if (vpOpt.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("ViewPoint itemId:$itemId schemaName:$schemaName vpName:$vpName does not exists"))
+      } else {
+        return Future.succeededFuture(vpOpt.get())
+      }
+    } as Future<ViewPointDO>
+  }
+
+  Future<OutcomeDO> getOutcomeDO(ViewPointDO vp) {
+    return getOutcomeDO(vp.outcomeId)
+  }
+
+  Future<OutcomeDO> getOutcomeDO(Long id) {
+    Future<Optional<OutcomeDO>> outcomeFuture = outcomeRepository.findById(id)
+
+    return outcomeFuture.compose { Optional<OutcomeDO> outcomeOpt ->
+      if (outcomeOpt.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("OutcomeId:$id NOT FOUND"))
+      } else {
+        return Future.succeededFuture(outcomeOpt.get())
+      }
+    } as Future<OutcomeDO>
+  }
+
   Future<ItemDO> getItemDO(UUID itemId) {
     return itemRepository.findById(itemId).compose { Optional<ItemDO> itemOptional ->
       if (itemOptional.isEmpty()) {

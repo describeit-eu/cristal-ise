@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import io.vertx.core.Future
 
 @CompileStatic
-public interface DomainPathRepository {
+interface DomainPathRepository {
 
   Future<Optional<DomainPathDO>> findById(Long id)
 
@@ -21,9 +21,15 @@ public interface DomainPathRepository {
 
   Future<Optional<DomainPathDO>> findByPath(String path)
 
-  // Returns direct children one level below the given path
+  /**
+   * @param path
+   * @return direct children one level below the given path
+   */
   Future<List<DomainPathDO>> getChildren(String path)
 
-  // Returns the subtree (all descendants including the given path if present)
+  /**
+   * @param path
+   * @return the subtree, i.e. all descendants, including the given path if present
+   */
   Future<List<DomainPathDO>> getTree(String path)
 }

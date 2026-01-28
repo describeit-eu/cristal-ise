@@ -1,24 +1,25 @@
 package eu.describeit.cristalise.kernel.module
 
 StateMachine(name: 'Default', version: 'v0') {
-  transition('Done', [origin: 'Waiting', target: 'Finished']) {
+  transition('Activate', [origin: 'Waiting', target: 'Active'])
+  transition('Done', [origin: 'Active', target: 'Finished']) {
     schema(name: '\${SchemaType}', version: '\${SchemaVersion}')
     script(name: '\${ScriptName}', version: '\${ScriptVersion}')
     query(name: '\${QueryName}', version: '\${QueryVersion}')
   }
-  transition('Start', [origin: 'Waiting', target: 'Started']) {
+  transition('Lock', [origin: 'Active', target: 'Locked']) {
     property reservation: 'set'
   }
-  transition('Complete', [origin: 'Started', target: 'Finished']) {
+  transition('Complete', [origin: 'Locked', target: 'Finished']) {
     property(reservation: 'clear')
     schema(name: '\${SchemaType}', version: '\${SchemaVersion}')
     script(name: '\${ScriptName}', version: '\${ScriptVersion}')
     query(name: '\${QueryName}', version: '\${QueryVersion}')
   }
-  transition('Suspend', [origin: 'Started', target: 'Suspended']) {
+  transition('Suspend', [origin: 'Locked', target: 'Suspended']) {
     schema(name: 'Errors', version: '0')
   }
-  transition('Resume', [origin: 'Suspended', target: 'Started']) {
+  transition('Resume', [origin: 'Suspended', target: 'Locked']) {
     property(reservation: 'preserve')
   }
 
@@ -26,8 +27,10 @@ StateMachine(name: 'Default', version: 'v0') {
   finishingState('Finished')
 }
 
+
 StateMachine(name: 'Simple', version: 'v0') {
-  transition('Done', [origin: 'Waiting', target: 'Finished']) {
+  transition('Activate', [origin: 'Waiting', target: 'Active'])
+  transition('Done', [origin: 'Active', target: 'Finished']) {
     schema(name: '${SchemaType}', version: '${SchemaVersion}')
     script(name: '${ScriptName}', version: '${ScriptVersion}')
     query(name: '${QueryName}', version: '${QueryVersion}')

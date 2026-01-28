@@ -23,6 +23,7 @@ import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toLis
   private static final String COLUMNS = "id,name,schema,schema_version,schema_name,outcome_id,item_id"
   private static final String SQL_FIND_BY_ID      = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE id=#{id}"
   private static final String SQL_FIND_BY_ITEM_ID = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{itemId}"
+  private static final String SQL_FIND_BY_ITEM_ID_AND = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{itemId} AND schema_name=#{schema_name} AND name=#{name}"
   private static final String SQL_FIND_ALL        = "SELECT " + COLUMNS + " FROM " + TABLE
   private static final String SQL_INSERT          = "INSERT INTO " + TABLE + " (name, schema, schema_version, schema_name, outcome_id, item_id) VALUES (#{name}, #{schema}, #{schema_version}, #{schema_name}, #{outcome_id}, #{item_id}) RETURNING " + COLUMNS
   private static final String SQL_UPDATE          = "UPDATE "      + TABLE + " SET name=#{name}, schema=#{schema}, schema_version=#{schema_version}, schema_name=#{schema_name}, outcome_id=#{outcome_id}, item_id=#{item_id} WHERE id=#{id} RETURNING " + COLUMNS
@@ -97,6 +98,15 @@ import static eu.describeit.cristalise.kernel.persistency.PersistencyUtils.toLis
       .mapTo(ViewPointDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("itemId", (Object)itemId))
       .map(rs -> toList(rs))
+  }
+
+  @Override
+  public Future<Optional<ViewPointDO>> findByItemIdAndSchemaNameAndName(UUID itemId, String schemaName, String name) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_BY_ITEM_ID_AND)
+      .mapTo(ViewPointDORowMapper.INSTANCE)
+      .execute(['itemId': itemId, 'schema_name': schemaName, 'name': name] as Map<String, Object>)
+      .map(rs -> firstOptional(rs))
   }
 
   @Override
