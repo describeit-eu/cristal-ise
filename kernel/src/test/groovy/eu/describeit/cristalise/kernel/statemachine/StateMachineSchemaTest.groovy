@@ -9,7 +9,6 @@ import spock.lang.Specification
 
 import static io.vertx.json.schema.Draft.DRAFT202012
 
-
 class StateMachineSchemaTest extends Specification {
 
     def "should validate StateMachine JSON against schema"() {
@@ -20,7 +19,7 @@ class StateMachineSchemaTest extends Specification {
         def smSchema = JsonSchema.of(schemaJson)
 
         def options = new JsonSchemaOptions()
-            .setDraft(DRAFT7)
+            .setDraft(DRAFT202012)
             .setBaseUri("https://describe-it.eu/schemas/statemachine")
         def validator = Validator.create(smSchema, options)
 

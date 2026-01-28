@@ -44,6 +44,16 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
+                  name: state_machine
+                  type: uuid
+                  constraints:
+                    nullable: true # use StateMachines 'Default' when null
+              - column:
+                  name: state_machine_version
+                  type: varchar(255)
+                  constraints:
+                    nullable: true # use StateMachines 'Default' when null
+              - column:
                   name: parent_id
                   type: bigint
                   constraints:
@@ -55,3 +65,4 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: action
             onDelete: CASCADE
+        # by design, the addForeignKeyConstraint is not used for state_machine column

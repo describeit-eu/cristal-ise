@@ -26,8 +26,8 @@ class ActionDO {
 
   ActionDO(JsonObject json) { ActionDOConverter.fromJson(json, this) }
 
-  @ConstructorProperties(["id", "name", "path", "version", "properties", "type", "layout", "parentId"])
-  ActionDO(Long id, String name, String path, String version, String properties, ActionType type, String layout, Long parentId) {
+  @ConstructorProperties(["id", "name", "path", "version", "properties", "type", "layout", "stateMachine", "stateMachineVersion", "parentId"])
+  ActionDO(Long id, String name, String path, String version, String properties, ActionType type, String layout, UUID stateMachine, String stateMachineVersion, Long parentId) {
     this.id = id
     this.name = name
     this.path = path
@@ -35,16 +35,26 @@ class ActionDO {
     this.properties = properties
     this.type = type
     this.layout = layout
+    this.stateMachine = stateMachine
+    this.stateMachineVersion = stateMachineVersion
     this.parentId = parentId
   }
 
-  @ConstructorProperties(["name", "path", "version", "properties", "type", "layout", "parentId"])
+  ActionDO(Long id, String name, String path, String version, String properties, ActionType type, String layout, Long parentId) {
+    this(id, name, path, version, properties, type, layout, null, null, parentId)
+  }
+
+  @ConstructorProperties(["name", "path", "version", "properties", "type", "layout", "stateMachine", "stateMachineVersion", "parentId"])
+  ActionDO(String name, String path, String version, String properties, ActionType type, String layout, UUID stateMachine, String stateMachineVersion, Long parentId) {
+    this(null, name, path, version, properties, type, layout, stateMachine, stateMachineVersion, parentId)
+  }
+
   ActionDO(String name, String path, String version, String properties, ActionType type, String layout, Long parentId) {
-    this(null, name, path, version, properties, type, layout, parentId)
+    this(null, name, path, version, properties, type, layout, null, null, parentId)
   }
 
   ActionDO(ActionDO other) {
-    this(null, other.name, other.path, other.version, other.properties, other.type, other.layout, other.parentId)
+    this(null, other.name, other.path, other.version, other.properties, other.type, other.layout, other.stateMachine, other.stateMachineVersion, other.parentId)
   }
 
   Long id
@@ -54,7 +64,7 @@ class ActionDO {
   String properties
   ActionType type
   String layout
-  Long parentId
   UUID stateMachine
   String stateMachineVersion
+  Long parentId
 }

@@ -1,6 +1,5 @@
 package eu.describeit.cristalise.kernel.persistency.repository
 
-
 import eu.describeit.cristalise.kernel.lifecycle.LoopingCompositeAction
 import eu.describeit.cristalise.kernel.persistency.ItemStorage
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
@@ -40,6 +39,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
 
   @Test
   void testInsertAndFindById() {
+    def stateMachineId = UUID.randomUUID()
+    def stateMachineVersion = "sm-v1"
     def toInsert = new ActionDO(
       "TestAction",
       "/CityWf/TestAction",
@@ -47,6 +48,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
       null,
       ELEMENTARY,
       null,
+      stateMachineId,
+      stateMachineVersion,
       1L // parent CityWf assumed to have id=1 as first inserted
     )
 
@@ -58,6 +61,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     assertEquals(toInsert.getProperties(), inserted.getProperties())
     assertEquals(toInsert.getType(), inserted.getType())
     assertEquals(toInsert.getLayout(), inserted.getLayout())
+    assertEquals(toInsert.getStateMachine(), inserted.getStateMachine())
+    assertEquals(toInsert.getStateMachineVersion(), inserted.getStateMachineVersion())
     assertEquals(toInsert.getParentId(), inserted.getParentId())
 
     def fetched = repository.findById(inserted.getId()).await()
@@ -106,6 +111,7 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
   @Test
   void testUpdate() {
     // insert a row then update it
+    def initialStateMachine = UUID.randomUUID()
     def base = new ActionDO(
       "TempAction",
       "/CapitalWf/TempAction",
@@ -113,6 +119,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
       null,
       ELEMENTARY,
       null,
+      initialStateMachine,
+      "sm-v1",
       6L // parent CapitalWf assumed id
     )
     def inserted = repository.insert(base).await()
@@ -121,6 +129,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
 
     inserted.setName("TempActionUpdated")
     inserted.setVersion("v2")
+    inserted.setStateMachine(UUID.randomUUID())
+    inserted.setStateMachineVersion("sm-v2")
 
     def updatedOpt = repository.update(inserted).await()
     assertTrue(updatedOpt.isPresent())
@@ -131,6 +141,8 @@ class ActionRepositoryIT extends AbstractRepositoryIT {
     assertEquals("v2", updated.getVersion())
     assertEquals(inserted.getPath(), updated.getPath())
     assertEquals(inserted.getType(), updated.getType())
+    assertEquals(inserted.getStateMachine(), updated.getStateMachine())
+    assertEquals(inserted.getStateMachineVersion(), updated.getStateMachineVersion())
     assertEquals(inserted.getParentId(), updated.getParentId())
   }
 

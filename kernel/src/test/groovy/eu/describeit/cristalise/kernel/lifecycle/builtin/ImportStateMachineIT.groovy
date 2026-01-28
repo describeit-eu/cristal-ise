@@ -34,7 +34,7 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
 
   @Test
   void testImportStateMachine() {
-    StateMachine sm = new StateMachine("TestSM", "v1.0")
+    StateMachine sm = new StateMachine('test', "TestSM", "v1.0")
     sm.namespace = "test"
     sm.createState("Start")
     sm.createState("End")
