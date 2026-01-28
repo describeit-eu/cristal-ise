@@ -10,7 +10,7 @@ import groovy.util.logging.Slf4j
 @Canonical
 class State {
 
-  int id
+  Integer id
   String name
 
   /**

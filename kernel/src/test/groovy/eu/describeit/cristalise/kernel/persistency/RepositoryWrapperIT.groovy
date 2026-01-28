@@ -16,15 +16,15 @@ import static org.junit.jupiter.api.Assertions.*
 @Testcontainers(disabledWithoutDocker = true)
 @TestInstance(Lifecycle.PER_CLASS)
 @CompileStatic
-class ItemStorageIT extends AbstractRepositoryIT {
+class RepositoryWrapperIT extends AbstractRepositoryIT {
 
-  private ItemStorage storage
+  private RepositoryWrapper storage
 
   @BeforeAll
   @Override
   void setUpAll() throws Exception {
     super.setUpAll()
-    storage = new ItemStorage(pool)
+    storage = new RepositoryWrapper(pool)
   }
 
   @Test

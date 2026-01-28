@@ -29,25 +29,23 @@ class StateMachine implements DescriptionObject {
   List<Integer> finalStateIds
 
   /**
-   * Stores the next State id. -1 means that the value was not initialized yet
-   * (e.g. after unmarshall from xml)
+   * Stores the next State id. Required for factory methods creating new State
    */
-  private int nextStateId = -1
+  private Integer nextStateId = null
 
   /**
-   * Stores the next Transition id. -1 means that the value was not
-   * initialized yet (e.g. after unmarshall from xml)
+   * Stores the next Transition id. Required for factory method creating new Transition
    */
-  private int nextTransId = -1
+  private Integer nextTransId = null
 
   /**
-   * Computes the next State id. When loaded from XML, the next id calculated
-   * from the existing States
+   * Computes the next State id from the existing States. Used by factory methods creating new State
    *
    * @return the next state id
    */
   private int getNextStateId() {
-    if (nextStateId == -1) {
+    if (nextStateId == null) {
+      nextStateId = -1
       for (State s : states) {
         if (s.id > nextStateId) nextStateId = s.id
       }
@@ -57,13 +55,13 @@ class StateMachine implements DescriptionObject {
   }
 
   /**
-   * Computes the next Transition id. When loaded from XML, the next id
-   * calculated from the existing Transitions
+   * Computes the next Transition id from the existing Transitions. Used by factory methods creating new State
    *
    * @return the next state id
    */
   private int getNextTransId() {
-    if (nextTransId == -1) {
+    if (nextTransId == null) {
+      nextTransId = -1
       for (Transition t : transitions) {
         if (t.id > nextTransId) nextTransId = t.id
       }

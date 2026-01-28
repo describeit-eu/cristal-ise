@@ -1,8 +1,9 @@
 package eu.describeit.cristalise.kernel.lifecycle
 
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.persistency.ItemStorage
+import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
+import eu.describeit.cristalise.kernel.persistency.domain.JobDO
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
@@ -28,6 +29,11 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   }
 
   @Override
+  Future<JobDO> calculateNextJobs() {
+    return Future.failedFuture('Unimplemented')
+  }
+
+  @Override
   Future<JsonObject> request(
     final ItemProxy item,
     final ItemProxy actor,
@@ -46,7 +52,7 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   }
 
   @Override
-  Future<Void> initialise(ItemStorage storage) {
+  Future<Void> initialise(RepositoryWrapper storage) {
     return storage.getChildActionDOs(dataObject.id).compose { actionDOList ->
       List<Future<Void>> initFutures = []
 

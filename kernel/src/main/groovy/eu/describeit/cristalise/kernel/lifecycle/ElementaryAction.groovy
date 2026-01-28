@@ -10,7 +10,6 @@ import io.vertx.core.json.JsonObject
 @CompileStatic
 class ElementaryAction extends AbstractAction {
 
-
   @Override
   Future<JsonObject> request(
     final ItemProxy item,

@@ -9,11 +9,11 @@ import groovy.util.logging.Slf4j
 @Canonical
 class Transition {
 
-  int id
+  Integer id
   String name
 
-  int originStateId = -1
-  int targetStateId = -1
+  Integer originStateId = -1
+  Integer targetStateId = -1
 
   String reservation
 

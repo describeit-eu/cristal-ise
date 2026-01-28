@@ -2,7 +2,8 @@ package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.persistency.ItemStorage
+import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
+import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDO
 import eu.describeit.cristalise.kernel.persistency.repository.AbstractRepositoryIT
 import eu.describeit.cristalise.kernel.statemachine.StateMachine
 import groovy.transform.CompileStatic
@@ -47,14 +48,14 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
     assertNotNull(resultId)
 
     // Verify it was created
-    ItemStorage storage = item.getStorage()
+    RepositoryWrapper storage = item.getStorage()
     def createdItem = storage.getItemDO(resultId).await()
     assertEquals("TestSM", createdItem.name)
     assertEquals("StateMachine", createdItem.type)
     assertEquals("v1.0", createdItem.version)
 
     // Verify properties
-    def props = storage.getItemPropertiesByItemId(resultId).await()
+    List<ItemPropertyDO> props = storage.getItemPropertiesByItemId(resultId).await()
     assertEquals(4, props.size())
     assertTrue(props.any { it.name == 'Name' && it.value == 'TestSM' })
     assertTrue(props.any { it.name == 'Type' && it.value == 'StateMachine' })

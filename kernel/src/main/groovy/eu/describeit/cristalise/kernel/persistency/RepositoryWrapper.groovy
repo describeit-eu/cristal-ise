@@ -7,7 +7,7 @@ import io.vertx.core.Future
 import io.vertx.sqlclient.SqlClient
 
 @CompileStatic
-class ItemStorage {
+class RepositoryWrapper {
   final ItemRepository itemRepository
   final DomainPathRepository domainPathRepository
   final ItemPropertyRepository itemPropertyRepository
@@ -20,7 +20,7 @@ class ItemStorage {
   final JobRepository jobRepository
   final EventRepository eventRepository
 
-  ItemStorage(SqlClient client) {
+  RepositoryWrapper(SqlClient client) {
     itemRepository = new ItemRepositoryImpl(client)
     domainPathRepository = new DomainPathRepositoryImpl(client)
     itemPropertyRepository = new ItemPropertyRepositoryImpl(client)
@@ -53,8 +53,6 @@ class ItemStorage {
       }
     } as Future<ActionDO>
   }
-
-  // --- Item ---
 
   Future<ItemDO> putItemDO(ItemDO item) {
     if (item.id != null) {

@@ -2,8 +2,7 @@ package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 import eu.describeit.cristalise.kernel.DescriptionObject
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.lifecycle.CompositeAction
-import eu.describeit.cristalise.kernel.persistency.ItemStorage
+import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -16,7 +15,7 @@ import java.time.LocalDateTime
 class ImportDescriptionObjectAction implements BuiltInAction {
   protected ItemProxy item
   protected ItemProxy actor
-  protected ItemStorage storage
+  protected RepositoryWrapper storage
 
   @Override
   Future<UUID> request(ItemProxy item, ItemProxy actor, Object input) {
