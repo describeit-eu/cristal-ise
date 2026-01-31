@@ -52,6 +52,18 @@ class RepositoryWrapper {
     } as Future<UUID>
   }
 
+  Future<List<ViewPointDO>> getViewPointsByItemId(UUID itemId) {
+    Future<List<ViewPointDO>> vpListFuture = viewPointRepository.findByItemId(itemId)
+
+    return vpListFuture.compose { List<ViewPointDO> vpList ->
+      if (vpListFuture) {
+        return Future.succeededFuture(vpList)
+      } else {
+        return Future.failedFuture(new IllegalArgumentException("NO ViewPoint exists for itemId:$itemId"))
+      }
+    } as Future<List<ViewPointDO>>
+  }
+
   Future<ViewPointDO> getViewPointDO(UUID itemId, String schemaName, String vpName) {
     Future<Optional<ViewPointDO>> vpFuture = viewPointRepository.findByItemIdAndSchemaNameAndName(itemId, schemaName, vpName)
 
@@ -156,6 +168,16 @@ class RepositoryWrapper {
     } as Future<DomainPathDO>
   }
 
+  Future<List<DomainPathDO>> getDomainPathListByItemId(UUID itemId) {
+    return domainPathRepository.findByItemId(itemId).compose { List<DomainPathDO> domainPathList ->
+      if (domainPathList) {
+        return Future.succeededFuture(domainPathList)
+      } else {
+        return Future.failedFuture(new IllegalArgumentException("NO DomainPath exists for itemId:$itemId"))
+      }
+    } as Future<List<DomainPathDO>>
+  }
+
   Future<ItemPropertyDO> putItemProperty(ItemPropertyDO itemProperty) {
     if (itemProperty.id != null) {
       return itemPropertyRepository.update(itemProperty).compose { opt ->
@@ -199,6 +221,16 @@ class RepositoryWrapper {
     } as Future<List<EventDO>>
   }
 
+  Future<List<EventDO>> getEventsByItemId(UUID itemId) {
+    return eventRepository.findByItemId(itemId).compose { List<EventDO> list ->
+      if (list.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("No Event exists for itemId:$itemId"))
+      } else {
+        return Future.succeededFuture(list)
+      }
+    } as Future<List<EventDO>>
+  }
+
   Future<OutcomeDO> putOutcome(OutcomeDO outcome) {
     if (outcome.id != null) {
       return outcomeRepository.update(outcome).compose { opt ->
@@ -211,7 +243,7 @@ class RepositoryWrapper {
   Future<List<OutcomeDO>> getOutcomesByItemId(UUID itemId) {
     return outcomeRepository.findByItemId(itemId).compose { List<OutcomeDO> list ->
       if (list.isEmpty()) {
-        return Future.failedFuture(new IllegalArgumentException("Outcome for item ${itemId} does not exists"))
+        return Future.failedFuture(new IllegalArgumentException("NO Outcome exists for itemId:${itemId}"))
       } else {
         return Future.succeededFuture(list)
       }

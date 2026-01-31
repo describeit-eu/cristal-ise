@@ -1,4 +1,4 @@
-package eu.describeit.cristalise.kernel.dsl
+package eu.describeit.cristalise.kernel.migration
 
 import eu.describeit.cristalise.kernel.DescriptionObject
 import eu.describeit.cristalise.kernel.dsl.statemachine.StateMachineBuilder

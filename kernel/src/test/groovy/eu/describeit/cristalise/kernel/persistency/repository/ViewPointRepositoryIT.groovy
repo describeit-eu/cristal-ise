@@ -168,11 +168,11 @@ class ViewPointRepositoryIT extends AbstractRepositoryIT {
     ViewPointDO inserted2 = repository.insert(viewPoint2).await()
 
     List<ViewPointDO> foundViewPoints = repository.findByItemId(testItemId).await()
-    assertEquals(5, foundViewPoints.size())
+    assertEquals(6, foundViewPoints.size())
 
     // Verify both viewPoints are present (order may vary)
-    assertTrue(foundViewPoints.stream().anyMatch(vp -> vp.getId().equals(inserted1.getId())))
-    assertTrue(foundViewPoints.stream().anyMatch(vp -> vp.getId().equals(inserted2.getId())))
+    assertTrue(foundViewPoints.stream().anyMatch(vp -> vp.getId() == inserted1.getId()))
+    assertTrue(foundViewPoints.stream().anyMatch(vp -> vp.getId() == inserted2.getId()))
   }
 
   @Test

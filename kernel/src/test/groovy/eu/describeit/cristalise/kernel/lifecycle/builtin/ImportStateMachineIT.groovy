@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 @CompileStatic
 class ImportStateMachineIT extends AbstractRepositoryIT {
 
-  private ImportDescriptionObjectAction action
+  private ImportDescriptionObjectAction importAction
 
   @BeforeAll
   @Override
   void setUpAll() throws Exception {
     super.setUpAll()
-    action = new ImportDescriptionObjectAction()
+    importAction = new ImportDescriptionObjectAction()
   }
 
   @Test
@@ -40,22 +40,22 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
     sm.createState("Start")
     sm.createState("End")
 
+    // TODO use the KernelRoot Item instead
     ItemProxy item = ItemProxy.create(pool, BUDAPEST.uuid).await()
     ItemProxy actor = null
 
-    UUID resultId = action.request(item, actor, sm).await()
+    UUID resultId = importAction.request(item, actor, sm).await()
 
     assertNotNull(resultId)
 
     // Verify it was created
-    RepositoryWrapper storage = item.getStorage()
-    def createdItem = storage.getItemDO(resultId).await()
+    ItemProxy createdItem = ItemProxy.create(pool, resultId).await()
     assertEquals("TestSM", createdItem.name)
     assertEquals("StateMachine", createdItem.type)
     assertEquals("v1.0", createdItem.version)
 
     // Verify properties
-    List<ItemPropertyDO> props = storage.getItemPropertiesByItemId(resultId).await()
+    List<ItemPropertyDO> props = createdItem.getAllItemProperties().await()
     assertEquals(4, props.size())
     assertTrue(props.any { it.name == 'Name' && it.value == 'TestSM' })
     assertTrue(props.any { it.name == 'Type' && it.value == 'StateMachine' })
@@ -63,32 +63,31 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
     assertTrue(props.any { it.name == 'Version' && it.value == 'v1.0' })
 
     // Verify DomainPath
-    def dp = storage.getDomainPathByPath("kernel.description.statemachine.TestSM").await()
+    def dpList = createdItem.getAllDomainPaths().await()
+    def dp = dpList.find {it.path == 'kernel.description.statemachine.TestSM'}
     assertNotNull(dp)
     assertEquals(resultId, dp.itemId)
 
     // Verify Event
-    def events = storage.getAllEvents().await()
-    def event = events.find { it.itemId == resultId }
-    assertNotNull(event)
-    assertEquals("import", event.actionPath)
-    assertEquals("v1.0", event.itemVersion)
-    assertEquals("v1.0", event.stateMachineVersion)
+    def events = createdItem.getAllEvents().await()
+    assert events
+    assertEquals("import", events[0].actionPath)
+    assertEquals("v1.0", events[0].itemVersion)
+    assertEquals("v1.0", events[0].stateMachineVersion)
 
     // Verify Outcome
-    def outcomes = storage.getOutcomesByItemId(resultId).await()
+    def outcomes = createdItem.getAllOutcomes().await()
     assertEquals(1, outcomes.size())
-    def outcome = outcomes[0]
-    assertEquals(event.id, outcome.eventId)
-    assertEquals("v1.0", outcome.schemaVersion)
-    assertNotNull(outcome.data)
-    assertEquals("TestSM", outcome.data.getString("name"))
+    assertEquals(events[0].id, outcomes[0].eventId)
+    assertEquals("v1.0", outcomes[0].schemaVersion)
+    assertNotNull(outcomes[0].data)
+    assertEquals("TestSM", outcomes[0].data.getString("name"))
 
     // Verify ViewPoints
-    def vps = storage.getAllViewPoints().await()
+    def vps = createdItem.getAllViewPoints().await()
     def itemVps = vps.findAll { it.itemId == resultId }
     assertEquals(2, itemVps.size())
-    assertTrue(itemVps.any { it.name == 'v0' && it.outcomeId == outcome.id })
-    assertTrue(itemVps.any { it.name == 'last' && it.outcomeId == outcome.id })
+    assertTrue(itemVps.any { it.name == 'v0'   && it.outcomeId == outcomes[0].id })
+    assertTrue(itemVps.any { it.name == 'last' && it.outcomeId == outcomes[0].id })
   }
 }

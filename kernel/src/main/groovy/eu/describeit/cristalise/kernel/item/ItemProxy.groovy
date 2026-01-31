@@ -187,4 +187,23 @@ class ItemProxy {
     )
   }
 
+  Future<List<ItemPropertyDO>> getAllItemProperties() {
+    return storage.getItemPropertiesByItemId(itemId)
+  }
+
+  Future<List<DomainPathDO>> getAllDomainPaths() {
+    return storage.getDomainPathListByItemId(itemId)
+  }
+
+  Future<List<EventDO>> getAllEvents() {
+    return storage.getEventsByItemId(itemId)
+  }
+
+  Future<List<OutcomeDO>> getAllOutcomes() {
+    return storage.getOutcomesByItemId(itemId)
+  }
+
+  Future<List<ViewPointDO>> getAllViewPoints() {
+    return storage.getViewPointsByItemId(itemId)
+  }
 }

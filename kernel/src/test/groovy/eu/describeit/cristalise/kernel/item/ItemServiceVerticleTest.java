@@ -55,7 +55,10 @@ class ItemServiceVerticleTest {
     ItemProxy item = new ItemProxy(vertx, UUID.randomUUID());
     String expectedMsg = String.format("Item %s does not exists", item.getItemId());
 
-    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "/workflow/Jump", "Start", new JsonObject());
+    String actionPath = "/workflow/Jump";
+    String transitionID = "Start";
+
+    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), actionPath, transitionID, new JsonObject());
 
     future.onComplete(
       testContext.failing(cause -> {
@@ -74,7 +77,10 @@ class ItemServiceVerticleTest {
     JsonObject outcome = new JsonObject().put("request", "OK");
     JsonObject expectedOutcome = outcome.copy().put("name", "Budapest");
 
-    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), "CapitalWf/UpdateCapital", "Start", outcome);
+    String actionPath = "CapitalWf/UpdateCapital";
+    String transitionID = "Start";
+
+    Future<JsonObject> future = item.requestAction(UUID.randomUUID(), actionPath, transitionID, outcome);
 
     future
       .onComplete(
