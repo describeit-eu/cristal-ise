@@ -1,9 +1,6 @@
 package eu.describeit.cristalise.kernel.migration
 
-import eu.describeit.cristalise.kernel.DescriptionObject
-import eu.describeit.cristalise.kernel.dsl.statemachine.StateMachineBuilder
-import eu.describeit.cristalise.kernel.dsl.statemachine.StateMachineDelegate
-import eu.describeit.cristalise.kernel.statemachine.StateMachine
+import eu.describeit.cristalise.kernel.dsl.module.ModuleDelegate
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -13,16 +10,17 @@ import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
 @CompileStatic
 abstract class ImportScript extends DelegatingScript {
 
+  @Delegate
+  ModuleDelegate moduleDelegate = new ModuleDelegate()
+
   static final String[] classLoaderRoots = ['eu/describeit/cristalise/kernel/module']
 
   abstract Object scriptBody()
 
   @Override
   Object run() {
-    DescriptionObject result = (DescriptionObject) scriptBody()
-
+    def result = scriptBody()
     log.info('run() - result:{}', result)
-
     return result
   }
 
@@ -40,11 +38,4 @@ abstract class ImportScript extends DelegatingScript {
 
     return script
   }
-
-  StateMachine StateMachine(Map<String, Object> args, @DelegatesTo(StateMachineDelegate) Closure cl) {
-    log.info('StateMachine() - name:{} version:{}', args.name, args.version)
-
-    return StateMachineBuilder.build((String)args.ns, (String)args.name, (String)args.version, cl).sm
-  }
-
 }

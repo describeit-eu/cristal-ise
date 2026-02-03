@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import static eu.describeit.cristalise.CommonTestItemIds.*
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.assertNull
 import static org.junit.jupiter.api.Assertions.assertTrue
 
 @Slf4j
@@ -25,12 +26,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 class ImportStateMachineIT extends AbstractRepositoryIT {
 
   private ImportDescriptionObjectAction importAction
+  private ItemProxy anItem
 
   @BeforeAll
   @Override
   void setUpAll() throws Exception {
     super.setUpAll()
     importAction = new ImportDescriptionObjectAction()
+
+    // TODO use the KernelRoot Item instead
+    anItem = ItemProxy.create(pool, BUDAPEST.uuid).await()
   }
 
   @Test
@@ -40,11 +45,7 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
     sm.createState("Start")
     sm.createState("End")
 
-    // TODO use the KernelRoot Item instead
-    ItemProxy item = ItemProxy.create(pool, BUDAPEST.uuid).await()
-    ItemProxy actor = null
-
-    UUID resultId = importAction.request(item, actor, sm).await()
+    UUID resultId = importAction.request(anItem, null, sm).await()
 
     assertNotNull(resultId)
 
@@ -89,5 +90,30 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
     assertEquals(2, itemVps.size())
     assertTrue(itemVps.any { it.name == 'v0'   && it.outcomeId == outcomes[0].id })
     assertTrue(itemVps.any { it.name == 'last' && it.outcomeId == outcomes[0].id })
+  }
+
+  @Test
+  void testImportStateMachineDsl() {
+    String smDsl = '''
+StateMachine(name: 'TestSimple', version: 'v0') {
+  transition('Activate', [origin: 'Waiting', target: 'Active'])
+  transition('Done', [origin: 'Active', target: 'Finished']) {
+    schema(name: '${SchemaType}', version: '${SchemaVersion}')
+    script(name: '${ScriptName}', version: '${ScriptVersion}')
+    query(name: '${QueryName}', version: '${QueryVersion}')
+  }
+
+  initialState('Waiting')
+  finishingState('Finished')
+}
+'''
+    UUID resultId = importAction.request(anItem, null, smDsl).await()
+
+    assert resultId
+    ItemProxy createdItem = ItemProxy.create(pool, resultId).await()
+
+    assertEquals("TestSimple", createdItem.name)
+    assertEquals("StateMachine", createdItem.type)
+    assertEquals("v0", createdItem.version)
   }
 }

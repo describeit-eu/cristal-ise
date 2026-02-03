@@ -1,12 +1,15 @@
 package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 import eu.describeit.cristalise.kernel.DescriptionObject
+import eu.describeit.cristalise.kernel.dsl.module.ModuleDelegate
 import eu.describeit.cristalise.kernel.item.ItemProxy
+import eu.describeit.cristalise.kernel.migration.ImportScript
 import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
+import org.codehaus.groovy.control.CompilerConfiguration
 
 import java.time.LocalDateTime
 
@@ -26,8 +29,36 @@ class ImportDescriptionObjectAction implements BuiltInAction {
 
     if (input instanceof DescriptionObject) {
       return importDescriptionObject(input)
+    } else if (input instanceof String) {
+      return importFromDsl(input)
     } else {
       return Future.failedFuture(new IllegalArgumentException("Cannot handle input of class:${input.class.simpleName}"))
+    }
+  }
+
+  private Script initDslScript(String dsl) {
+    log.debug('initDslScript() - dsl:{}', dsl)
+
+    CompilerConfiguration cc = new CompilerConfiguration()
+    cc.setScriptBaseClass(DelegatingScript.class.getName())
+
+    GroovyShell shell = new GroovyShell(this.class.classLoader, new Binding(), cc)
+    DelegatingScript script = shell.parse(dsl) as DelegatingScript
+    script.setDelegate(new ModuleDelegate())
+
+    return script
+  }
+
+  private Future<UUID> importFromDsl(String dslScript) {
+    def descObj = initDslScript(dslScript).run()
+
+    log.info('importFromDsl() - result:{}', descObj)
+
+    if (descObj instanceof DescriptionObject) {
+      return importDescriptionObject(descObj)
+    }
+    else {
+      return Future.failedFuture("Uncovered result type:$descObj.class.simpleName")
     }
   }
 

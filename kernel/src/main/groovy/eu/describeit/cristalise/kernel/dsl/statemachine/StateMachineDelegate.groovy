@@ -26,8 +26,7 @@ class StateMachineDelegate {
     name = n
     version = v
 
-    sm = new StateMachine(n, v)
-    sm.namespace = ns
+    sm = new StateMachine(namespace: ns, name: n, version: v)
   }
 
   public void processClosure(@DelegatesTo(StateMachineDelegate) Closure cl) {
