@@ -25,11 +25,12 @@ abstract class AbstractRepositoryIT {
 
   protected PostgreSQLContainer pgContainer
   protected Pool pool
+  protected TestKernelComponent component
 
   @BeforeAll
   void setUpAll() throws Exception {
     System.setProperty('vertx-config-path', 'src/test/conf/config.json')
-    TestKernelComponent component = DaggerTestKernelComponent.create()
+    component = DaggerTestKernelComponent.create()
 
     pgContainer = component.pgContainer()
     pgContainer.start()

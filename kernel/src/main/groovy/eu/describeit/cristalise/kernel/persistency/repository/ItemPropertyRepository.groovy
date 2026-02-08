@@ -11,6 +11,8 @@ public interface ItemPropertyRepository {
 
   Future<List<ItemPropertyDO>> findByItemId(UUID item_id)
 
+  Future<List<UUID>> findItemIdsByItemProperty(ItemPropertyDO itemProperty)
+
   Future<List<ItemPropertyDO>> findAll()
 
   Future<ItemPropertyDO> insert(ItemPropertyDO itemProperty)

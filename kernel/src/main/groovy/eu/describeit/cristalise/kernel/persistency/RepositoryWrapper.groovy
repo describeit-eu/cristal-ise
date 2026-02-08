@@ -158,6 +158,12 @@ class RepositoryWrapper {
     return domainPathRepository.insert(domainPath)
   }
 
+  Future<Boolean> exists(DomainPathDO dp) {
+    domainPathRepository.findByPath(dp.path).compose { Optional<DomainPathDO> domainPathOptional ->
+      return Future.succeededFuture(domainPathOptional.present)
+    }
+  }
+
   Future<DomainPathDO> getDomainPathByPath(String path) {
     return domainPathRepository.findByPath(path).compose { Optional<DomainPathDO> domainPathOptional ->
       if (domainPathOptional.isEmpty()) {
@@ -187,7 +193,19 @@ class RepositoryWrapper {
     return itemPropertyRepository.insert(itemProperty)
   }
 
+  Future<List<ItemPropertyDO>> putItemProperties(Map<String, String> itemPropsMap, UUID itemId) {
+    List<ItemPropertyDO> itemProps = new ArrayList<>()
+
+    for (propEntry in itemPropsMap) {
+      boolean mutable = propEntry.key != 'Type'
+      itemProps << new ItemPropertyDO(propEntry.key, propEntry.value, mutable, itemId)
+    }
+
+    return putItemProperties(itemProps)
+  }
+
   Future<List<ItemPropertyDO>> putItemProperties(List<ItemPropertyDO> itemProperties) {
+
     List<Future<ItemPropertyDO>> futures = itemProperties.collect { putItemProperty(it) }
     return Future.all(futures).map { it.list() as List<ItemPropertyDO> }
   }

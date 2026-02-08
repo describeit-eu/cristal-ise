@@ -124,4 +124,14 @@ class ItemPropertyRepositoryIT extends AbstractRepositoryIT {
     List<ItemPropertyDO> afterDelete = repository.findByItemId(PARIS.uuid).await()
     assertEquals(0, afterDelete.size())
   }
+
+  @Test
+  void testFindItemIdsByItemProperty() {
+    ItemPropertyDO search = new ItemPropertyDO("Type", "City", false, null)
+    List<UUID> itemIds = repository.findItemIdsByItemProperty(search).await()
+
+    assertNotNull(itemIds)
+    assertTrue(itemIds.contains(BUDAPEST.uuid))
+    assertTrue(itemIds.contains(DELHI.uuid))
+  }
 }

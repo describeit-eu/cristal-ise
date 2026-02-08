@@ -5,7 +5,6 @@ import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDOParamete
 import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDORowMapper
 import groovy.transform.CompileStatic
 import io.vertx.core.Future
-import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.SqlClient
 import io.vertx.sqlclient.templates.SqlTemplate
 
@@ -28,6 +27,7 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
   private static final String SQL_DELETE_BY_ID = "DELETE FROM " + TABLE + " WHERE id=#{id}"
 
   private static final String SQL_FIND_BY_ITEM_ID   = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE item_id=#{item_id}"
+  private static final String SQL_FIND_ITEM_IDS_BY_ITEM_PROPERTY = "SELECT " + COLUMNS + " FROM " + TABLE + " WHERE name=#{name} AND value=#{value}"
   private static final String SQL_DELETE_BY_ITEM_ID = "DELETE FROM " + TABLE + " WHERE item_id=#{item_id}"
 
   public ItemPropertyRepositoryImpl(SqlClient client) { this.client = client; }
@@ -48,6 +48,16 @@ public class ItemPropertyRepositoryImpl implements ItemPropertyRepository {
       .mapTo(ItemPropertyDORowMapper.INSTANCE)
       .execute(Collections.singletonMap("item_id", (Object)item_id))
       .map(rs -> toList(rs))
+  }
+
+  @Override
+  public Future<List<UUID>> findItemIdsByItemProperty(ItemPropertyDO itemProperty) {
+    return SqlTemplate
+      .forQuery(client, SQL_FIND_ITEM_IDS_BY_ITEM_PROPERTY)
+      .mapFrom(ItemPropertyDOParametersMapper.INSTANCE)
+      .mapTo(ItemPropertyDORowMapper.INSTANCE)
+      .execute(itemProperty)
+      .map(rs -> toList(rs).collect { ItemPropertyDO it -> it.itemId })
   }
 
   @Override

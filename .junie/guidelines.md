@@ -31,7 +31,8 @@ The project uses Gradle (Kotlin DSL).
 
 #### Adding New Tests
 1. **Unit Tests**: Use Spock (`Specification`) or JUnit 5 and place them in `kernel/src/test/groovy/`.
-2. **Integration Tests (IT)**:
+2. Use Futures.await() in tests to wait for asynchronous operations
+3. **Integration Tests (IT)**:
    - Integration tests often require a database. The project uses **Testcontainers** with PostgreSQL.
    - Extend `eu.describeit.cristalise.kernel.persistency.repository.AbstractRepositoryIT` to get automatic database setup and Liquibase migration.
    - Annotate with `@Testcontainers(disabledWithoutDocker = true)` and `@TestInstance(Lifecycle.PER_CLASS)`.
@@ -57,6 +58,8 @@ class MyNewTest extends Specification {
 
 #### Code Style & Patterns
 - **Groovy Usage**: Use `@CompileStatic` for better performance and type safety unless dynamic features are specifically needed.
+- Verticles are configured to use 'virtual threads' threading model.
+- Verticles with virtual threads use Future.await() to wait for asynchronous operations.
 - **Vert.x Data Objects**: Use `@DataObject`, `@JsonGen`, `@RowMapped`, and `@ParametersMapped` for domain objects to leverage Vert.x code generation for JSON and SQL mapping.
 - **Asynchronous Code**: Prefer `io.vertx.core.Future` for asynchronous operations.
 - **Dependency Injection**: Use Dagger 2. Components are defined in `eu.describeit.cristalise.kernel.dagger`.
