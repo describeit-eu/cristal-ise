@@ -16,7 +16,10 @@ class MainVerticle extends VerticleBase {
 
     KernelComponent component = DaggerKernelComponent.create()
 
-    vertx.deployVerticle(component.itemServiceVerticle(), component.deploymentOptions())
+    component.bootstrap().execute()
+      .compose {
+        vertx.deployVerticle(component.itemServiceVerticle(), component.deploymentOptions())
+      }
       .onSuccess { String result ->
         log.info("start() - ItemServiceVerticle deployed successfully")
         promise.complete(result)

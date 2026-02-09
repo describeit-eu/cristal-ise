@@ -39,17 +39,21 @@ class RepositoryWrapper {
 
     return domainPathRepository.findByPath(path).compose { Optional<DomainPathDO> domainPathOptional ->
       if (domainPathOptional.isEmpty()) {
-        return Future.failedFuture(new IllegalArgumentException("DomainPath ${path} does not exists"))
+        return Future.failedFuture(new IllegalArgumentException("DomainPath '${path}' does not exists"))
       }
 
       UUID itemId = domainPathOptional.get().itemId
 
-      if (itemId == null) {
-        return Future.failedFuture(new IllegalArgumentException("DomainPath ${path} does not reference an item"))
-      } else {
+      if (itemId) {
         return Future.succeededFuture(itemId)
+      } else {
+        return Future.failedFuture(new IllegalArgumentException("DomainPath '${path}' does not reference an Item"))
       }
     } as Future<UUID>
+  }
+
+  Future<List<UUID>> getItemIdsOfSameType(String type) {
+    return itemPropertyRepository.findItemIdsByItemProperty(new ItemPropertyDO(name: 'Type', value: type))
   }
 
   Future<List<ViewPointDO>> getViewPointsByItemId(UUID itemId) {

@@ -3,6 +3,7 @@ package eu.describeit.cristalise.kernel.dagger
 import dagger.Component
 import eu.describeit.cristalise.kernel.item.ItemServiceVerticle
 import eu.describeit.cristalise.kernel.migration.LiquibaseCommand
+import eu.describeit.cristalise.kernel.process.Bootstrap
 import groovy.transform.CompileStatic
 import io.vertx.config.ConfigRetriever
 import io.vertx.core.DeploymentOptions
@@ -18,6 +19,8 @@ interface KernelComponent {
   ConfigRetriever configRetriever()
 
   LiquibaseCommand liquibaseCommand()
+
+  Bootstrap bootstrap()
 
   ItemServiceVerticle itemServiceVerticle()
 
