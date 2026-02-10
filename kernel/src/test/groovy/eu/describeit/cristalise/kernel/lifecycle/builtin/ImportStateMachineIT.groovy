@@ -1,8 +1,9 @@
 package eu.describeit.cristalise.kernel.lifecycle.builtin
 
-
+import eu.describeit.cristalise.kernel.BuiltInResources
 import eu.describeit.cristalise.kernel.item.ItemProxy
 import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
+import eu.describeit.cristalise.kernel.persistency.domain.DomainPathDO
 import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDO
 import eu.describeit.cristalise.kernel.persistency.repository.AbstractRepositoryIT
 import eu.describeit.cristalise.kernel.statemachine.StateMachine
@@ -14,9 +15,10 @@ import org.junit.jupiter.api.TestInstance
 import org.testcontainers.junit.jupiter.Testcontainers
 
 import static eu.describeit.cristalise.CommonTestItemIds.*
+import static eu.describeit.cristalise.kernel.BuiltInResources.STATE_MACHINE_RESOURCE
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertNotNull
-import static org.junit.jupiter.api.Assertions.assertNull
+import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.assertTrue
 
 @Slf4j
@@ -24,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @CompileStatic
 class ImportStateMachineIT extends AbstractRepositoryIT {
+
+  private static final String parentPath = "kernel.description.$STATE_MACHINE_RESOURCE.typeCode"
 
   private ImportDescriptionObjectAction importAction
   private ItemProxy anItem
@@ -41,16 +45,14 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
   @Test
   void testImportStateMachine() {
     StateMachine sm = new StateMachine('test', "TestSM", "v1.0")
-    sm.namespace = "test"
     sm.createState("Start")
     sm.createState("End")
+    sm.createTransition('Done')
 
-    UUID resultId = importAction.request(anItem, null, sm).await()
-
-    assertNotNull(resultId)
+    importAction.request(anItem, null, sm).await()
 
     // Verify it was created
-    ItemProxy createdItem = ItemProxy.create(pool, resultId).await()
+    ItemProxy createdItem = ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.TestSM')).await()
     assertEquals("TestSM", createdItem.name)
     assertEquals("StateMachine", createdItem.type)
     assertEquals("v1.0", createdItem.version)
@@ -63,16 +65,10 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
 //    assertTrue(props.any { it.name == 'Module' && it.value == 'kernel.statemachine' })
     assertTrue(props.any { it.name == 'Version' && it.value == 'v1.0' })
 
-    // Verify DomainPath
-    def dpList = createdItem.getAllDomainPaths().await()
-    def dp = dpList.find {it.path == 'kernel.description.statemachine.TestSM'}
-    assertNotNull(dp)
-    assertEquals(resultId, dp.itemId)
-
     // Verify Event
     def events = createdItem.getAllEvents().await()
     assert events
-    assertEquals("import", events[0].actionPath)
+    assertEquals("builtin/ImportDescriptionObject", events[0].actionPath)
     assertEquals("v1.0", events[0].itemVersion)
     assertEquals("v1.0", events[0].stateMachineVersion)
 
@@ -86,14 +82,14 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
 
     // Verify ViewPoints
     def vps = createdItem.getAllViewPoints().await()
-    def itemVps = vps.findAll { it.itemId == resultId }
+    def itemVps = vps.findAll { it.itemId == createdItem.itemId }
     assertEquals(2, itemVps.size())
     assertTrue(itemVps.any { it.name == 'v0'   && it.outcomeId == outcomes[0].id })
     assertTrue(itemVps.any { it.name == 'last' && it.outcomeId == outcomes[0].id })
   }
 
   @Test
-  void testImportStateMachineDsl() {
+  void importDslStringThrowsException() {
     String smDsl = '''
 StateMachine(name: 'TestSimple', version: 'v0') {
   transition('Activate', [origin: 'Waiting', target: 'Active'])
@@ -107,13 +103,16 @@ StateMachine(name: 'TestSimple', version: 'v0') {
   finishingState('Finished')
 }
 '''
-    UUID resultId = importAction.request(anItem, null, smDsl).await()
+    assertThrows(ResourceException.class) {
+      importAction.request(anItem, null, smDsl).await()
+    }
+  }
 
-    assert resultId
-    ItemProxy createdItem = ItemProxy.create(pool, resultId).await()
+  @Test
+  void testImporting_StateMachineScript() {
+    importAction.request(anItem, null, 'StateMachineScript').await()
 
-    assertEquals("TestSimple", createdItem.name)
-    assertEquals("StateMachine", createdItem.type)
-    assertEquals("v0", createdItem.version)
+    ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.Default')).await()
+    ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.Simple')).await()
   }
 }

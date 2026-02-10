@@ -17,10 +17,11 @@ import java.time.LocalDateTime
 @CompileStatic
 @Singleton
 class Bootstrap {
-  static String rootItemName = "CristaliseRoot"
-  static String rootItemType = "RootItem"
-  static String rootItemPath = "kernel.${rootItemType}.${rootItemName}"
-  static String rootItemVersion = "v0"
+  static final UUID   rootItemId   = UUID.fromString('00000000-0000-0000-0000-000000000001')
+  static final String rootItemName = 'CristaliseRoot'
+  static final String rootItemType = 'RootItem'
+  static final String rootItemPath = "kernel.${rootItemType}.${rootItemName}"
+  static final String rootItemVersion = 'v0'
 
   private final Pool pool
   private RepositoryWrapper storage = null
@@ -34,42 +35,49 @@ class Bootstrap {
     pool.withTransaction { SqlConnection conn ->
       storage = new RepositoryWrapper(conn)
       return createCristaliseRoot()
-    }.mapEmpty()
+        .compose { return importKernelResources() }
+    }
   }
 
-  private Future<UUID> createCristaliseRoot() {
-    storage.getItemId(new DomainPathDO(path:  rootItemPath))
-      .compose({ UUID itemId ->
-          log.info("createCristaliseRoot() - CristaliseRoot already exists ${itemId}")
-          return Future.succeededFuture(itemId)
-        }, { Throwable t ->
-          return createCristaliseRootHandler()
-      })
+  private Future<Void> createCristaliseRoot() {
+    return storage.exists(new DomainPathDO(path:  rootItemPath))
+      .compose { Boolean exists ->
+        if (exists) return Future.succeededFuture()
+        else        return createCristaliseRootHandler()
+      }
+      .mapEmpty()
   }
 
-  private Future<UUID> createCristaliseRootHandler() {
-    UUID rootId = UUID.randomUUID() //UUID.nameUUIDFromBytes("CristaliseRoot".getBytes())
+  private Future<Void> createCristaliseRootHandler() {
+    log.info('createCristaliseRootHandler() - creating with itemId:{}', rootItemId)
 
-    log.info("createCristaliseRootHandler() - creating with itemId:{}", rootId)
-
-    ItemDO rootDO = new ItemDO(rootId, rootItemName, rootItemType, rootItemVersion, null)
+    ItemDO rootDO = new ItemDO(rootItemId, rootItemName, rootItemType, rootItemVersion, null)
 
     return storage.putItemDO(rootDO)
       .compose {
         log.debug('createCristaliseRootHandler() - ItemDO created with id:{}', it.id)
-        assert it.id == rootId
-        storage.putDomainPath(new DomainPathDO("kernel.${rootItemType}.${rootItemName}", rootId))
+        //assert it.id == rootId
+        storage.putDomainPath(new DomainPathDO("kernel.${rootItemType}.${rootItemName}", rootItemId))
       }
       .compose {
-        return storage.putItemProperties([Name: rootItemName, Type: rootItemType, Version: rootItemVersion], rootId)
+        return storage.putItemProperties([Name: rootItemName, Type: rootItemType, Version: rootItemVersion], rootItemId)
       }
       .compose {
-        EventDO event = new EventDO(itemId: rootId, itemVersion: rootItemVersion, userLogin: 'system', timestamp: LocalDateTime.now(), actionPath: "bootstrap")
+        EventDO event = new EventDO(
+          itemId: rootItemId,
+          itemVersion: rootItemVersion,
+          userLogin: 'system',
+          timestamp: LocalDateTime.now(),
+          actionPath: 'bootstrap'
+        )
         return storage.putEvent(event)
       }
       .map {
-        log.info('createCristaliseRootHandler() - DONE itemId:{}', rootId)
-        return rootId
+        log.info('createCristaliseRootHandler() - DONE itemId:{}', rootItemId)
       }
+  }
+
+  private Future<Void> importKernelResources() {
+    return Future.succeededFuture()
   }
 }

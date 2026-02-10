@@ -1,6 +1,8 @@
 package eu.describeit.cristalise.kernel.module
 
-StateMachine(name: 'Default', version: 'v0') {
+import eu.describeit.cristalise.kernel.DescriptionObject
+
+def defaultSM = StateMachine(name: 'Default', version: 'v0') {
   transition('Activate', [origin: 'Waiting', target: 'Active'])
   transition('Done', [origin: 'Active', target: 'Finished']) {
     schema(name: '${SchemaType}', version: '${SchemaVersion}')
@@ -27,7 +29,7 @@ StateMachine(name: 'Default', version: 'v0') {
   finishingState('Finished')
 }
 
-StateMachine(name: 'Simple', version: 'v0') {
+def simpleSM = StateMachine(name: 'Simple', version: 'v0') {
   transition('Activate', [origin: 'Waiting', target: 'Active'])
   transition('Done', [origin: 'Active', target: 'Finished']) {
     schema(name: '${SchemaType}', version: '${SchemaVersion}')
@@ -38,3 +40,5 @@ StateMachine(name: 'Simple', version: 'v0') {
   initialState('Waiting')
   finishingState('Finished')
 }
+
+return [defaultSM, simpleSM] as List<DescriptionObject>

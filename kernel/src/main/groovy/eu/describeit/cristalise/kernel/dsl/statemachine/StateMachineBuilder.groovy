@@ -58,7 +58,7 @@ class StateMachineBuilder {
     def builder = new StateMachineBuilder(module, delegate)
     builder.sm.validate()
 
-    log.info('build() - json:\n{}', JsonObject.mapFrom(builder.sm).encodePrettily())
+    log.debug('build() - json:\n{}', JsonObject.mapFrom(builder.sm).encodePrettily())
 
     return builder
   }

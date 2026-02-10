@@ -10,10 +10,15 @@ import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
 @CompileStatic
 abstract class ImportScript extends DelegatingScript {
 
+  // TODO read script directories from configs
+  static final String[] classLoaderRoots = [
+    'eu/describeit/cristalise/kernel/module/',
+    'src/main/groovy/eu/describeit/cristalise/kernel/module/',
+    'kernel/src/main/groovy/eu/describeit/cristalise/kernel/module/',
+  ]
+
   @Delegate
   ModuleDelegate moduleDelegate = new ModuleDelegate()
-
-  static final String[] classLoaderRoots = ['eu/describeit/cristalise/kernel/module']
 
   abstract Object scriptBody()
 
@@ -28,12 +33,12 @@ abstract class ImportScript extends DelegatingScript {
     CompilerConfiguration cc = new CompilerConfiguration()
     cc.setScriptBaseClass(ImportScript.class.getName())
 
-    cc.addCompilationCustomizers(new ASTTransformationCustomizer(CompileStatic))
-
     GroovyScriptEngine engine = new GroovyScriptEngine(classLoaderRoots)
     engine.setConfig(cc)
 
-    ImportScript script = (ImportScript) engine.createScript(scriptName+'.groovy', scriptBinding)
+    scriptName = scriptName.endsWith('.groovy') ?: scriptName+'.groovy'
+
+    ImportScript script = (ImportScript) engine.createScript(scriptName, scriptBinding)
     script.setDelegate(script)
 
     return script

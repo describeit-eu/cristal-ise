@@ -18,24 +18,35 @@ import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.Action
 @CompileStatic
 class ItemProxy {
   private final RepositoryWrapper storage
-  private final UUID itemId
+  private UUID itemId
   private ItemDO itemDO
 
   private Future<CompositeAction> lifeCycle
 
   private final Vertx vertx
 
+  static Future<ItemProxy> create(SqlClient client, DomainPathDO dp) {
+    ItemProxy proxy = new ItemProxy(client)
+    return proxy.initialise(dp)
+  }
+
   static Future<ItemProxy> create(SqlClient client, String itemId) {
     return create(client, UUID.fromString(itemId))
   }
 
   static Future<ItemProxy> create(SqlClient client, UUID uuid) {
-    ItemProxy proxy = new ItemProxy(client, uuid)
-    return proxy.initialise()
+    ItemProxy proxy = new ItemProxy(client)
+    return proxy.initialise(uuid)
   }
 
-  private Future<ItemProxy> initialise() {
-    return storage.getItemDO(itemId).compose { ItemDO itemDO ->
+  private Future<ItemProxy> initialise(DomainPathDO dp) {
+    return storage.getItemId(dp)
+      .compose { UUID itemId -> return initialise(itemId) }
+  }
+
+  private Future<ItemProxy> initialise(UUID uuid) {
+    return storage.getItemDO(uuid).compose { ItemDO itemDO ->
+      this.itemId = uuid
       this.itemDO = itemDO
       return Future.succeededFuture(this)
     } as Future<ItemProxy>
@@ -93,12 +104,14 @@ class ItemProxy {
   /**
    *
    * @param client
-   * @param uuid
+   * @param dp
    */
-  public ItemProxy(SqlClient client, UUID uuid) {
-    vertx = null
-    itemId = uuid
+  ItemProxy(SqlClient client) {
     storage = new RepositoryWrapper(client)
+
+    vertx = null
+    itemId = null
+    itemDO = null
   }
 
   /**

@@ -1,7 +1,6 @@
 package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 import eu.describeit.cristalise.kernel.DescriptionObject
-import eu.describeit.cristalise.kernel.dsl.module.ModuleDelegate
 import eu.describeit.cristalise.kernel.item.ItemProxy
 import eu.describeit.cristalise.kernel.migration.ImportScript
 import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
@@ -9,7 +8,6 @@ import eu.describeit.cristalise.kernel.persistency.domain.*
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
-import org.codehaus.groovy.control.CompilerConfiguration
 
 import java.time.LocalDateTime
 
@@ -21,7 +19,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
   protected RepositoryWrapper storage
 
   @Override
-  Future<UUID> request(ItemProxy item, ItemProxy actor, Object input) {
+  Future<Void> request(ItemProxy item, ItemProxy actor, Object input) {
     log.info('request({}) - inputType:{}', item, input.class)
     this.item = item
     this.actor = actor
@@ -30,43 +28,29 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     if (input instanceof DescriptionObject) {
       return importDescriptionObject(input)
     } else if (input instanceof String) {
-      return importFromDsl(input)
+      return runImportScript(input)
     } else {
       return Future.failedFuture(new IllegalArgumentException("Cannot handle input of class:${input.class.simpleName}"))
     }
   }
 
-  private Script initDslScript(String dsl) {
-    log.debug('initDslScript() - dsl:{}', dsl)
+  private Future<Void> runImportScript(String scriptName) {
+    ImportScript script = ImportScript.initScript(scriptName, new Binding())
 
-    CompilerConfiguration cc = new CompilerConfiguration()
-    cc.setScriptBaseClass(DelegatingScript.class.getName())
+    List<DescriptionObject> descObjList = script.run() as List<DescriptionObject>
 
-    GroovyShell shell = new GroovyShell(this.class.classLoader, new Binding(), cc)
-    DelegatingScript script = shell.parse(dsl) as DelegatingScript
-    script.setDelegate(new ModuleDelegate())
-
-    return script
+    List<Future<Void>> futures = []
+    for (descObj in descObjList) {
+      futures.add(importDescriptionObject(descObj))
+    }
+    return Future.all(futures).mapEmpty()
   }
 
-  private Future<UUID> importFromDsl(String dslScript) {
-    def descObj = initDslScript(dslScript).run()
-
-    log.info('importFromDsl() - result:{}', descObj)
-
-    if (descObj instanceof DescriptionObject) {
-      return importDescriptionObject(descObj)
-    }
-    else {
-      return Future.failedFuture("Uncovered result type:$descObj.class.simpleName")
-    }
-  }
-
-  private Future<UUID> importDescriptionObject(DescriptionObject descObject) {
+  private Future<Void> importDescriptionObject(DescriptionObject descObject) {
     UUID newItemId = UUID.randomUUID()
     String parentPath = "kernel.description.${descObject.resourceType.typeCode}"
 
-    log.info('importDescriptionObject({}) - parentPath:{}', item, parentPath)
+    log.info('importDescriptionObject() - name:{} parentPath:{}', descObject.name, parentPath)
 
     return ensurePathExists(parentPath)
       .compose { createItem(newItemId, descObject) }
@@ -76,7 +60,9 @@ class ImportDescriptionObjectAction implements BuiltInAction {
       .compose { createImportEvent(newItemId, descObject) }
       .compose { createdEvent -> createStateMachineOutcome(newItemId, createdEvent, descObject) }
       .compose { createdOutcome -> createViewPoints(newItemId, createdOutcome, descObject) }
-      .map { newItemId }
+      .map {
+        log.info('importDescriptionObject() - DONE name:{} type:{} id:{}', descObject.name, descObject.resourceType, newItemId)
+      }
   }
 
   private Future<ItemDO> createItem(UUID newItemId, DescriptionObject descObject) {
@@ -109,7 +95,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     event.itemVersion = descObject.version
     event.userLogin = actor?.getName() ?: "system"
     event.timestamp = LocalDateTime.now()
-    event.actionPath = "import"
+    event.actionPath = getPath()
     event.stateMachineVersion = descObject.version
 
     return storage.putEvent(event)

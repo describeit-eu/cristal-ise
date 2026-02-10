@@ -15,7 +15,11 @@ interface BuiltInAction {
     else                            return className
   }
 
-  Future<UUID> request(
+  default String getPath() {
+    return 'builtin/' + name
+  }
+
+  Future<Void> request(
     final ItemProxy item,
     final ItemProxy actor,
     final Object input
