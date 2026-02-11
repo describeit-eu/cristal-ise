@@ -7,19 +7,31 @@ import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
 import eu.describeit.cristalise.kernel.persistency.domain.*
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
+import io.vertx.core.json.JsonArray
+import io.vertx.core.json.JsonObject
+
+import javax.inject.Inject
 
 import java.time.LocalDateTime
 
 @Slf4j
 @CompileStatic
 class ImportDescriptionObjectAction implements BuiltInAction {
+  protected ImportScript.Factory importScriptFactory
+
   protected ItemProxy item
   protected ItemProxy actor
   protected RepositoryWrapper storage
 
+  @Inject
+  ImportDescriptionObjectAction(ImportScript.Factory importScriptFactory) {
+    this.importScriptFactory = importScriptFactory
+  }
+
   @Override
-  Future<Void> request(ItemProxy item, ItemProxy actor, Object input) {
+  Future<JsonObject> request(ItemProxy item, ItemProxy actor, Object input) {
     log.info('request({}) - inputType:{}', item, input.class)
     this.item = item
     this.actor = actor
@@ -28,25 +40,53 @@ class ImportDescriptionObjectAction implements BuiltInAction {
     if (input instanceof DescriptionObject) {
       return importDescriptionObject(input)
     } else if (input instanceof String) {
-      return runImportScript(input)
+      return importString(input)
     } else {
       return Future.failedFuture(new IllegalArgumentException("Cannot handle input of class:${input.class.simpleName}"))
     }
   }
 
-  private Future<Void> runImportScript(String scriptName) {
-    ImportScript script = ImportScript.initScript(scriptName, new Binding())
+  private Future<JsonObject> importString(String input) {
+    if      (input.endsWith('.groovy')) return runImportScript(input)
+    else if (input.endsWith('.json'))   return importJson(new JsonObject(input))
+    else
+      return Future.failedFuture(new IllegalArgumentException("Cannot handle string input:$input"))
+  }
+
+  private Future<JsonObject> importJson(JsonObject inputJson) {
+    // TODO implement
+    return Future.failedFuture('Unimplemented')
+  }
+
+  private Future<JsonObject> runImportScript(String scriptName) {
+    ImportScript script = importScriptFactory.create(scriptName, new Binding())
 
     List<DescriptionObject> descObjList = script.run() as List<DescriptionObject>
 
-    List<Future<Void>> futures = []
-    for (descObj in descObjList) {
-      futures.add(importDescriptionObject(descObj))
+    List<Future<JsonObject>> futures = []
+    for (descObj in descObjList) futures.add(importDescriptionObject(descObj))
+
+    return Future.all(futures).map { CompositeFuture cf ->
+      def descObjsStatusJson = new JsonObject()
+      def uuids = new JsonArray()
+      def names = new JsonArray()
+      def types = new JsonArray()
+      descObjsStatusJson.put('uuids', uuids)
+      descObjsStatusJson.put('names', names)
+      descObjsStatusJson.put('types', types)
+
+      for (int i = 0; i < cf.size(); i++) {
+        def aJson = (JsonObject) cf.resultAt(i)
+        uuids.add(aJson.getJsonArray('uuids').getString(0))
+        names.add(aJson.getJsonArray('names').getString(0))
+        types.add(aJson.getJsonArray('types').getString(0))
+      }
+
+      return descObjsStatusJson
     }
-    return Future.all(futures).mapEmpty()
   }
 
-  private Future<Void> importDescriptionObject(DescriptionObject descObject) {
+  private Future<JsonObject> importDescriptionObject(DescriptionObject descObject) {
     UUID newItemId = UUID.randomUUID()
     String parentPath = "kernel.description.${descObject.resourceType.typeCode}"
 
@@ -62,7 +102,14 @@ class ImportDescriptionObjectAction implements BuiltInAction {
       .compose { createdOutcome -> createViewPoints(newItemId, createdOutcome, descObject) }
       .map {
         log.info('importDescriptionObject() - DONE name:{} type:{} id:{}', descObject.name, descObject.resourceType, newItemId)
-      }
+
+        def descObjImportedJson = new JsonObject()
+        descObjImportedJson.put('uuids', new JsonArray().add(newItemId.toString()))
+        descObjImportedJson.put('names', new JsonArray().add(descObject.name))
+        descObjImportedJson.put('types', new JsonArray().add(descObject.resourceType.name()))
+
+        descObjImportedJson
+      } as Future<JsonObject>
   }
 
   private Future<ItemDO> createItem(UUID newItemId, DescriptionObject descObject) {

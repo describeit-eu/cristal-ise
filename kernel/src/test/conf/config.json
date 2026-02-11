@@ -6,5 +6,12 @@
   "deployment": {
     "threadingModel": "VIRTUAL_THREAD",
     "instances": 1
+  },
+  "import": {
+    "scriptsRoots": [
+      "eu/describeit/cristalise/kernel/module/",
+      "src/main/groovy/eu/describeit/cristalise/kernel/module/",
+      "kernel/src/main/groovy/eu/describeit/cristalise/kernel/module/"
+    ]
   }
 }

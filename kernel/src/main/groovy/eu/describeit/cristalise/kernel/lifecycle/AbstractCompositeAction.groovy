@@ -1,6 +1,7 @@
 package eu.describeit.cristalise.kernel.lifecycle
 
 import eu.describeit.cristalise.kernel.item.ItemProxy
+import eu.describeit.cristalise.kernel.lifecycle.builtin.BuiltInActionContainer
 import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
 import eu.describeit.cristalise.kernel.persistency.domain.ActionDO
 import eu.describeit.cristalise.kernel.persistency.domain.JobDO
@@ -9,12 +10,17 @@ import groovy.util.logging.Slf4j
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
 
+import javax.inject.Inject
+
 import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.ActionType.*
 
 @Slf4j
 @CompileStatic
 abstract class AbstractCompositeAction extends AbstractAction implements CompositeAction {
   List<Action> actions = []
+
+  @Inject
+  BuiltInActionContainer builtInActions
 
   static Action createAction(ActionDO actionDO) {
     switch (actionDO.type) {
@@ -43,11 +49,17 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   {
     log.info('request() - item:{}/{} action({}):{} ', item.type, item.name, dataObject.type, actionPath)
 
-    return findAction(actionPath).compose { Action action ->
-      return action.request(item, actor, actionPath, transitionID, inputOutcome)
+    if (actionPath.startsWith('builtIn/')) {
+      return builtInActions.request(item, actor, actionPath, inputOutcome)
     }
-    .onFailure {
-      return Future.failedFuture(it)
+    else {
+      return findAction(actionPath)
+        .compose { Action action ->
+          return action.request(item, actor, actionPath, transitionID, inputOutcome)
+        }
+        .onFailure { Throwable ex ->
+          return Future.failedFuture(ex)
+        }
     }
   }
 
@@ -75,6 +87,7 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   @Override
   Future<Action> findAction(String actionPath) {
     if (actionPath.startsWith('/')) actionPath = actionPath.substring(1)
+
     return handleFindAction(actionPath.split('/'))
       .compose { Action action ->
         if (action) return Future.succeededFuture(action)
@@ -83,9 +96,9 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   }
 
   private Future<Action> handleFindAction(String ... actionPath) {
-    if (actionPath[0] == this.name) actionPath = actionPath.drop(1)
-
     log.debug('findAction() - name:{} actionPath:{}', name, actionPath)
+
+    if (actionPath[0] == this.name) actionPath = actionPath.drop(1)
 
     if (actionPath.size() == 0) {
       return Future.succeededFuture((Action)this)

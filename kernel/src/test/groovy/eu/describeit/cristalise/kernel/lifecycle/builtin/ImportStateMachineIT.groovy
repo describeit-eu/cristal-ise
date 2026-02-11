@@ -1,8 +1,6 @@
 package eu.describeit.cristalise.kernel.lifecycle.builtin
 
-import eu.describeit.cristalise.kernel.BuiltInResources
 import eu.describeit.cristalise.kernel.item.ItemProxy
-import eu.describeit.cristalise.kernel.persistency.RepositoryWrapper
 import eu.describeit.cristalise.kernel.persistency.domain.DomainPathDO
 import eu.describeit.cristalise.kernel.persistency.domain.ItemPropertyDO
 import eu.describeit.cristalise.kernel.persistency.repository.AbstractRepositoryIT
@@ -36,7 +34,7 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
   @Override
   void setUpAll() throws Exception {
     super.setUpAll()
-    importAction = new ImportDescriptionObjectAction()
+    importAction = component.importDescriptionObjectAction()
 
     // TODO use the KernelRoot Item instead
     anItem = ItemProxy.create(pool, BUDAPEST.uuid).await()
@@ -92,25 +90,26 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
   void importDslStringThrowsException() {
     String smDsl = '''
 StateMachine(name: 'TestSimple', version: 'v0') {
-  transition('Activate', [origin: 'Waiting', target: 'Active'])
-  transition('Done', [origin: 'Active', target: 'Finished']) {
-    schema(name: '${SchemaType}', version: '${SchemaVersion}')
-    script(name: '${ScriptName}', version: '${ScriptVersion}')
-    query(name: '${QueryName}', version: '${QueryVersion}')
-  }
+  transition('Done', [origin: 'Waiting', target: 'Finished'])
 
   initialState('Waiting')
   finishingState('Finished')
 }
 '''
-    assertThrows(ResourceException.class) {
+    assertThrows(IllegalArgumentException.class) {
       importAction.request(anItem, null, smDsl).await()
     }
   }
 
   @Test
   void testImporting_StateMachineScript() {
-    importAction.request(anItem, null, 'StateMachineScript').await()
+    def result = importAction.request(anItem, null, 'StateMachineScript.groovy').await()
+
+    assert result.getJsonArray('uuids').size() == 2
+    assert result.getJsonArray('names').size() == 2
+    assert result.getJsonArray('types').size() == 2
+
+    assertEquals(['Default','Simple'], result.getJsonArray('names').toList())
 
     ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.Default')).await()
     ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.Simple')).await()

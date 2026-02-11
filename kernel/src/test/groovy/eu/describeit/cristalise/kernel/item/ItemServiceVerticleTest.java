@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @CompileStatic
 class ItemServiceVerticleTest {
 
-  private final String dbSchemaChangelogFiles = "/liquibase/changelog/changelog-master.yaml";
-  private final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
+  private static final String dbSchemaChangelogFiles = "/liquibase/changelog/changelog-master.yaml";
+  private static final String testDataChangelogFiles = "/liquibase/changelog/changelog-testData-master.yaml";
 
   @BeforeAll
   @DisplayName("Deploy ItemServiceVerticle")

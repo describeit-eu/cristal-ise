@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import eu.describeit.cristalise.kernel.item.ItemService
 import eu.describeit.cristalise.kernel.item.ItemServiceVerticle
+import eu.describeit.cristalise.kernel.migration.ImportScript
+import eu.describeit.cristalise.kernel.lifecycle.builtin.BuiltInActionContainer
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.config.ConfigRetriever
@@ -12,6 +14,7 @@ import io.vertx.core.DeploymentOptions
 import io.vertx.core.ThreadingModel
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
+import org.codehaus.groovy.control.CompilerConfiguration
 
 import javax.inject.Singleton
 
@@ -95,4 +98,35 @@ class KernelModule {
       .setInstances(instances)
   }
 
+  /**
+   * Provides the ImportScript factory.
+   */
+  @Provides
+  @Singleton
+  static ImportScript.Factory provideImportScript(ConfigRetriever configRetriever) {
+    JsonObject importConfig = configRetriever.cachedConfig.getJsonObject('import')
+    String[] scriptRoots = importConfig.getJsonArray('scriptsRoots').toList().toArray() as String[]
+
+    return { String scriptName, Binding scriptBinding ->
+      CompilerConfiguration cc = new CompilerConfiguration()
+      cc.setScriptBaseClass(ImportScript.class.getName())
+
+      GroovyScriptEngine engine = new GroovyScriptEngine(scriptRoots)
+      engine.setConfig(cc)
+
+      ImportScript script = (ImportScript) engine.createScript(scriptName, scriptBinding)
+      script.setDelegate(script)
+
+      return script
+    } as ImportScript.Factory
+  }
+
+  /**
+   * Provides the BuiltInActionContainer aggregating built-in actions.
+   */
+  @Provides
+  @Singleton
+  static BuiltInActionContainer provideBuiltInActionContainer(ImportScript.Factory importScriptFactory) {
+    return new BuiltInActionContainer(importScriptFactory)
+  }
 }

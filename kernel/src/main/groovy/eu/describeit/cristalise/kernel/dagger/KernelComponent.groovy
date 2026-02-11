@@ -2,6 +2,8 @@ package eu.describeit.cristalise.kernel.dagger
 
 import dagger.Component
 import eu.describeit.cristalise.kernel.item.ItemServiceVerticle
+import eu.describeit.cristalise.kernel.lifecycle.builtin.ImportDescriptionObjectAction
+import eu.describeit.cristalise.kernel.migration.ImportScript
 import eu.describeit.cristalise.kernel.migration.LiquibaseCommand
 import eu.describeit.cristalise.kernel.process.Bootstrap
 import groovy.transform.CompileStatic
@@ -19,6 +21,10 @@ interface KernelComponent {
   ConfigRetriever configRetriever()
 
   LiquibaseCommand liquibaseCommand()
+
+  ImportScript.Factory importScriptFactory()
+
+  ImportDescriptionObjectAction importDescriptionObjectAction()
 
   Bootstrap bootstrap()
 
