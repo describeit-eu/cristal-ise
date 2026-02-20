@@ -8,10 +8,12 @@ val liquibaseVersion = "5.0.1"
 val groovyVersion    = "4.0.28"
 val daggerVersion    = "2.57.2"
 val psqlVersion      = "42.7.8"
+val caffeineVersion  = "3.2.3"
 
 val junitVersion          = "5.13.4"
 val testcontainersVersion = "2.0.2"
 val spockVersion          = "2.3-groovy-4.0"
+val bytebuddyVersion      = "1.17.1"
 
 plugins {
   application
@@ -54,6 +56,7 @@ dependencies {
   implementation("com.google.dagger:dagger:${daggerVersion}")
   annotationProcessor ("com.google.dagger:dagger-compiler:${daggerVersion}")
   implementation("org.liquibase:liquibase-core:${liquibaseVersion}")
+  implementation("com.github.ben-manes.caffeine:caffeine:${caffeineVersion}")
 
   // Logging dependencies
   implementation("org.slf4j:slf4j-api:$slf4jVersion")
@@ -65,6 +68,7 @@ dependencies {
   testImplementation("io.vertx:vertx-json-schema")
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.spockframework:spock-core:$spockVersion")
+  testImplementation("net.bytebuddy:byte-buddy:${bytebuddyVersion}")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testAnnotationProcessor ("com.google.dagger:dagger-compiler:${daggerVersion}")
 

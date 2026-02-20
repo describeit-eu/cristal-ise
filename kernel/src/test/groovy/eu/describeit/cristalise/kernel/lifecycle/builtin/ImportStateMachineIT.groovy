@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 @CompileStatic
 class ImportStateMachineIT extends AbstractRepositoryIT {
 
-  private static final String parentPath = "kernel.description.$STATE_MACHINE_RESOURCE.typeCode"
+//  private static final String parentPath = "description.$STATE_MACHINE_RESOURCE.typeCode"
 
   private ImportDescriptionObjectAction importAction
   private ItemProxy anItem
@@ -50,7 +50,7 @@ class ImportStateMachineIT extends AbstractRepositoryIT {
     importAction.request(anItem, null, sm).await()
 
     // Verify it was created
-    ItemProxy createdItem = ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.TestSM')).await()
+    ItemProxy createdItem = ItemProxy.create(pool, new DomainPathDO(path: 'description.StateMachine.TestSM')).await()
     assertEquals("TestSM", createdItem.name)
     assertEquals("StateMachine", createdItem.type)
     assertEquals("v1.0", createdItem.version)
@@ -104,14 +104,15 @@ StateMachine(name: 'TestSimple', version: 'v0') {
   @Test
   void testImporting_StateMachineScript() {
     def result = importAction.request(anItem, null, 'StateMachineScript.groovy').await()
+    log.info('Import result: {}', result)
 
-    assert result.getJsonArray('uuids').size() == 2
-    assert result.getJsonArray('names').size() == 2
-    assert result.getJsonArray('types').size() == 2
+    assertEquals(2, result.getJsonArray('uuids').size())
+    assertEquals(2,  result.getJsonArray('names').size())
+    assertEquals(2,  result.getJsonArray('types').size())
 
-    assertEquals(['Default','Simple'], result.getJsonArray('names').toList())
+    assertEquals(['Default','Simple'], result.getJsonArray('names').getList())
 
-    ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.Default')).await()
-    ItemProxy.create(pool, new DomainPathDO(path: 'kernel.description.statemachine.Simple')).await()
+    ItemProxy.create(pool, new DomainPathDO(path: 'description.StateMachine.Default')).await()
+    ItemProxy.create(pool, new DomainPathDO(path: 'description.StateMachine.Simple')).await()
   }
 }

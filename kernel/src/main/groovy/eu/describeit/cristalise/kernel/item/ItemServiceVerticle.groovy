@@ -1,6 +1,7 @@
 package eu.describeit.cristalise.kernel.item
 
 import eu.describeit.cristalise.kernel.lifecycle.CompositeAction
+import eu.describeit.cristalise.kernel.lifecycle.LifeCycle
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.Future
@@ -71,7 +72,7 @@ class ItemServiceVerticle extends VerticleBase implements ItemService {
   }
 
   private static JsonObject handleRequest(final ItemProxy item, final ItemProxy actor, final String actionPath, final String transitionId, final JsonObject inputOutcome) {
-    CompositeAction lifecycle = item.lifeCycle.await()
+    LifeCycle lifecycle = item.lifeCycle.await()
 
     final JsonObject outputOutcome = lifecycle.request(item, actor, actionPath, transitionId, inputOutcome).await()
 

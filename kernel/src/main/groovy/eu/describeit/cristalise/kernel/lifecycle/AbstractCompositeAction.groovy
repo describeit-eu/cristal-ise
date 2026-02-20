@@ -19,9 +19,6 @@ import static eu.describeit.cristalise.kernel.persistency.domain.ActionDO.Action
 abstract class AbstractCompositeAction extends AbstractAction implements CompositeAction {
   List<Action> actions = []
 
-  @Inject
-  BuiltInActionContainer builtInActions
-
   static Action createAction(ActionDO actionDO) {
     switch (actionDO.type) {
       case ELEMENTARY: return new ElementaryAction(dataObject: actionDO)
@@ -49,18 +46,12 @@ abstract class AbstractCompositeAction extends AbstractAction implements Composi
   {
     log.info('request() - item:{}/{} action({}):{} ', item.type, item.name, dataObject.type, actionPath)
 
-    if (actionPath.startsWith('builtIn/')) {
-      return builtInActions.request(item, actor, actionPath, inputOutcome)
+    return findAction(actionPath).compose { Action action ->
+      return action.request(item, actor, actionPath, transitionID, inputOutcome)
     }
-    else {
-      return findAction(actionPath)
-        .compose { Action action ->
-          return action.request(item, actor, actionPath, transitionID, inputOutcome)
-        }
-        .onFailure { Throwable ex ->
-          return Future.failedFuture(ex)
-        }
-    }
+//    .onFailure { Throwable ex ->
+//      return Future.failedFuture(ex)
+//    }
   }
 
   @Override

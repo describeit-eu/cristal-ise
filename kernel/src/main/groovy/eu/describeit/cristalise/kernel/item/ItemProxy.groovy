@@ -21,7 +21,7 @@ class ItemProxy {
   private UUID itemId
   private ItemDO itemDO
 
-  private Future<CompositeAction> lifeCycle
+  private Future<LifeCycle> lifeCycle
 
   private final Vertx vertx
 
@@ -62,13 +62,13 @@ class ItemProxy {
   /**
    * @return the lifecycle of this item
    */
-  Future<CompositeAction> getLifeCycle() {
+  Future<LifeCycle> getLifeCycle() {
     if (lifeCycle) return lifeCycle
 
     Long actionId = itemDO?.actionId
     if (actionId == null) return Future.succeededFuture(null)
 
-    return (Future<CompositeAction>) storage.getActionDO(actionId)
+    return storage.getActionDO(actionId)
       .compose { ActionDO actionDO ->
         log.info('getLifeCycle() - creating {}', actionDO)
         Action newAction = AbstractCompositeAction.createAction(actionDO)
@@ -79,11 +79,13 @@ class ItemProxy {
           CompositeAction compositeAction = (CompositeAction) newAction
           return compositeAction.initialise(storage)
             .compose {
-              lifeCycle = Future.succeededFuture(compositeAction)
+              def lc = new LifeCycle()
+              lc.domainActions = compositeAction
+              lifeCycle = Future.succeededFuture(lc)
               return lifeCycle
             }
         }
-      }
+      } as Future<LifeCycle>
   }
 
   /**

@@ -1,9 +1,11 @@
 package eu.describeit.cristalise.kernel.lifecycle.builtin
 
 import eu.describeit.cristalise.kernel.item.ItemProxy
+import groovy.transform.CompileStatic
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
 
+@CompileStatic
 interface BuiltInAction {
 
   default String getName() {
