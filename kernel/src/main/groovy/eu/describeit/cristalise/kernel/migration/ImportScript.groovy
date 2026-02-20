@@ -20,7 +20,7 @@ abstract class ImportScript extends DelegatingScript {
   @Override
   Object run() {
     def result = scriptBody()
-    log.info('run() - result:{}', result)
+    log.debug('run() - result:{}', result)
     return result
   }
 }

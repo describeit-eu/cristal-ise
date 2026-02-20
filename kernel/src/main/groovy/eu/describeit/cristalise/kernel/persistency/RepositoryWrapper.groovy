@@ -214,10 +214,24 @@ class RepositoryWrapper {
     return Future.all(futures).map { it.list() as List<ItemPropertyDO> }
   }
 
+  Future<ItemPropertyDO> getItemProperty(UUID itemId, String name) {
+    return itemPropertyRepository.findByItemId(itemId).compose { List<ItemPropertyDO> itemProps ->
+      if (itemProps.isEmpty()) {
+        return Future.failedFuture(new IllegalArgumentException("ItemProperty '$name' for item ${itemId} does not exists"))
+      } else {
+        ItemPropertyDO prop = itemProps.find { ItemPropertyDO prop -> prop.name == name }
+        if (prop)
+          return Future.succeededFuture(prop)
+        else
+          return Future.failedFuture(new IllegalArgumentException("ItemProperty '$name' does not exists for item ${itemId}"))
+      }
+    } as Future<ItemPropertyDO>
+  }
+
   Future<List<ItemPropertyDO>> getItemPropertiesByItemId(UUID itemId) {
     return itemPropertyRepository.findByItemId(itemId).compose { List<ItemPropertyDO> list ->
       if (list.isEmpty()) {
-        return Future.failedFuture(new IllegalArgumentException("ItemProperty for item ${itemId} does not exists"))
+        return Future.failedFuture(new IllegalArgumentException("No ItemProperty exists for item ${itemId}"))
       } else {
         return Future.succeededFuture(list)
       }

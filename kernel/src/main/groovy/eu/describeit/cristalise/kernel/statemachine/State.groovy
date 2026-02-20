@@ -26,7 +26,7 @@ class State {
 
   protected void addTransition(Transition transition) {
     transitionIds.add(transition.id)
-    log.info("Added transition {} to state {}", transition.name, name)
+    log.debug("Added transition {} to state {}", transition.name, name)
   }
 
   @JsonIgnore
