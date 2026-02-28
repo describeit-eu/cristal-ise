@@ -7,6 +7,7 @@ import eu.describeit.cristalise.kernel.persistency.repository.AbstractRepository
 import eu.describeit.cristalise.kernel.statemachine.StateMachine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import io.vertx.core.json.JsonObject
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -24,8 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @CompileStatic
 class ImportStateMachineIT extends AbstractRepositoryIT {
-
-//  private static final String parentPath = "description.$STATE_MACHINE_RESOURCE.typeCode"
 
   private ImportDescriptionObjectAction importAction
   private ItemProxy anItem
@@ -106,11 +105,8 @@ StateMachine(name: 'TestSimple', version: 'v0') {
     def result = importAction.request(anItem, null, 'StateMachineScript.groovy').await()
     log.info('Import result: {}', result)
 
-    assertEquals(2, result.getJsonArray('uuids').size())
-    assertEquals(2,  result.getJsonArray('names').size())
-    assertEquals(2,  result.getJsonArray('types').size())
-
-    assertEquals(['Default','Simple'], result.getJsonArray('names').getList())
+    result.getJsonArray('importedObjects').size() == 2
+    result.getJsonArray('importedObjects').toList().collect() { ((JsonObject)it).getString('name') } == ['Default', 'Simple']
 
     ItemProxy.create(pool, new DomainPathDO(path: 'description.StateMachine.Default')).await()
     ItemProxy.create(pool, new DomainPathDO(path: 'description.StateMachine.Simple')).await()

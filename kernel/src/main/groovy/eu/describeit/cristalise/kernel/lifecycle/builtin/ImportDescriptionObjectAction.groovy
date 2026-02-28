@@ -9,24 +9,23 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
-import io.vertx.core.Vertx
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 
 import javax.inject.Inject
 
 import java.time.LocalDateTime
-import java.util.stream.Collectors
-import java.util.stream.IntStream
 
 @Slf4j
 @CompileStatic
 class ImportDescriptionObjectAction implements BuiltInAction {
-  protected ImportScript.Factory importScriptFactory
+  private enum Status { SUCCESS, FAILED }
 
-  protected ItemProxy item
-  protected ItemProxy actor
-  protected RepositoryWrapper storage
+  private ImportScript.Factory importScriptFactory
+
+  private ItemProxy item
+  private ItemProxy actor
+  private RepositoryWrapper storage
 
   @Inject
   ImportDescriptionObjectAction(ImportScript.Factory factory) {
@@ -77,17 +76,19 @@ class ImportDescriptionObjectAction implements BuiltInAction {
         .map { CompositeFuture cf ->
           List<JsonObject> resultList = cf.list() as List<JsonObject>
 
-          def descObjsStatusJson = new JsonObject()
-          descObjsStatusJson.put('uuids', new JsonArray())
-          descObjsStatusJson.put('names', new JsonArray())
-          descObjsStatusJson.put('types', new JsonArray())
+          def importStatusJson = new JsonObject()
+
+          importStatusJson.put('action', getName())
+          importStatusJson.put('status', Status.SUCCESS)
+          importStatusJson.put('importedObjects', new JsonArray())
 
           for (aJson in resultList) {
-            descObjsStatusJson.getJsonArray('uuids').addAll(aJson.getJsonArray('uuids'))
-            descObjsStatusJson.getJsonArray('names').addAll(aJson.getJsonArray('names'))
-            descObjsStatusJson.getJsonArray('types').addAll(aJson.getJsonArray('types'))
+            importStatusJson.getJsonArray('importedObjects').add(aJson)
+            if (Status.FAILED == aJson.getValue('status')) {
+              importStatusJson.put('status', Status.FAILED)
+            }
           }
-          return descObjsStatusJson
+          return importStatusJson
         }
     } catch (Throwable t) {
       return Future.failedFuture(t)
@@ -96,11 +97,11 @@ class ImportDescriptionObjectAction implements BuiltInAction {
 
   private Future<JsonObject> importDescriptionObject(DescriptionObject descObject) {
     UUID newItemId = UUID.randomUUID()
-    log.debug('importDescriptionObject() - name:{} parentPath:{}', descObject.name, descObject.resourceType.typeRoot)
+    log.trace('importDescriptionObject() - {}/{}', descObject.name, descObject.resourceType.name())
 
     //TODO check if Item exist and if so check if Item needs to be updated (use checksum of the JSON Outcome)
 
-    return ensurePathExists(descObject.resourceType.typeRoot)
+    ensurePathExists(descObject.resourceType.typeRoot)
       .compose { createItem(newItemId, descObject) }
       .compose { createItemDomainPath(newItemId, descObject, descObject.resourceType.typeRoot) }
       .compose { createItemProperties(newItemId, descObject) }
@@ -110,14 +111,29 @@ class ImportDescriptionObjectAction implements BuiltInAction {
       .compose { createdOutcome -> createViewPoints(newItemId, createdOutcome, descObject) }
       .map {
         def descObjImportedJson = new JsonObject()
-        descObjImportedJson.put('uuids', new JsonArray().add(newItemId.toString()))
-        descObjImportedJson.put('names', new JsonArray().add(descObject.name))
-        descObjImportedJson.put('types', new JsonArray().add(descObject.resourceType.name()))
 
-        log.info('importDescriptionObject() - DONE {}', descObjImportedJson)
+        descObjImportedJson.put('action', getName())
+        descObjImportedJson.put('status', Status.SUCCESS)
+        descObjImportedJson.put('uuid', newItemId.toString())
+        descObjImportedJson.put('name', descObject.name)
+        descObjImportedJson.put('type', descObject.resourceType.name())
+
+        log.info('importDescriptionObject() - SUCCESS:{}/{}', descObject.name, descObject.resourceType.name())
 
         return descObjImportedJson
-      } as Future<JsonObject>
+      }
+      .onFailure { Throwable t ->
+        def descObjImportedJson = new JsonObject()
+
+        descObjImportedJson.put('action', getName())
+        descObjImportedJson.put('status', Status.FAILED)
+        descObjImportedJson.put('name', descObject.name)
+        descObjImportedJson.put('type', descObject.resourceType.name())
+
+        log.error('importDescriptionObject() - FAILED:{}/{}', descObject.name, descObject.resourceType.name(), t)
+
+        return descObjImportedJson
+      }
   }
 
   private Future<ItemDO> createItem(UUID newItemId, DescriptionObject descObject) {
@@ -177,7 +193,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
   }
 
   private Future<DomainPathDO> ensurePathExists(String path) {
-    return (Future<DomainPathDO>) storage.getDomainPathByPath(path).recover { Throwable err ->
+    return storage.getDomainPathByPath(path).recover { Throwable err ->
       int lastDot = path.lastIndexOf('.')
       if (lastDot > 0) {
         String parent = path.substring(0, lastDot)
