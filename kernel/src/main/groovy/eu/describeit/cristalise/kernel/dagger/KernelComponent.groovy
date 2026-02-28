@@ -24,8 +24,6 @@ interface KernelComponent {
 
   ImportScript.Factory importScriptFactory()
 
-  ImportDescriptionObjectAction importDescriptionObjectAction()
-
   Bootstrap bootstrap()
 
   ItemServiceVerticle itemServiceVerticle()

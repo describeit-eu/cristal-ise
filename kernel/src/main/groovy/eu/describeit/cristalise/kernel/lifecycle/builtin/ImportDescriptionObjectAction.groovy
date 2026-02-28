@@ -79,13 +79,13 @@ class ImportDescriptionObjectAction implements BuiltInAction {
           def importStatusJson = new JsonObject()
 
           importStatusJson.put('action', getName())
-          importStatusJson.put('status', Status.SUCCESS)
+          importStatusJson.put('status', Status.SUCCESS.name())
           importStatusJson.put('importedObjects', new JsonArray())
 
           for (aJson in resultList) {
             importStatusJson.getJsonArray('importedObjects').add(aJson)
-            if (Status.FAILED == aJson.getValue('status')) {
-              importStatusJson.put('status', Status.FAILED)
+            if (Status.FAILED.name() == aJson.getString('status')) {
+              importStatusJson.put('status', Status.FAILED.name())
             }
           }
           return importStatusJson
@@ -113,7 +113,7 @@ class ImportDescriptionObjectAction implements BuiltInAction {
         def descObjImportedJson = new JsonObject()
 
         descObjImportedJson.put('action', getName())
-        descObjImportedJson.put('status', Status.SUCCESS)
+        descObjImportedJson.put('status', Status.SUCCESS.name())
         descObjImportedJson.put('uuid', newItemId.toString())
         descObjImportedJson.put('name', descObject.name)
         descObjImportedJson.put('type', descObject.resourceType.name())
@@ -122,17 +122,17 @@ class ImportDescriptionObjectAction implements BuiltInAction {
 
         return descObjImportedJson
       }
-      .onFailure { Throwable t ->
+      .recover { Throwable t ->
         def descObjImportedJson = new JsonObject()
 
         descObjImportedJson.put('action', getName())
-        descObjImportedJson.put('status', Status.FAILED)
+        descObjImportedJson.put('status', Status.FAILED.name())
         descObjImportedJson.put('name', descObject.name)
         descObjImportedJson.put('type', descObject.resourceType.name())
 
         log.error('importDescriptionObject() - FAILED:{}/{}', descObject.name, descObject.resourceType.name(), t)
 
-        return descObjImportedJson
+        return Future.succeededFuture(descObjImportedJson)
       }
   }
 

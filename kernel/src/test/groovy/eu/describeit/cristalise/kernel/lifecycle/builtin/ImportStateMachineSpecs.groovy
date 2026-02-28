@@ -25,12 +25,7 @@ class ImportStateMachineSpecs extends Specification {
 
   def "Import StateMachine created manually"() {
     given:
-    StateMachine sm = new StateMachine('test', "TestSM", "v1.0")
-    sm.createState("Start")
-    sm.createState("End")
-    sm.createTransition('Done')
-    sm.initialState = sm.getState('Start')
-    sm.finalStateIds = [sm.getState('End').id]
+    StateMachine sm = createTestSM()
 
     and:
     storage.getDomainPathByPath(_ as String) >> Future.failedFuture("Not found")
@@ -51,13 +46,7 @@ class ImportStateMachineSpecs extends Specification {
     def result = importAction.request(item, actor, sm).await()
 
     then:
-
-    result.getString('status') == 'SUCCESS'
-    result.getString('action') == 'ImportDescriptionObject'
-    result.getString('status') == 'SUCCESS'
-    result.getString('name') == 'TestSM'
-    result.getString('type') == 'STATE_MACHINE_RESOURCE'
-    result.getString('uuid')
+    checkResult(result, 'SUCCESS', 'TestSM')
 
     and:
     1 * storage.putItemDO({ it.name == 'TestSM' && it.type == 'StateMachine' && it.version == 'v1.0' }) >> Future.succeededFuture()
@@ -65,6 +54,22 @@ class ImportStateMachineSpecs extends Specification {
     1 * storage.putEvent({ it.itemVersion == 'v1.0' && it.userLogin == 'test-actor' }) >> Future.succeededFuture(new EventDO(id: 123L))
     1 * storage.putOutcome({ it.data.getString('name') == 'TestSM' }) >> Future.succeededFuture(new OutcomeDO(id: 456L))
     1 * storage.putViewPoints(_) >> Future.succeededFuture()
+  }
+
+  def "Import StateMachine fails if item already exists"() {
+    given:
+    StateMachine sm = createTestSM()
+
+    and:
+    storage.getDomainPathByPath(_ as String) >> Future.failedFuture("Not found")
+    storage.putDomainPath(_ as DomainPathDO) >> { DomainPathDO dp -> Future.succeededFuture(dp) }
+    storage.putItemDO(_ as ItemDO) >> Future.failedFuture(new RuntimeException("Item already exists"))
+
+    when:
+    def result = importAction.request(item, actor, sm).await()
+
+    then:
+    checkResult(result, 'FAILED', 'TestSM')
   }
 
   def "Importing DSL string throws exception"() {
@@ -84,7 +89,7 @@ StateMachine(name: 'TestSimple', version: 'v0') {
     thrown(IllegalArgumentException)
   }
 
-  def "Import StateMachineScript dot groovy"() {
+  def "Import StateMachineScript dot groovy file"() {
     given:
     def scriptName = 'StateMachineScript.groovy'
 
@@ -109,7 +114,62 @@ StateMachine(name: 'TestSimple', version: 'v0') {
     def result = importAction.request(item, actor, scriptName).await()
 
     then:
+    result.getString('action') == 'ImportDescriptionObject'
+    result.getString('status') == 'SUCCESS'
     result.getJsonArray('importedObjects').size() == 2
-    result.getJsonArray('importedObjects').collect() { it.getString('name') } == ['Default', 'Simple']
+    checkResult(result.getJsonArray('importedObjects').getJsonObject(0), 'SUCCESS', 'Default')
+    checkResult(result.getJsonArray('importedObjects').getJsonObject(1), 'SUCCESS', 'Simple')
+  }
+
+  def "Import StateMachineScript dor groovy file with partial failure"() {
+    given:
+    def scriptName = 'StateMachineScript.groovy'
+
+    ImportScript script = Mock()
+    importScriptFactory.create(scriptName, _) >> script
+
+    StateMachine sm1 = new StateMachine('test', 'Default', 'v1.0')
+    StateMachine sm2 = new StateMachine('test', 'Simple', 'v1.0')
+
+    script.run() >> [sm1, sm2]
+
+    and:
+    storage.getDomainPathByPath(_ as String) >> Future.failedFuture("Not found")
+    storage.putDomainPath(_ as DomainPathDO) >> { DomainPathDO dp -> Future.succeededFuture(dp) }
+    storage.putItemDO({ it.name == 'Default' }) >> Future.succeededFuture()
+    storage.putItemDO({ it.name == 'Simple' }) >> Future.failedFuture(new RuntimeException("Item already exists"))
+
+    storage.putItemProperties(_ as List<ItemPropertyDO>) >> Future.succeededFuture()
+    storage.putEvent(_ as EventDO) >> Future.succeededFuture(new EventDO(id: 1L))
+    storage.putOutcome(_ as OutcomeDO) >> Future.succeededFuture(new OutcomeDO(id: 2L))
+    storage.putViewPoints(_ as List<ViewPointDO>) >> Future.succeededFuture()
+
+    when:
+    def result = importAction.request(item, actor, scriptName).await()
+
+    then:
+    result.getString('action') == 'ImportDescriptionObject'
+    result.getString('status') == 'FAILED'
+    result.getJsonArray('importedObjects').size() == 2
+    checkResult(result.getJsonArray('importedObjects').getJsonObject(0), 'SUCCESS', 'Default')
+    checkResult(result.getJsonArray('importedObjects').getJsonObject(1), 'FAILED', 'Simple')
+  }
+
+  private static void checkResult(JsonObject result, String status, String name, String type = 'STATE_MACHINE_RESOURCE') {
+    assert result.getString('action') == 'ImportDescriptionObject'
+    assert result.getString('status') == status
+    assert result.getString('name') == name
+    assert result.getString('type') == type
+    if (status == 'SUCCESS') assert result.getString('uuid') != null
+  }
+
+  private static StateMachine createTestSM() {
+    StateMachine sm = new StateMachine('test', "TestSM", "v1.0")
+    sm.createState("Start")
+    sm.createState("End")
+    sm.createTransition('Done')
+    sm.initialState = sm.getState('Start')
+    sm.addFinalState(sm.getState('End'))
+    return sm
   }
 }

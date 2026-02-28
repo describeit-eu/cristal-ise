@@ -26,7 +26,7 @@ class StateMachine implements DescriptionObject {
   List<Transition> transitions = []
 
   Integer initialStateId
-  List<Integer> finalStateIds
+  List<Integer> finalStateIds = []
 
   /**
    * Stores the next State id. Required for factory methods creating new State
@@ -161,5 +161,14 @@ class StateMachine implements DescriptionObject {
   @Override
   JsonObject toJson() {
     return JsonObject.mapFrom(this)
+  }
+
+  boolean addFinalState(State state) {
+    if (finalStateIds.contains(state.id)) {
+      return true
+    } else {
+      finalStateIds.add(state.id)
+      return validate()
+    }
   }
 }

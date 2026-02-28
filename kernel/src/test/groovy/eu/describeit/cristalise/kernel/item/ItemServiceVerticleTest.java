@@ -43,6 +43,8 @@ class ItemServiceVerticleTest {
       .executeUpdate(pgContainer.getJdbcUrl(), pgContainer.getUsername(), pgContainer.getPassword(), dbSchemaChangelogFiles)
       .executeUpdate(pgContainer.getJdbcUrl(), pgContainer.getUsername(), pgContainer.getPassword(), testDataChangelogFiles);
 
+    component.bootstrap().execute().await();
+
     vertx.deployVerticle(component.itemServiceVerticle(), options)
       .onComplete(
         testContext.succeeding(id -> testContext.completeNow())
